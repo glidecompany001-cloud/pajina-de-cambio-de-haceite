@@ -6,11 +6,10 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "@sendgrid/mail": "^8.1.6",
+    "@libsql/client": "^0.14.0",
+    "cookie-session": "^2.1.0",
     "dotenv": "^16.4.5",
     "express": "^4.18.2",
-    "express-session": "^1.18.0",
-    "nodemailer": "^6.9.13",
     "resend": "^6.12.2"
   }
 }
