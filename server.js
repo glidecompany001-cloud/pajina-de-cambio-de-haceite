@@ -109,6 +109,9 @@ const dbReady = (async () => {
     "ALTER TABLE appointments ADD COLUMN brake_front INTEGER DEFAULT NULL",
     "ALTER TABLE appointments ADD COLUMN brake_rear INTEGER DEFAULT NULL",
     "ALTER TABLE appointments ADD COLUMN paypal_auth_id TEXT DEFAULT NULL",
+    "ALTER TABLE appointments ADD COLUMN arrival_confirmed INTEGER DEFAULT 0",
+    "ALTER TABLE appointments ADD COLUMN payment_token TEXT DEFAULT NULL",
+    "ALTER TABLE appointments ADD COLUMN payment_status TEXT DEFAULT 'pending'",
   ]) { try { await dbExec(sql); } catch {} }
   try { await dbExec("UPDATE users SET email_verified=1 WHERE verification_token IS NULL AND email_verified=0"); } catch {}
   await buildSendGrid();
@@ -489,30 +492,10 @@ app.get('/api/admin/stats', requireAdmin, async (_req, res) => {
   res.json({ today: Number(r1.c), week: Number(r2.c), twoWeeks: Number(r3.c), pending: Number(r4.c), customers: Number(r5.c), technicians: Number(r6.c) });
 });
 
-async function capturePayPalAuth(authId) {
-  const token = await getPayPalToken();
-  if (!token) return { ok: false, error: 'PayPal no configurado' };
-  try {
-    const r = await fetch(`${await getPayPalBase()}/v2/payments/authorizations/${authId}/capture`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', 'PayPal-Request-Id': crypto.randomUUID() },
-      body: JSON.stringify({})
-    });
-    const d = await r.json();
-    if (!r.ok || (d.status !== 'COMPLETED' && d.status !== 'PENDING'))
-      return { ok: false, error: d.message || 'Captura fallida' };
-    return { ok: true };
-  } catch(e) { return { ok: false, error: e.message }; }
-}
-
 app.put('/api/admin/appointments/:id/complete', requireAdmin, async (req, res) => {
   const appt = await dbGet('SELECT * FROM appointments WHERE id=?', [+req.params.id]);
   if (!appt) return res.status(404).json({ error: 'Not found' });
   if (appt.status === 'completed') return res.status(409).json({ error: 'Ya completada' });
-  if (appt.paypal_auth_id) {
-    const capture = await capturePayPalAuth(appt.paypal_auth_id);
-    if (!capture.ok) return res.status(402).json({ error: `No se pudo cobrar el pago: ${capture.error}` });
-  }
   const { tire_fl, tire_fr, tire_rl, tire_rr, brake_front, brake_rear, mileage } = req.body || {};
   await dbRun(`UPDATE appointments SET status='completed', mileage=?,
     tire_fl=?, tire_fr=?, tire_rl=?, tire_rr=?, brake_front=?, brake_rear=? WHERE id=?`,
@@ -678,18 +661,55 @@ app.get('/api/tech/appointments', requireTech, async (req, res) => {
     [req.session.customerId, today]
   ));
 });
+app.put('/api/tech/appointments/:id/arrive', requireTech, async (req, res) => {
+  const appt = await dbGet('SELECT * FROM appointments WHERE id=? AND technician_id=?', [+req.params.id, req.session.customerId]);
+  if (!appt) return res.status(404).json({ error: 'Not found' });
+  const token = crypto.randomBytes(16).toString('hex');
+  await dbRun("UPDATE appointments SET arrival_confirmed=1, payment_token=?, payment_status='pending' WHERE id=?", [token, Number(appt.id)]);
+  const paymentUrl = `${req.protocol}://${req.get('host')}/pay/${token}`;
+  if (appt.email && resendClient) {
+    const fromEmail = await getSetting('sg_from_email') || process.env.RESEND_FROM || 'onboarding@resend.dev';
+    const fromName  = await getSetting('sg_from_name')  || 'Cambio de Aceite';
+    const price = OIL_PRICES[appt.oil_type] || '65.00';
+    const html = wrapEmailHtml('appointment_confirmed',
+      `Hola ${appt.name},\n\nTu técnico ha llegado y está listo para realizar el cambio de aceite.\n\nVehículo: ${appt.vehicle}\nServicio: Cambio de aceite ${appt.oil_type}\nMonto: $${price} USD\n\nElige cómo quieres pagar:\n\n${paymentUrl}`
+    );
+    resendClient.emails.send({ from: `${fromName} <${fromEmail}>`, to: appt.email, subject: '💳 Tu técnico llegó — Selecciona tu forma de pago', html }).catch(()=>{});
+  }
+  res.json({ success: true, paymentUrl });
+});
+
+app.put('/api/tech/appointments/:id/mark-cash', requireTech, async (req, res) => {
+  const appt = await dbGet('SELECT id FROM appointments WHERE id=? AND technician_id=?', [+req.params.id, req.session.customerId]);
+  if (!appt) return res.status(404).json({ error: 'Not found' });
+  await dbRun("UPDATE appointments SET payment_status='cash' WHERE id=?", [Number(appt.id)]);
+  res.json({ success: true });
+});
+
 app.put('/api/tech/appointments/:id/complete', requireTech, async (req, res) => {
   const appt = await dbGet('SELECT * FROM appointments WHERE id=? AND technician_id=?', [+req.params.id, req.session.customerId]);
   if (!appt) return res.status(404).json({ error: 'Not found' });
   if (appt.status === 'completed') return res.status(409).json({ error: 'Ya completada' });
-  if (appt.paypal_auth_id) {
-    const capture = await capturePayPalAuth(appt.paypal_auth_id);
-    if (!capture.ok) return res.status(402).json({ error: `No se pudo cobrar el pago: ${capture.error}` });
-  }
+  if (appt.arrival_confirmed && appt.payment_status === 'pending')
+    return res.status(402).json({ error: 'El cliente aún no ha confirmado el pago' });
   const { tire_fl, tire_fr, tire_rl, tire_rr, brake_front, brake_rear, mileage } = req.body || {};
   await dbRun(`UPDATE appointments SET status='completed', mileage=?,
     tire_fl=?, tire_fr=?, tire_rl=?, tire_rr=?, brake_front=?, brake_rear=? WHERE id=?`,
     [mileage??null,tire_fl??null,tire_fr??null,tire_rl??null,tire_rr??null,brake_front??null,brake_rear??null,Number(appt.id)]);
+  const tech = await dbGet('SELECT name FROM users WHERE id=?', [req.session.customerId]);
+  const next = await dbGet(
+    `SELECT * FROM appointments WHERE technician_id=? AND date=? AND time>? AND status='pending' ORDER BY time ASC LIMIT 1`,
+    [req.session.customerId, appt.date, appt.time]
+  );
+  if (next?.email && resendClient) {
+    const fromEmail = await getSetting('sg_from_email') || process.env.RESEND_FROM || 'onboarding@resend.dev';
+    const fromName  = await getSetting('sg_from_name')  || 'Cambio de Aceite';
+    const techName  = tech?.name || 'Tu técnico';
+    const html = wrapEmailHtml('appointment_confirmed',
+      `Hola ${next.name},\n\n${techName} terminó con el cliente anterior y está en camino a tu domicilio.\n\nPreparate para recibirlo. Tu cita es a las ${next.time}.\n\nVehículo: ${next.vehicle}\nServicio: Cambio de aceite ${next.oil_type}${next.location ? `\nDirección: ${next.location}` : ''}`
+    );
+    resendClient.emails.send({ from: `${fromName} <${fromEmail}>`, to: next.email, subject: `🚗 ${techName} va en camino a tu domicilio`, html }).catch(() => {});
+  }
   res.json({ success: true });
 });
 
@@ -750,53 +770,60 @@ app.get('/api/settings/paypal-client', async (_req, res) => {
   const clientId = await getSetting('paypal_client_id');
   res.json({ client_id: clientId || '', mode: await getSetting('paypal_mode') || 'sandbox', enabled: !!clientId });
 });
-app.post('/api/payments/create-order', requireCustomer, async (req, res) => {
-  const { oil_type } = req.body;
-  const price = OIL_PRICES[oil_type] || '65.00';
-  const token = await getPayPalToken();
-  if (!token) return res.status(503).json({ error: 'PayPal no configurado' });
+
+// ─── Token-based payment page (technician arrives → customer pays) ─────────────
+app.get('/pay/:token', async (req, res) => {
+  const appt = await dbGet('SELECT id FROM appointments WHERE payment_token=?', [req.params.token]);
+  if (!appt) return res.status(404).send('Link de pago no válido o expirado.');
+  res.sendFile(path.join(__dirname, 'views', 'pay.html'));
+});
+app.get('/api/pay/:token/info', async (req, res) => {
+  const appt = await dbGet('SELECT id,name,vehicle,oil_type,payment_status FROM appointments WHERE payment_token=?', [req.params.token]);
+  if (!appt) return res.status(404).json({ error: 'Not found' });
+  const price = OIL_PRICES[appt.oil_type] || '65.00';
+  const clientId = await getSetting('paypal_client_id');
+  res.json({ ...appt, price, paypal_client_id: clientId || '', paypal_enabled: !!clientId });
+});
+app.post('/api/pay/:token/cash', async (req, res) => {
+  const appt = await dbGet('SELECT id,payment_status FROM appointments WHERE payment_token=?', [req.params.token]);
+  if (!appt) return res.status(404).json({ error: 'Not found' });
+  if (appt.payment_status !== 'pending') return res.json({ success: true });
+  await dbRun("UPDATE appointments SET payment_status='cash' WHERE id=?", [Number(appt.id)]);
+  res.json({ success: true });
+});
+app.post('/api/pay/:token/create-paypal-order', async (req, res) => {
+  const appt = await dbGet('SELECT id,oil_type,payment_status FROM appointments WHERE payment_token=?', [req.params.token]);
+  if (!appt) return res.status(404).json({ error: 'Not found' });
+  if (appt.payment_status !== 'pending') return res.status(409).json({ error: 'Ya pagado' });
+  const price = OIL_PRICES[appt.oil_type] || '65.00';
+  const ppToken = await getPayPalToken();
+  if (!ppToken) return res.status(503).json({ error: 'PayPal no configurado' });
   try {
     const r = await fetch(`${await getPayPalBase()}/v2/checkout/orders`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', 'PayPal-Request-Id': crypto.randomUUID() },
-      body: JSON.stringify({ intent: 'AUTHORIZE', purchase_units: [{ amount: { currency_code: 'USD', value: price }, description: `Cambio de aceite — ${oil_type}` }] })
+      headers: { Authorization: `Bearer ${ppToken}`, 'Content-Type': 'application/json', 'PayPal-Request-Id': crypto.randomUUID() },
+      body: JSON.stringify({ intent: 'CAPTURE', purchase_units: [{ amount: { currency_code: 'USD', value: price }, description: `Cambio de aceite — ${appt.oil_type}` }] })
     });
     const d = await r.json();
-    if (!r.ok) return res.status(r.status).json({ error: d.message || 'Error creando orden PayPal' });
+    if (!r.ok) return res.status(r.status).json({ error: d.message || 'Error' });
     res.json({ order_id: d.id });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
-app.post('/api/payments/save-authorization', requireCustomer, async (req, res) => {
-  const { order_id, name, email, phone, vehicle, oil_type, date, time, notes, location, vehicle_id } = req.body;
-  if (!order_id || !name || !phone || !vehicle || !date || !time || !location)
-    return res.status(400).json({ error: 'Faltan campos requeridos' });
-  const u = await dbGet('SELECT email_verified FROM users WHERE id=?', [req.session.customerId]);
-  if (u && !u.email_verified) return res.status(403).json({ error: 'verify_email' });
-  const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
-  if (date < tomorrow.toISOString().split('T')[0])
-    return res.status(400).json({ error: 'Las citas deben agendarse con al menos 1 día de anticipación' });
-  const exists = await dbGet("SELECT id FROM appointments WHERE date=? AND time=? AND status='pending'", [date, time]);
-  if (exists) return res.status(409).json({ error: 'Ese horario ya está reservado' });
-  const token = await getPayPalToken();
-  if (!token) return res.status(503).json({ error: 'PayPal no configurado' });
+app.post('/api/pay/:token/capture-paypal', async (req, res) => {
+  const { order_id } = req.body;
+  const appt = await dbGet('SELECT id,payment_status FROM appointments WHERE payment_token=?', [req.params.token]);
+  if (!appt) return res.status(404).json({ error: 'Not found' });
+  if (appt.payment_status !== 'pending') return res.status(409).json({ error: 'Ya pagado' });
+  const ppToken = await getPayPalToken();
+  if (!ppToken) return res.status(503).json({ error: 'PayPal no configurado' });
   try {
-    const authRes = await fetch(`${await getPayPalBase()}/v2/checkout/orders/${order_id}/authorize`, {
-      method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', 'PayPal-Request-Id': crypto.randomUUID() }
+    const r = await fetch(`${await getPayPalBase()}/v2/checkout/orders/${order_id}/capture`, {
+      method: 'POST', headers: { Authorization: `Bearer ${ppToken}`, 'Content-Type': 'application/json' }
     });
-    const authData = await authRes.json();
-    if (!authRes.ok || authData.status !== 'COMPLETED')
-      return res.status(400).json({ error: 'La autorización no fue completada. Inténtalo de nuevo.' });
-    const authId = authData.purchase_units?.[0]?.payments?.authorizations?.[0]?.id;
-    if (!authId) return res.status(400).json({ error: 'No se pudo obtener el ID de autorización.' });
-    const r = await dbRun(
-      `INSERT INTO appointments (user_id,vehicle_id,name,email,phone,vehicle,oil_type,date,time,notes,location,is_recurring,recurrence_weeks,paypal_auth_id)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-      [req.session.customerId, vehicle_id || null, name, email || '', phone, vehicle,
-       oil_type || 'Convencional', date, time, notes || '', location, 0, 12, authId]
-    );
-    const appt = await dbGet('SELECT a.*, v.color as vehicle_color FROM appointments a LEFT JOIN vehicles v ON a.vehicle_id=v.id WHERE a.id=?', [r.lastInsertRowid]);
-    sendConfirmation(appt);
-    res.json({ success: true, id: r.lastInsertRowid });
+    const d = await r.json();
+    if (!r.ok || d.status !== 'COMPLETED') return res.status(400).json({ error: 'El pago no fue completado' });
+    await dbRun("UPDATE appointments SET payment_status='paid_online' WHERE id=?", [Number(appt.id)]);
+    res.json({ success: true });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
 app.get('/api/admin/settings/paypal/test-token', requireAdmin, async (_req, res) => {

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pago – Cambio de Aceite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box}
+    body{font-family:'DM Sans',sans-serif;background:#09090B;color:#F4F4F8;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+    .grain{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E")}
+    .orb{position:fixed;width:600px;height:600px;border-radius:50%;top:-200px;left:50%;transform:translateX(-50%);pointer-events:none;background:radial-gradient(circle,rgba(204,41,54,0.07) 0%,transparent 65%)}
+    .card{background:#111118;border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:32px;width:100%;max-width:420px;position:relative;z-index:1;box-shadow:0 32px 80px rgba(0,0,0,0.6)}
+    .logo{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+    .logo-icon{font-size:28px}
+    .logo-name{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;letter-spacing:-0.02em}
+    .title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.02em;margin-bottom:4px}
+    .subtitle{font-size:13px;color:#44445A;margin-bottom:24px}
+    .info-box{background:#18181F;border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:16px;margin-bottom:24px}
+    .info-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0}
+    .info-row:not(:last-child){border-bottom:1px solid rgba(255,255,255,0.04)}
+    .info-label{font-size:12px;color:#44445A;font-weight:500}
+    .info-value{font-size:14px;color:#C8C8D8;font-weight:600}
+    .price-row{padding-top:10px!important;margin-top:4px}
+    .price-row .info-label{font-size:13px;color:#8888A0}
+    .price-row .info-value{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#F4F4F8}
+    .section-title{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#5A5A78;margin-bottom:12px}
+    .btn-cash{width:100%;padding:15px;background:#18181F;border:2px solid rgba(255,255,255,0.08);border-radius:14px;color:#C8C8D8;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:border-color 0.15s ease,background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1);margin-bottom:12px}
+    .btn-cash:hover{border-color:rgba(255,255,255,0.18);background:#1E1E28;transform:translateY(-2px)}
+    .btn-cash:active{transform:translateY(0)}
+    #paypal-button-container{margin-top:4px}
+    .divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:#2A2A3A;font-size:12px}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.05)}
+    .success-wrap{text-align:center;padding:16px 0}
+    .success-icon{font-size:56px;margin-bottom:16px}
+    .success-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.02em;margin-bottom:8px}
+    .success-sub{font-size:14px;color:#44445A;line-height:1.6}
+    #loading{text-align:center;padding:40px 0;color:#33334A;font-size:14px}
+    #error-wrap{text-align:center;padding:40px 0;color:#CC2936;font-size:14px}
+  </style>
+</head>
+<body>
+  <div class="grain"></div>
+  <div class="orb"></div>
+  <div class="card">
+    <div class="logo">
+      <span class="logo-icon">🛢️</span>
+      <span class="logo-name">Cambio de Aceite</span>
+    </div>
+    <div id="loading">Cargando…</div>
+    <div id="error-wrap" style="display:none"></div>
+    <div id="main" style="display:none">
+      <div class="title">Pago del servicio</div>
+      <div class="subtitle" id="sub-name"></div>
+      <div class="info-box" id="info-box"></div>
+      <div class="section-title">Elige cómo pagar</div>
+      <button class="btn-cash" id="btn-cash" onclick="payCash()">
+        <span style="font-size:20px">💵</span> Pagar en efectivo
+      </button>
+      <div class="divider">o</div>
+      <div id="paypal-button-container"></div>
+    </div>
+    <div id="success" style="display:none">
+      <div class="success-wrap">
+        <div class="success-icon" id="success-icon">✅</div>
+        <div class="success-title" id="success-title">¡Pago confirmado!</div>
+        <div class="success-sub" id="success-sub">Tu pago ha sido registrado. El técnico completará el servicio en un momento.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const token = location.pathname.split('/pay/')[1];
+    let _info = null;
+
+    async function init() {
+      try {
+        const r = await fetch(`/api/pay/${token}/info`);
+        if (!r.ok) { showError('Este link de pago no es válido o ya fue usado.'); return; }
+        _info = await r.json();
+        if (_info.payment_status !== 'pending') {
+          showAlreadyPaid(_info.payment_status);
+          return;
+        }
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('main').style.display = 'block';
+        document.getElementById('sub-name').textContent = 'Hola ' + _info.name + ', tu técnico está listo';
+        document.getElementById('info-box').innerHTML = `
+          <div class="info-row"><span class="info-label">Vehículo</span><span class="info-value">${esc(_info.vehicle)}</span></div>
+          <div class="info-row"><span class="info-label">Servicio</span><span class="info-value">Cambio de aceite ${esc(_info.oil_type)}</span></div>
+          <div class="info-row price-row"><span class="info-label">Total a pagar</span><span class="info-value">$${esc(_info.price)} <span style="font-size:13px;color:#44445A;font-weight:500">USD</span></span></div>`;
+        if (_info.paypal_enabled && _info.paypal_client_id) loadPayPal(_info.paypal_client_id);
+        else document.querySelector('.divider').style.display = 'none';
+      } catch(e) { showError('Error al cargar el pago.'); }
+    }
+
+    function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+
+    function showError(msg) {
+      document.getElementById('loading').style.display = 'none';
+      const w = document.getElementById('error-wrap');
+      w.style.display = 'block';
+      w.textContent = msg;
+    }
+
+    function showAlreadyPaid(status) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('success').style.display = 'block';
+      document.getElementById('success-icon').textContent = '✅';
+      document.getElementById('success-title').textContent = '¡Ya está pagado!';
+      document.getElementById('success-sub').textContent = status === 'cash'
+        ? 'El pago en efectivo fue registrado. ¡Gracias!'
+        : 'Tu pago en línea fue procesado correctamente. ¡Gracias!';
+    }
+
+    function showSuccess(method) {
+      document.getElementById('main').style.display = 'none';
+      document.getElementById('success').style.display = 'block';
+      document.getElementById('success-icon').textContent = method === 'cash' ? '💵' : '✅';
+      document.getElementById('success-title').textContent = method === 'cash' ? 'Efectivo confirmado' : '¡Pago completado!';
+      document.getElementById('success-sub').textContent = method === 'cash'
+        ? 'Le avisamos al técnico que pagarás en efectivo. ¡Gracias!'
+        : 'Tu pago fue procesado. El técnico completará el servicio ahora.';
+    }
+
+    async function payCash() {
+      document.getElementById('btn-cash').disabled = true;
+      document.getElementById('btn-cash').textContent = 'Registrando…';
+      try {
+        const r = await fetch(`/api/pay/${token}/cash`, { method: 'POST' });
+        if (r.ok) showSuccess('cash');
+        else { document.getElementById('btn-cash').disabled = false; document.getElementById('btn-cash').innerHTML = '<span style="font-size:20px">💵</span> Pagar en efectivo'; alert('Error al registrar. Intenta de nuevo.'); }
+      } catch { document.getElementById('btn-cash').disabled = false; }
+    }
+
+    function loadPayPal(clientId) {
+      const script = document.createElement('script');
+      script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=USD&intent=capture&enable-funding=venmo,applepay`;
+      script.onload = renderPayPalButtons;
+      script.onerror = () => { document.querySelector('.divider').style.display = 'none'; };
+      document.head.appendChild(script);
+    }
+
+    function renderPayPalButtons() {
+      if (!window.paypal) return;
+      window.paypal.Buttons({
+        style: { layout: 'vertical', shape: 'rect', color: 'gold', height: 44 },
+        createOrder: async () => {
+          const r = await fetch(`/api/pay/${token}/create-paypal-order`, { method: 'POST' });
+          const d = await r.json();
+          if (!r.ok) throw new Error(d.error || 'Error');
+          return d.order_id;
+        },
+        onApprove: async (data) => {
+          const r = await fetch(`/api/pay/${token}/capture-paypal`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ order_id: data.orderID })
+          });
+          const d = await r.json();
+          if (r.ok) showSuccess('online');
+          else alert('Error al procesar el pago: ' + (d.error || 'Intenta de nuevo'));
+        },
+        onError: () => alert('Hubo un error con PayPal. Intenta de nuevo o paga en efectivo.')
+      }).render('#paypal-button-container');
+    }
+
+    init();
+  </script>
+</body>
+</html>

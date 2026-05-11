@@ -52,6 +52,16 @@
     .btn-complete:hover{background:rgba(56,161,105,0.18);transform:scale(1.04)}
     .btn-complete:active{transform:scale(0.97)}
     .btn-complete:focus-visible{outline:2px solid rgba(56,161,105,0.5);outline-offset:2px;border-radius:9px}
+    .btn-arrive{padding:9px 16px;border-radius:9px;background:rgba(74,126,200,0.1);border:1px solid rgba(74,126,200,0.2);color:#4A7EC8;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1)}
+    .btn-arrive:hover{background:rgba(74,126,200,0.18);transform:scale(1.04)}
+    .btn-arrive:active{transform:scale(0.97)}
+    .btn-cash{padding:9px 16px;border-radius:9px;background:rgba(202,138,4,0.1);border:1px solid rgba(202,138,4,0.2);color:#CA8A04;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1)}
+    .btn-cash:hover{background:rgba(202,138,4,0.18);transform:scale(1.04)}
+    .btn-cash:active{transform:scale(0.97)}
+    .pay-status{font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:3px 9px;border-radius:5px}
+    .pay-pending{background:rgba(217,119,6,0.1);border:1px solid rgba(217,119,6,0.2);color:#D97706}
+    .pay-done{background:rgba(56,161,105,0.1);border:1px solid rgba(56,161,105,0.2);color:#38A169}
+    .pay-link{font-size:12px;color:#4A7EC8;word-break:break-all;margin-top:4px}
 
     .empty{text-align:center;padding:60px 20px;color:#2A2A3A}
     .empty-icon{font-size:48px;margin-bottom:12px}
@@ -158,6 +168,28 @@
 
     let _pendingId = null;
 
+    async function markArrived(id) {
+      const btn = document.querySelector(`#card-${id} .btn-arrive`);
+      if (btn) { btn.disabled = true; btn.textContent = '…'; }
+      try {
+        const r = await fetch(`/api/tech/appointments/${id}/arrive`, { method: 'PUT', headers: { 'Content-Type': 'application/json' } });
+        const d = await r.json();
+        if (d.success) loadAppointments();
+        else { alert('Error: ' + (d.error || 'desconocido')); if (btn) { btn.disabled = false; btn.innerHTML = '📍 Llegué'; } }
+      } catch { if (btn) { btn.disabled = false; btn.innerHTML = '📍 Llegué'; } }
+    }
+
+    async function markCash(id) {
+      const btn = document.querySelector(`#card-${id} .btn-cash`);
+      if (btn) { btn.disabled = true; btn.textContent = '…'; }
+      try {
+        const r = await fetch(`/api/tech/appointments/${id}/mark-cash`, { method: 'PUT', headers: { 'Content-Type': 'application/json' } });
+        const d = await r.json();
+        if (d.success) loadAppointments();
+        else { alert('Error: ' + (d.error || 'desconocido')); if (btn) { btn.disabled = false; btn.innerHTML = '💵 Cobrado'; } }
+      } catch { if (btn) { btn.disabled = false; btn.innerHTML = '💵 Cobrado'; } }
+    }
+
     async function init(){
       try {
         const me = await fetch('/api/tech/me').then(r=>{ if(r.status===401){location.href='/auth';throw 0;} return r.json(); });
@@ -186,6 +218,20 @@
               <span class="count-lbl">${list.length} cita${list.length>1?'s':''}</span>
             </div>`;
           list.forEach(a=>{
+            const paid = a.payment_status === 'cash' || a.payment_status === 'paid_online';
+            const payLabel = a.payment_status === 'paid_online' ? '✓ Pagado en línea' : a.payment_status === 'cash' ? '✓ Efectivo' : '⏳ Sin pagar';
+            const payClass = paid ? 'pay-done' : 'pay-pending';
+            let actionBtn = '';
+            if (!a.arrival_confirmed) {
+              actionBtn = `<button class="btn-arrive" onclick="markArrived(${a.id})">📍 Llegué</button>`;
+            } else if (!paid) {
+              actionBtn = `<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+                <button class="btn-cash" onclick="markCash(${a.id})">💵 Cobrado</button>
+                ${a.payment_token?`<a class="pay-link" href="/pay/${a.payment_token}" target="_blank">Link de pago →</a>`:''}
+              </div>`;
+            } else {
+              actionBtn = `<button class="btn-complete" onclick="openModal(${a.id},'${esc(a.name)}','${esc(a.vehicle)}','${esc(a.date)}','${esc(a.time)}')">✓ Completar</button>`;
+            }
             html += `<div class="appt-card ${urgencyClass(days)}" id="card-${a.id}">
               <div class="time-pill">${esc(a.time)}</div>
               <div class="appt-info">
@@ -195,10 +241,13 @@
                   <span style="width:14px;height:14px;border-radius:3px;background:${a.vehicle_color||'#33334A'};border:1px solid rgba(255,255,255,0.18);display:inline-block;flex-shrink:0" title="${a.vehicle_color?cname(a.vehicle_color):'Sin color'}"></span>
                   🚗 ${esc(a.vehicle)}${a.vehicle_color?` <span style="font-size:11px;color:#606078">${cname(a.vehicle_color)}</span>`:''}
                 </div>
-                <div class="badge-row"><span class="badge b-oil">${esc(a.oil_type)}</span></div>
+                <div class="badge-row">
+                  <span class="badge b-oil">${esc(a.oil_type)}</span>
+                  ${a.arrival_confirmed?`<span class="pay-status ${payClass}">${payLabel}</span>`:''}
+                </div>
                 ${a.notes?`<div style="font-size:12px;color:#33334A;margin-top:6px;font-style:italic">${esc(a.notes)}</div>`:''}
               </div>
-              <button class="btn-complete" onclick="openModal(${a.id},'${esc(a.name)}','${esc(a.vehicle)}','${esc(a.date)}','${esc(a.time)}')">✓ Completar</button>
+              ${actionBtn}
             </div>`;
           });
           html += '</div>';

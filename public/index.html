@@ -659,26 +659,11 @@
 
     function renderPayPalButtons() {
       const container = document.getElementById('paypal-button-container');
-      container.innerHTML = '<div style="text-align:center;padding:20px;color:#66667A;font-size:13px">⏳ Cargando métodos de pago…</div>';
-      if (!window.paypal) {
-        let attempts = 0;
-        const wait = setInterval(() => {
-          attempts++;
-          if (window.paypal) {
-            clearInterval(wait);
-            _doRenderPayPalButtons();
-          } else if (_paypalLoadFailed || attempts > 20) {
-            clearInterval(wait);
-            container.innerHTML = `
-              <div style="text-align:center;padding:16px">
-                <div style="font-size:13px;color:#FF8090;margin-bottom:12px">⚠️ No se pudo cargar PayPal.<br>Verifica el Client ID en <a href="/admin" style="color:#4A7EC8">Admin → Pagos</a>.</div>
-                <button onclick="submitBookingFallback()" style="padding:12px 24px;background:linear-gradient(135deg,#CC2936,#A31F2B);border:none;border-radius:10px;color:white;font-size:14px;font-weight:700;cursor:pointer">Confirmar cita sin pago →</button>
-              </div>`;
-          }
-        }, 500);
-        return;
-      }
-      _doRenderPayPalButtons();
+      container.innerHTML = `
+        <button onclick="submitBookingFallback()" style="width:100%;padding:15px 24px;background:linear-gradient(135deg,#CC2936,#A31F2B);border:none;border-radius:12px;color:white;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:-0.01em;box-shadow:0 0 24px rgba(204,41,54,0.25);transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.2s ease" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 0 32px rgba(204,41,54,0.38)'" onmouseout="this.style.transform='';this.style.boxShadow='0 0 24px rgba(204,41,54,0.25)'">
+          Confirmar cita →
+        </button>
+        <p style="text-align:center;font-size:12px;color:#44445A;margin-top:10px;line-height:1.5">El pago se realiza cuando el técnico llega a tu domicilio</p>`;
     }
 
     async function submitBookingFallback() {
