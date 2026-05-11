@@ -772,6 +772,24 @@ app.post('/api/payments/capture-order', requireCustomer, async (req, res) => {
     res.json({ success: true, id: r.lastInsertRowid });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
+app.get('/api/admin/settings/paypal/test-token', requireAdmin, async (_req, res) => {
+  const clientId = await getSetting('paypal_client_id');
+  const secret   = await getSetting('paypal_client_secret');
+  const mode     = await getSetting('paypal_mode') || 'sandbox';
+  const base     = mode === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
+  if (!clientId || !secret) return res.json({ ok: false, error: 'Sin credenciales', clientId: !!clientId, secret: !!secret });
+  try {
+    const auth = Buffer.from(`${clientId}:${secret}`).toString('base64');
+    const r = await fetch(`${base}/v1/oauth2/token`, {
+      method: 'POST',
+      headers: { Authorization: `Basic ${auth}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'grant_type=client_credentials'
+    });
+    const d = await r.json();
+    res.json({ ok: !!d.access_token, status: r.status, mode, base, error: d.error, error_description: d.error_description, token_type: d.token_type });
+  } catch(e) { res.json({ ok: false, error: e.message }); }
+});
+
 app.get('/api/admin/settings/paypal', requireAdmin, async (_req, res) => {
   res.json({
     client_id: await getSetting('paypal_client_id') || '',
