@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Admin – Cambio de Aceite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family:'DM Sans',sans-serif; background:#09090B; color:#F4F4F8; min-height:100vh; }
+    .grain { position:fixed;inset:0;pointer-events:none;z-index:40;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"); }
+    .orb-1 { position:fixed;width:700px;height:700px;border-radius:50%;top:-300px;right:-200px;pointer-events:none;background:radial-gradient(circle,rgba(204,41,54,0.09) 0%,transparent 65%); }
+
+    /* Topbar */
+    .topbar { background:#111118;border-bottom:1px solid rgba(255,255,255,0.06);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30; }
+    .topbar-brand { display:flex;align-items:center;gap:10px; }
+    .topbar-brand .name { font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:-0.02em;color:#F4F4F8; }
+    .admin-chip { font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:2px 8px;border-radius:5px;background:rgba(204,41,54,0.12);border:1px solid rgba(204,41,54,0.2);color:#CC2936; }
+    .topbar-right { display:flex;align-items:center;gap:10px; }
+    .btn-link { padding:6px 14px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:#606078;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;transition:background 0.15s ease,color 0.15s ease,transform 0.15s ease;display:inline-block; }
+    .btn-link:hover { background:rgba(255,255,255,0.07);color:#C0C0D0;transform:translateY(-1px); }
+    .btn-link:active { transform:translateY(0); }
+    .btn-link:focus-visible { outline:2px solid rgba(255,255,255,0.15);outline-offset:2px;border-radius:8px; }
+
+    /* Page layout */
+    .page { max-width:1100px;margin:0 auto;padding:28px 16px 64px;position:relative;z-index:10; }
+
+    /* Stats */
+    .stats-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:24px; }
+    @media(min-width:640px) { .stats-grid { grid-template-columns:repeat(3,1fr); } }
+    @media(min-width:900px) { .stats-grid { grid-template-columns:repeat(6,1fr); } }
+    .stat-card { background:#111118;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:18px 20px;box-shadow:0 2px 12px rgba(0,0,0,0.4);cursor:pointer;transition:border-color 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.15s ease; }
+    .stat-card:hover { border-color:rgba(255,255,255,0.14);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.5); }
+    .stat-card:active { transform:translateY(0); }
+    .stat-card:focus-visible { outline:2px solid rgba(204,41,54,0.4);outline-offset:2px;border-radius:14px; }
+    .stat-card.stat-active { border-color:rgba(204,41,54,0.35);box-shadow:0 0 0 1px rgba(204,41,54,0.12) inset,0 4px 16px rgba(0,0,0,0.5); }
+    .stat-num { font-family:'Syne',sans-serif;font-size:34px;font-weight:800;letter-spacing:-0.03em;line-height:1; }
+    .stat-lbl { font-size:11px;font-weight:600;color:#44445A;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px; }
+    .num-red    { color:#CC2936; }
+    .num-amber  { color:#D97706; }
+    .num-blue   { color:#4A7EC8; }
+    .num-green  { color:#38A169; }
+    .num-purple { color:#8B5CF6; }
+    .num-teal   { color:#0D9488; }
+
+    /* Tabs */
+    .tab-bar { display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,0.07);margin-bottom:0;overflow-x:auto; }
+    .tab-btn { padding:11px 20px;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.03em;text-transform:uppercase;color:#44445A;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.15s ease,border-color 0.15s ease;white-space:nowrap; }
+    .tab-btn:hover { color:#8888A0; }
+    .tab-btn.active { color:#F4F4F8;border-bottom-color:#CC2936; }
+    .tab-btn:focus-visible { outline:2px solid rgba(204,41,54,0.4);outline-offset:2px;border-radius:4px; }
+
+    /* Panel */
+    .panel-wrap { background:#111118;border:1px solid rgba(255,255,255,0.07);border-radius:0 0 16px 16px;padding:24px;box-shadow:0 4px 24px rgba(0,0,0,0.4); }
+    .panel { display:none; }
+    .panel.active { display:block; }
+
+    /* Date group */
+    .date-group { margin-bottom:28px; }
+    .date-head { display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.05); }
+    .date-str { font-family:'Syne',sans-serif;font-size:14px;font-weight:700;letter-spacing:-0.01em;text-transform:capitalize;color:#C8C8D8; }
+    .urgency-chip { font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:3px 9px;border-radius:5px; }
+    .u-today    { background:rgba(204,41,54,0.12);border:1px solid rgba(204,41,54,0.22);color:#CC2936; }
+    .u-tomorrow { background:rgba(217,119,6,0.12);border:1px solid rgba(217,119,6,0.22);color:#D97706; }
+    .u-week     { background:rgba(202,138,4,0.1);border:1px solid rgba(202,138,4,0.2);color:#CA8A04; }
+    .u-later    { background:rgba(56,161,105,0.1);border:1px solid rgba(56,161,105,0.2);color:#38A169; }
+    .count-lbl  { margin-left:auto;font-size:12px;color:#33334A;font-weight:500; }
+
+    /* Appointment card */
+    .appt-card { display:flex;align-items:flex-start;gap:14px;background:#18181F;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:16px;margin-bottom:10px;transition:border-color 0.15s ease,box-shadow 0.15s ease; }
+    .appt-card:hover { border-color:rgba(255,255,255,0.1);box-shadow:0 4px 16px rgba(0,0,0,0.3); }
+    .appt-card.urgent  { border-left:3px solid #CC2936;background:rgba(204,41,54,0.04); }
+    .appt-card.warning { border-left:3px solid #D97706;background:rgba(217,119,6,0.04); }
+    .time-pill { background:#22222E;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:8px 12px;font-size:16px;font-weight:800;font-family:'Syne',sans-serif;color:#F4F4F8;flex-shrink:0;min-width:68px;text-align:center;font-variant-numeric:tabular-nums; }
+    .appt-info { flex:1;min-width:0; }
+    .a-name { font-size:15px;font-weight:600;color:#F4F4F8; }
+    .a-detail { font-size:13px;color:#44445A;margin-top:3px; }
+    .a-vehicle { font-size:13px;color:#606078;margin-top:3px; }
+    .badge-row { display:flex;gap:6px;flex-wrap:wrap;margin-top:8px; }
+    .badge { font-size:10px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;padding:2px 8px;border-radius:5px; }
+    .b-oil { background:rgba(202,138,4,0.1);border:1px solid rgba(202,138,4,0.2);color:#CA8A04; }
+    .b-rec { background:rgba(74,126,200,0.1);border:1px solid rgba(74,126,200,0.2);color:#4A7EC8; }
+    .b-new { background:rgba(56,161,105,0.1);border:1px solid rgba(56,161,105,0.2);color:#38A169; }
+    .b-tech { background:rgba(13,148,136,0.1);border:1px solid rgba(13,148,136,0.2);color:#0D9488; }
+    .a-notes { font-size:12px;color:#33334A;margin-top:6px;font-style:italic; }
+    .appt-actions { display:flex;flex-direction:column;gap:6px;flex-shrink:0; }
+    .btn-done { padding:8px 14px;border-radius:8px;background:rgba(56,161,105,0.1);border:1px solid rgba(56,161,105,0.2);color:#38A169;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+    .btn-done:hover { background:rgba(56,161,105,0.18);transform:scale(1.04); }
+    .btn-done:active { transform:scale(0.97); }
+    .btn-done:focus-visible { outline:2px solid rgba(56,161,105,0.5);outline-offset:2px;border-radius:8px; }
+    .btn-del { padding:8px 14px;border-radius:8px;background:rgba(204,41,54,0.08);border:1px solid rgba(204,41,54,0.15);color:#CC2936;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+    .btn-del:hover { background:rgba(204,41,54,0.14);transform:scale(1.04); }
+    .btn-del:active { transform:scale(0.97); }
+    .btn-del:focus-visible { outline:2px solid rgba(204,41,54,0.5);outline-offset:2px;border-radius:8px; }
+    .tech-assign { margin-top:10px;display:flex;align-items:center;gap:8px; }
+    .tech-assign-lbl { font-size:11px;font-weight:600;color:#44445A;text-transform:uppercase;letter-spacing:0.06em;white-space:nowrap; }
+    .tech-select { padding:5px 10px;background:#22222E;border:1px solid rgba(255,255,255,0.07);border-radius:7px;color:#C8C8D8;font-family:'DM Sans',sans-serif;font-size:12px;outline:none;cursor:pointer;transition:border-color 0.15s ease; }
+    .tech-select:focus { border-color:rgba(13,148,136,0.45); }
+
+    /* Filter bar */
+    .filter-bar { display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;align-items:center; }
+    .filter-select,.filter-input { padding:8px 12px;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:8px;color:#C8C8D8;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color 0.15s ease; }
+    .filter-select:focus,.filter-input:focus { border-color:rgba(204,41,54,0.4); }
+    .filter-input::placeholder { color:#33334A; }
+    .btn-refresh { margin-left:auto;padding:8px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px;color:#606078;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.15s ease,color 0.15s ease,transform 0.15s ease; }
+    .btn-refresh:hover { background:rgba(255,255,255,0.07);color:#C0C0D0;transform:translateY(-1px); }
+    .btn-refresh:active { transform:translateY(0); }
+    .btn-refresh:focus-visible { outline:2px solid rgba(255,255,255,0.15);outline-offset:2px;border-radius:8px; }
+
+    /* Table */
+    .tbl-wrap { overflow-x:auto; }
+    table { width:100%;border-collapse:collapse;font-size:13px;min-width:780px; }
+    th { background:#18181F;padding:10px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.07);font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#44445A; }
+    td { padding:11px 12px;border-bottom:1px solid rgba(255,255,255,0.04);color:#B0B0C8;vertical-align:middle; }
+    tr:hover td { background:rgba(255,255,255,0.02); }
+    .s-pending   { color:#4A7EC8;font-weight:600; }
+    .s-completed { color:#38A169;font-weight:600; }
+    .s-cancelled { color:#44445A;font-weight:600; }
+    .empty { text-align:center;padding:48px 20px;color:#2A2A3A; }
+    .empty-icon { font-size:48px;margin-bottom:12px; }
+
+    /* New form */
+    .form-section-title { font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#5A5A78;margin:22px 0 12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.05); }
+    .form-section-title:first-child { margin-top:0; }
+    .nf-row { display:grid;grid-template-columns:1fr 1fr;gap:14px; }
+    @media(max-width:580px) { .nf-row { grid-template-columns:1fr; } }
+    .nf-group { margin-bottom:14px; }
+    .nf-label { display:block;font-size:11px;font-weight:600;color:#5A5A78;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:7px; }
+    .nf-field { width:100%;padding:10px 13px;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:9px;color:#F4F4F8;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color 0.18s ease,box-shadow 0.18s ease; }
+    .nf-field::placeholder { color:#333345; }
+    .nf-field:focus { border-color:rgba(204,41,54,0.55);box-shadow:0 0 0 3px rgba(204,41,54,0.09); }
+    textarea.nf-field { resize:vertical;min-height:80px; }
+    .nf-error { background:rgba(204,41,54,0.08);border:1px solid rgba(204,41,54,0.22);border-radius:8px;padding:10px 14px;color:#FF8590;font-size:13px;margin-top:4px;display:none; }
+    .nf-error.show { display:block; }
+    .btn-primary-form { padding:12px 28px;background:linear-gradient(135deg,#CC2936 0%,#A31F2B 100%);border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 0 24px rgba(204,41,54,0.22),0 2px 8px rgba(0,0,0,0.45);transition:transform 0.22s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.22s ease;margin-top:20px; }
+    .btn-primary-form:hover { transform:translateY(-2px) scale(1.01);box-shadow:0 0 32px rgba(204,41,54,0.32),0 6px 16px rgba(0,0,0,0.5); }
+    .btn-primary-form:active { transform:translateY(0) scale(0.99); }
+    .btn-primary-form:focus-visible { outline:2px solid rgba(204,41,54,0.7);outline-offset:3px;border-radius:10px; }
+    .nf-hint { font-size:11px;color:#33334A;margin-top:5px; }
+
+    /* Technicians panel */
+    .tech-card { display:flex;align-items:center;gap:14px;background:#18181F;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:14px 16px;margin-bottom:10px;transition:border-color 0.15s ease; }
+    .tech-card:hover { border-color:rgba(255,255,255,0.1); }
+    .tech-avatar { width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,rgba(13,148,136,0.2),rgba(13,148,136,0.08));border:1px solid rgba(13,148,136,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0; }
+    .tech-info { flex:1;min-width:0; }
+    .tech-name { font-size:14px;font-weight:600;color:#F4F4F8; }
+    .tech-meta { font-size:12px;color:#44445A;margin-top:2px; }
+    .btn-del-tech { padding:6px 12px;border-radius:8px;background:rgba(204,41,54,0.08);border:1px solid rgba(204,41,54,0.15);color:#CC2936;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+    .btn-del-tech:hover { background:rgba(204,41,54,0.14);transform:scale(1.04); }
+    .btn-del-tech:active { transform:scale(0.97); }
+    .btn-del-tech:focus-visible { outline:2px solid rgba(204,41,54,0.5);outline-offset:2px;border-radius:8px; }
+    .btn-pass-tech { padding:6px 12px;border-radius:8px;background:rgba(13,148,136,0.08);border:1px solid rgba(13,148,136,0.18);color:#0D9488;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1);margin-right:6px; }
+    .btn-pass-tech:hover { background:rgba(13,148,136,0.14);transform:scale(1.04); }
+    .btn-pass-tech:active { transform:scale(0.97); }
+    .btn-pass-tech:focus-visible { outline:2px solid rgba(13,148,136,0.5);outline-offset:2px;border-radius:8px; }
+    .var-chip { display:inline-block;padding:3px 10px;background:#18181F;border:1px solid rgba(255,255,255,0.1);border-radius:6px;font-family:monospace;font-size:11px;color:#B0B0C8;cursor:pointer;transition:background 0.15s ease,color 0.15s ease; }
+    .var-chip:hover { background:#22222E;color:#F4F4F8; }
+    .add-tech-box { background:#18181F;border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:20px;margin-bottom:24px; }
+    .btn-add-tech { padding:10px 22px;background:rgba(13,148,136,0.1);border:1px solid rgba(13,148,136,0.22);border-radius:9px;color:#0D9488;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+    .btn-add-tech:hover { background:rgba(13,148,136,0.18);transform:scale(1.03); }
+    .btn-add-tech:active { transform:scale(0.97); }
+    .btn-add-tech:focus-visible { outline:2px solid rgba(13,148,136,0.5);outline-offset:2px;border-radius:9px; }
+
+    /* Health modal */
+    .modal-backdrop { position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:100;display:none;align-items:center;justify-content:center;padding:16px; }
+    .modal-backdrop.open { display:flex; }
+    .modal { background:#111118;border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:28px;width:100%;max-width:500px;box-shadow:0 24px 80px rgba(0,0,0,0.7);position:relative;max-height:90vh;overflow-y:auto; }
+    .modal-title { font-family:'Syne',sans-serif;font-size:18px;font-weight:800;letter-spacing:-0.02em;margin-bottom:6px; }
+    .modal-sub { font-size:13px;color:#44445A;margin-bottom:22px; }
+    .modal-close { position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);color:#606078;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s ease,color 0.15s ease; }
+    .modal-close:hover { background:rgba(255,255,255,0.1);color:#F4F4F8; }
+    .modal-close:focus-visible { outline:2px solid rgba(255,255,255,0.15);outline-offset:2px;border-radius:8px; }
+    .modal-section { font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#5A5A78;margin:20px 0 12px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.04); }
+    .mileage-row { display:flex;align-items:center;gap:12px;margin-bottom:4px; }
+    .mileage-input { flex:1;max-width:180px;padding:9px 13px;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:9px;color:#F4F4F8;font-family:'Syne',sans-serif;font-size:17px;font-weight:800;outline:none;transition:border-color 0.18s ease,box-shadow 0.18s ease; }
+    .mileage-input:focus { border-color:rgba(204,41,54,0.55);box-shadow:0 0 0 3px rgba(204,41,54,0.09); }
+    .mileage-input::placeholder { color:#333345;font-family:'DM Sans',sans-serif;font-weight:400;font-size:14px; }
+    .slider-row { display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:4px; }
+    .slider-item { display:flex;flex-direction:column;gap:6px; }
+    .slider-lbl { font-size:12px;font-weight:600;color:#8888A0; }
+    .slider-val { font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#F4F4F8;min-width:36px; }
+    .slider-header { display:flex;justify-content:space-between;align-items:center; }
+    input[type="range"] { width:100%;accent-color:#CC2936;cursor:pointer;height:4px; }
+    .modal-actions { display:flex;gap:10px;margin-top:24px; }
+    .btn-modal-confirm { flex:1;padding:12px;background:linear-gradient(135deg,#38A169,#2F855A);border:none;border-radius:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 0 20px rgba(56,161,105,0.2);transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.2s ease; }
+    .btn-modal-confirm:hover { transform:translateY(-2px) scale(1.01);box-shadow:0 0 28px rgba(56,161,105,0.32); }
+    .btn-modal-confirm:active { transform:translateY(0) scale(0.99); }
+    .btn-modal-confirm:focus-visible { outline:2px solid rgba(56,161,105,0.6);outline-offset:3px;border-radius:10px; }
+    .btn-modal-skip { padding:12px 18px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#606078;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.15s ease,color 0.15s ease,transform 0.15s ease; }
+    .btn-modal-skip:hover { background:rgba(255,255,255,0.08);color:#C0C0D0;transform:translateY(-1px); }
+    .btn-modal-skip:active { transform:translateY(0); }
+    .btn-modal-skip:focus-visible { outline:2px solid rgba(255,255,255,0.15);outline-offset:2px;border-radius:10px; }
+  </style>
+</head>
+<body>
+  <div class="grain"></div>
+  <div class="orb-1"></div>
+
+  <header class="topbar">
+    <div class="topbar-brand">
+      <span style="font-size:20px">🛢️</span>
+      <span class="name">Cambio de Aceite</span>
+      <span class="admin-chip">Admin</span>
+    </div>
+    <div class="topbar-right">
+      <a href="/" target="_blank" class="btn-link">Ver página →</a>
+      <a href="/logout" class="btn-link" style="color:#CC2936;border-color:rgba(204,41,54,0.2);background:rgba(204,41,54,0.06)">Salir</a>
+    </div>
+  </header>
+
+  <div class="page">
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card" role="button" tabindex="0" id="sc-today"   onclick="statClick('today')"   onkeydown="if(event.key==='Enter'||event.key===' ')statClick('today')">  <div class="stat-num num-red"    id="s-today">–</div><div class="stat-lbl">Hoy</div></div>
+      <div class="stat-card" role="button" tabindex="0" id="sc-week"    onclick="statClick('week')"    onkeydown="if(event.key==='Enter'||event.key===' ')statClick('week')">   <div class="stat-num num-amber"  id="s-week">–</div><div class="stat-lbl">Esta semana</div></div>
+      <div class="stat-card" role="button" tabindex="0" id="sc-two"     onclick="statClick('two')"     onkeydown="if(event.key==='Enter'||event.key===' ')statClick('two')">    <div class="stat-num num-blue"   id="s-14">–</div><div class="stat-lbl">Próximas 2 semanas</div></div>
+      <div class="stat-card" role="button" tabindex="0" id="sc-pending" onclick="statClick('pending')" onkeydown="if(event.key==='Enter'||event.key===' ')statClick('pending')"><div class="stat-num num-green"  id="s-all">–</div><div class="stat-lbl">Total pendientes</div></div>
+      <div class="stat-card" role="button" tabindex="0" id="sc-users"   onclick="statClick('users')"   onkeydown="if(event.key==='Enter'||event.key===' ')statClick('users')">  <div class="stat-num num-purple" id="s-users">–</div><div class="stat-lbl">Clientes</div></div>
+      <div class="stat-card" role="button" tabindex="0" id="sc-techs"   onclick="statClick('techs')"   onkeydown="if(event.key==='Enter'||event.key===' ')statClick('techs')">  <div class="stat-num num-teal"   id="s-techs">–</div><div class="stat-lbl">Técnicos</div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tb-upcoming" onclick="switchTab('upcoming')">Próximas 14 días</button>
+      <button class="tab-btn"        id="tb-all"      onclick="switchTab('all')">Todas las citas</button>
+      <button class="tab-btn"        id="tb-new"      onclick="switchTab('new')">+ Nueva cita</button>
+      <button class="tab-btn"        id="tb-techs"    onclick="switchTab('techs')">Técnicos</button>
+      <button class="tab-btn"        id="tb-config"   onclick="switchTab('config')">⚙️ Configuración</button>
+      <button class="tab-btn"        id="tb-pagos"    onclick="switchTab('pagos')">💳 Pagos</button>
+    </div>
+    <div class="panel-wrap">
+
+      <!-- ── Upcoming ── -->
+      <div class="panel active" id="panel-upcoming">
+        <div class="filter-bar">
+          <input type="text" class="filter-input" id="f-zip-upcoming" placeholder="Filtrar por ZIP…" oninput="loadUpcoming()" style="max-width:180px">
+          <button class="btn-refresh" onclick="document.getElementById('f-zip-upcoming').value='';loadUpcoming()">✕ Limpiar</button>
+        </div>
+        <div id="upcoming-list"><div class="empty"><div class="empty-icon">⏳</div></div></div>
+      </div>
+
+      <!-- ── All ── -->
+      <div class="panel" id="panel-all">
+        <div class="filter-bar">
+          <select class="filter-select" id="f-status" onchange="loadAll()">
+            <option value="">Todos los estados</option>
+            <option value="pending">Pendientes</option>
+            <option value="completed">Completadas</option>
+            <option value="cancelled">Canceladas</option>
+          </select>
+          <input type="text" class="filter-input" id="f-search" placeholder="Buscar por nombre…" oninput="filterRows()">
+          <input type="text" class="filter-input" id="f-zip" placeholder="Filtrar por ZIP…" oninput="filterRows()" style="max-width:180px">
+          <button class="btn-refresh" onclick="loadAll()">↺ Actualizar</button>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th><th>Hora</th><th>Nombre</th><th>Teléfono</th>
+                <th>Ubicación</th><th>Vehículo</th><th>Aceite</th>
+                <th>Técnico</th><th>Estado</th><th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="all-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── Nueva cita ── -->
+      <div class="panel" id="panel-new">
+        <div class="form-section-title">Datos del cliente</div>
+        <div class="nf-row">
+          <div class="nf-group">
+            <label class="nf-label">Nombre *</label>
+            <input class="nf-field" id="nf-name" type="text" placeholder="Nombre completo">
+          </div>
+          <div class="nf-group">
+            <label class="nf-label">Teléfono *</label>
+            <input class="nf-field" id="nf-phone" type="tel" placeholder="555-000-0000">
+          </div>
+        </div>
+        <div class="nf-group">
+          <label class="nf-label">Correo electrónico</label>
+          <input class="nf-field" id="nf-email" type="email" placeholder="correo@ejemplo.com">
+        </div>
+
+        <div class="form-section-title">Vehículo</div>
+        <div class="nf-row">
+          <div class="nf-group">
+            <label class="nf-label">Vehículo *</label>
+            <input class="nf-field" id="nf-vehicle" type="text" placeholder="Toyota Corolla 2020">
+          </div>
+          <div class="nf-group">
+            <label class="nf-label">Tipo de aceite</label>
+            <select class="nf-field" id="nf-oil">
+              <option value="Convencional">Convencional — $65 · 20% desc.</option>
+              <option value="Semi-sintético">Semi-sintético — $75 · 20% desc.</option>
+              <option value="Sintético total">Sintético total — $85 · 20% desc.</option>
+            </select>
+            <div style="font-size:11px;color:#44445A;margin-top:4px">Precio por 4.4 quarts de aceite</div>
+          </div>
+        </div>
+        <div class="nf-group">
+          <label class="nf-label">Ubicación / Dirección</label>
+          <input class="nf-field" id="nf-location" type="text" placeholder="Av. Principal 123, Col. Centro">
+        </div>
+
+        <div class="form-section-title">Horario</div>
+        <div class="nf-row">
+          <div class="nf-group">
+            <label class="nf-label">Fecha *</label>
+            <input class="nf-field" id="nf-date" type="date" onchange="loadSlots()">
+            <div class="nf-hint">Mínimo 1 día de anticipación</div>
+          </div>
+          <div class="nf-group">
+            <label class="nf-label">Hora *</label>
+            <select class="nf-field" id="nf-time">
+              <option value="">— Selecciona una fecha primero —</option>
+            </select>
+          </div>
+        </div>
+        <div class="nf-group">
+          <label class="nf-label">Técnico asignado</label>
+          <select class="nf-field" id="nf-tech">
+            <option value="">— Sin asignar —</option>
+          </select>
+        </div>
+        <div class="nf-group" style="margin-bottom:0">
+          <label class="nf-label">Notas adicionales</label>
+          <textarea class="nf-field" id="nf-notes" rows="3" placeholder="Instrucciones especiales…"></textarea>
+        </div>
+
+        <div class="nf-error" id="nf-error"></div>
+        <button class="btn-primary-form" onclick="submitNewAppt()">Crear cita →</button>
+      </div>
+
+      <!-- ── Técnicos ── -->
+      <div class="panel" id="panel-techs">
+        <div class="add-tech-box">
+          <div class="form-section-title" style="margin-top:0">Añadir técnico</div>
+          <div class="nf-row">
+            <div class="nf-group">
+              <label class="nf-label">Nombre *</label>
+              <input class="nf-field" id="tf-name" type="text" placeholder="Nombre completo">
+            </div>
+            <div class="nf-group">
+              <label class="nf-label">Teléfono</label>
+              <input class="nf-field" id="tf-phone" type="tel" placeholder="555-000-0000">
+            </div>
+          </div>
+          <div class="nf-row">
+            <div class="nf-group" style="margin-bottom:0">
+              <label class="nf-label">Correo electrónico *</label>
+              <input class="nf-field" id="tf-email" type="email" placeholder="tecnico@ejemplo.com">
+            </div>
+            <div class="nf-group" style="margin-bottom:0">
+              <label class="nf-label">Contraseña *</label>
+              <input class="nf-field" id="tf-pass" type="password" placeholder="Mínimo 6 caracteres">
+            </div>
+          </div>
+          <div class="nf-error" id="tf-error" style="margin-top:12px"></div>
+          <button class="btn-add-tech" style="margin-top:16px" onclick="addTech()">+ Añadir técnico</button>
+        </div>
+
+        <div class="form-section-title">Técnicos registrados</div>
+        <div id="techs-list"><div class="empty"><div class="empty-icon" style="font-size:32px">👨‍🔧</div><p style="color:#33334A;font-size:14px">No hay técnicos registrados</p></div></div>
+      </div>
+
+      <!-- ── Config ── -->
+      <div class="panel" id="panel-config">
+
+        <!-- Resend Setup -->
+        <div class="form-section-title" style="margin-top:0">⚡ Resend — Configuración</div>
+        <div id="sg-status" style="margin-bottom:18px"></div>
+        <div class="nf-row" style="margin-bottom:0">
+          <div class="nf-group">
+            <label class="nf-label">API Key</label>
+            <div style="position:relative">
+              <input class="nf-field" id="sg-api-key" type="password" placeholder="re_xxxxxxxxxxxx" autocomplete="off" style="padding-right:44px">
+              <button onclick="toggleApiKey()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#606078;cursor:pointer;font-size:14px;padding:2px 4px" title="Mostrar/ocultar">👁</button>
+            </div>
+            <div style="font-size:11px;color:#44445A;margin-top:5px">Déjalo vacío para no cambiar la key guardada</div>
+          </div>
+          <div class="nf-group">
+            <label class="nf-label">Nombre del remitente</label>
+            <input class="nf-field" id="sg-from-name" type="text" placeholder="Cambio de Aceite">
+          </div>
+        </div>
+        <div class="nf-group" style="margin-bottom:6px">
+          <label class="nf-label">Correo de envío (From) *</label>
+          <input class="nf-field" id="sg-from-email" type="email" placeholder="noreply@tudominio.com">
+          <div style="font-size:11px;color:#44445A;margin-top:5px">Debe estar verificado en tu cuenta de Resend (o usa <strong style="color:#8888A0">onboarding@resend.dev</strong> para pruebas)</div>
+        </div>
+        <div id="sg-error" style="font-size:13px;color:#FF8090;margin-bottom:12px;display:none"></div>
+        <div id="sg-ok" style="font-size:13px;color:#68D391;margin-bottom:12px;display:none"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+          <button class="btn-primary-form" style="margin-top:0;padding:10px 22px;font-size:13px" onclick="saveSendGridConfig()">💾 Guardar configuración</button>
+          <button onclick="testSendGrid()" style="padding:10px 18px;background:rgba(13,148,136,0.1);border:1px solid rgba(13,148,136,0.22);border-radius:9px;color:#0D9488;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background 0.15s ease">📤 Enviar correo de prueba</button>
+        </div>
+
+        <!-- Email Templates -->
+        <div class="form-section-title" style="margin-top:32px">✉️ Correos automáticos</div>
+        <p style="font-size:13px;color:#44445A;margin-bottom:16px">Escribe el mensaje en texto normal. Usa los botones de abajo para insertar información del cliente automáticamente.</p>
+
+        <div style="display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,0.07);margin-bottom:20px">
+          <button class="tab-btn active" id="tpltab-appointment_confirmed" onclick="switchTplTab('appointment_confirmed')" style="font-size:12px;padding:9px 16px">📅 Cita confirmada</button>
+          <button class="tab-btn"        id="tpltab-forgot_password"       onclick="switchTplTab('forgot_password')"       style="font-size:12px;padding:9px 16px">🔑 Recuperar contraseña</button>
+          <button class="tab-btn"        id="tpltab-email_verification"    onclick="switchTplTab('email_verification')"    style="font-size:12px;padding:9px 16px">✉️ Confirmar correo</button>
+        </div>
+
+        <div id="tpl-panel-appointment_confirmed" class="tpl-panel">
+          <div class="nf-group">
+            <label class="nf-label">Asunto del correo</label>
+            <input class="nf-field" id="tpl-subj-appointment_confirmed" type="text" placeholder="Asunto del correo">
+          </div>
+          <div style="margin-bottom:12px">
+            <div style="font-size:11px;font-weight:600;color:#5A5A78;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px">Insertar en el mensaje →</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <span class="var-chip" onclick="insertVar('tpl-body-appointment_confirmed','[nombre del cliente]')">Nombre del cliente</span>
+              <span class="var-chip" onclick="insertVar('tpl-body-appointment_confirmed','[fecha]')">Fecha</span>
+              <span class="var-chip" onclick="insertVar('tpl-body-appointment_confirmed','[hora]')">Hora</span>
+              <span class="var-chip" onclick="insertVar('tpl-body-appointment_confirmed','[vehículo]')">Vehículo</span>
+              <span class="var-chip" onclick="insertVar('tpl-body-appointment_confirmed','[tipo de aceite]')">Tipo de aceite</span>
+              <span class="var-chip" onclick="insertVar('tpl-body-appointment_confirmed','[dirección]')">Dirección</span>
+              <span class="var-chip" onclick="insertVar('tpl-body-appointment_confirmed','[notas]')">Notas</span>
+            </div>
+          </div>
+          <div class="nf-group">
+            <label class="nf-label">Mensaje del correo</label>
+            <textarea class="nf-field" id="tpl-body-appointment_confirmed" rows="10" style="resize:vertical;line-height:1.6" placeholder="Escribe aquí el mensaje que recibirá el cliente…"></textarea>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn-primary-form" style="margin-top:0;padding:10px 20px;font-size:13px" onclick="saveTpl('appointment_confirmed')">💾 Guardar</button>
+            <button onclick="previewTpl('appointment_confirmed')" style="padding:10px 16px;background:rgba(74,126,200,0.1);border:1px solid rgba(74,126,200,0.22);border-radius:9px;color:#4A7EC8;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer">👁 Vista previa</button>
+            <button onclick="resetTpl('appointment_confirmed')" style="padding:10px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:9px;color:#606078;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer">↺ Restaurar por defecto</button>
+          </div>
+          <div id="tpl-ok-appointment_confirmed" style="font-size:13px;color:#68D391;margin-top:12px;display:none"></div>
+          <div id="tpl-err-appointment_confirmed" style="font-size:13px;color:#FF8090;margin-top:12px;display:none"></div>
+        </div>
+
+        <div id="tpl-panel-forgot_password" class="tpl-panel" style="display:none">
+          <div class="nf-group">
+            <label class="nf-label">Asunto del correo</label>
+            <input class="nf-field" id="tpl-subj-forgot_password" type="text" placeholder="Asunto del correo">
+          </div>
+          <div style="margin-bottom:12px">
+            <div style="font-size:11px;font-weight:600;color:#5A5A78;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px">Insertar en el mensaje →</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <span class="var-chip" onclick="insertVar('tpl-body-forgot_password','[nombre del cliente]')">Nombre del cliente</span>
+              <span class="var-chip" onclick="insertVar('tpl-body-forgot_password','[enlace de recuperación]')">Enlace para cambiar contraseña</span>
+            </div>
+          </div>
+          <div class="nf-group">
+            <label class="nf-label">Mensaje del correo</label>
+            <textarea class="nf-field" id="tpl-body-forgot_password" rows="10" style="resize:vertical;line-height:1.6" placeholder="Escribe aquí el mensaje que recibirá el cliente…"></textarea>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn-primary-form" style="margin-top:0;padding:10px 20px;font-size:13px" onclick="saveTpl('forgot_password')">💾 Guardar</button>
+            <button onclick="previewTpl('forgot_password')" style="padding:10px 16px;background:rgba(74,126,200,0.1);border:1px solid rgba(74,126,200,0.22);border-radius:9px;color:#4A7EC8;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer">👁 Vista previa</button>
+            <button onclick="resetTpl('forgot_password')" style="padding:10px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:9px;color:#606078;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer">↺ Restaurar por defecto</button>
+          </div>
+          <div id="tpl-ok-forgot_password" style="font-size:13px;color:#68D391;margin-top:12px;display:none"></div>
+          <div id="tpl-err-forgot_password" style="font-size:13px;color:#FF8090;margin-top:12px;display:none"></div>
+        </div>
+
+        <div id="tpl-panel-email_verification" class="tpl-panel" style="display:none">
+          <div class="nf-group">
+            <label class="nf-label">Asunto del correo</label>
+            <input class="nf-field" id="tpl-subj-email_verification" type="text" placeholder="Asunto del correo">
+          </div>
+          <div style="margin-bottom:12px">
+            <div style="font-size:11px;font-weight:600;color:#5A5A78;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px">Insertar en el mensaje →</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <span class="var-chip" onclick="insertVar('tpl-body-email_verification','[nombre del cliente]')">Nombre del cliente</span>
+              <span class="var-chip" onclick="insertVar('tpl-body-email_verification','[enlace de verificación]')">Enlace para confirmar correo</span>
+            </div>
+          </div>
+          <div class="nf-group">
+            <label class="nf-label">Mensaje del correo</label>
+            <textarea class="nf-field" id="tpl-body-email_verification" rows="10" style="resize:vertical;line-height:1.6" placeholder="Escribe aquí el mensaje que recibirá el cliente…"></textarea>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn-primary-form" style="margin-top:0;padding:10px 20px;font-size:13px" onclick="saveTpl('email_verification')">💾 Guardar</button>
+            <button onclick="previewTpl('email_verification')" style="padding:10px 16px;background:rgba(74,126,200,0.1);border:1px solid rgba(74,126,200,0.22);border-radius:9px;color:#4A7EC8;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer">👁 Vista previa</button>
+            <button onclick="resetTpl('email_verification')" style="padding:10px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:9px;color:#606078;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer">↺ Restaurar por defecto</button>
+          </div>
+          <div id="tpl-ok-email_verification" style="font-size:13px;color:#68D391;margin-top:12px;display:none"></div>
+          <div id="tpl-err-email_verification" style="font-size:13px;color:#FF8090;margin-top:12px;display:none"></div>
+        </div>
+
+      </div>
+
+      <!-- ── Pagos ── -->
+      <div class="panel" id="panel-pagos">
+
+        <!-- Status banner -->
+        <div id="pp-status" style="margin-bottom:20px"></div>
+
+        <div class="form-section-title" style="margin-top:0">💳 PayPal — Configuración</div>
+        <p style="font-size:13px;color:#44445A;margin-bottom:20px;line-height:1.6">
+          Los pagos van directamente a tu cuenta PayPal Business. Obtén tus credenciales en
+          <a href="https://developer.paypal.com/dashboard/" target="_blank" rel="noopener" style="color:#4A7EC8;text-decoration:underline">developer.paypal.com/dashboard</a>
+          → Apps &amp; Credentials → crea una app y copia el Client ID y Secret.
+        </p>
+
+        <!-- Mode toggle -->
+        <div style="margin-bottom:20px">
+          <div style="font-size:11px;font-weight:600;color:#5A5A78;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px">Modo</div>
+          <div style="display:flex;gap:8px">
+            <button id="pp-mode-sandbox" onclick="setPPMode('sandbox')" style="padding:8px 20px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s ease;background:rgba(204,41,54,0.12);border:1px solid rgba(204,41,54,0.3);color:#CC2936">🧪 Sandbox (pruebas)</button>
+            <button id="pp-mode-live"    onclick="setPPMode('live')"    style="padding:8px 20px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s ease;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:#606078">🚀 Live (producción)</button>
+          </div>
+          <input type="hidden" id="pp-mode" value="sandbox">
+        </div>
+
+        <div class="nf-row" style="margin-bottom:0">
+          <div class="nf-group">
+            <label class="nf-label">Client ID *</label>
+            <input class="nf-field" id="pp-client-id" type="text" placeholder="AYlC…" autocomplete="off">
+            <div style="font-size:11px;color:#44445A;margin-top:5px">Lo encuentras en PayPal Developer → tu App → Client ID</div>
+          </div>
+          <div class="nf-group">
+            <label class="nf-label">Client Secret *</label>
+            <div style="position:relative">
+              <input class="nf-field" id="pp-client-secret" type="password" placeholder="EK5p…" autocomplete="off" style="padding-right:44px">
+              <button onclick="togglePPSecret()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#606078;cursor:pointer;font-size:14px;padding:2px 4px" title="Mostrar/ocultar">👁</button>
+            </div>
+            <div style="font-size:11px;color:#44445A;margin-top:5px">Déjalo vacío para no cambiar el secreto guardado</div>
+          </div>
+        </div>
+
+        <div id="pp-error" style="font-size:13px;color:#FF8090;margin-bottom:12px;margin-top:12px;display:none"></div>
+        <div id="pp-ok"    style="font-size:13px;color:#68D391;margin-bottom:12px;margin-top:12px;display:none"></div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+          <button class="btn-primary-form" style="margin-top:0;padding:10px 22px;font-size:13px" onclick="savePayPalConfig()">💾 Guardar configuración</button>
+        </div>
+
+        <!-- Info box -->
+        <div style="margin-top:28px;padding:16px 20px;background:rgba(74,126,200,0.07);border:1px solid rgba(74,126,200,0.18);border-radius:12px">
+          <div style="font-size:12px;font-weight:700;color:#4A7EC8;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px">Métodos de pago habilitados</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8888A0"><span>🟡</span> PayPal</div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8888A0"><span>🔵</span> Google Pay</div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8888A0"><span>⚫</span> Apple Pay</div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8888A0"><span>🔵</span> Venmo</div>
+          </div>
+          <div style="font-size:11px;color:#44445A;margin-top:8px">Google Pay y Apple Pay aparecen automáticamente según el dispositivo y navegador del cliente. Apple Pay requiere HTTPS.</div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Complete / health modal -->
+  <div class="modal-backdrop" id="health-modal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()" aria-label="Cerrar">✕</button>
+      <div class="modal-title">✓ Completar servicio</div>
+      <div class="modal-sub" id="modal-appt-info">Registra el estado del vehículo (opcional)</div>
+
+      <div class="modal-section">Millaje del vehículo</div>
+      <div class="mileage-row">
+        <input type="number" class="mileage-input" id="sl-mileage" placeholder="Ej. 45000" min="0" max="999999" step="100"
+          oninput="document.getElementById('modal-mileage-err').style.display='none'">
+        <span style="font-size:12px;color:#44445A">km</span>
+      </div>
+      <div id="modal-mileage-err" style="font-size:12px;color:#FF8090;margin-top:6px;display:none">
+        ⚠️ El millaje es requerido para completar el servicio
+      </div>
+
+      <div class="modal-section">Desgaste de neumáticos <span style="font-size:11px;color:#44445A;font-weight:400">(0 = agotado · 100 = nuevo)</span></div>
+      <div class="slider-row">
+        <div class="slider-item"><div class="slider-header"><span class="slider-lbl">Conductor Delantero</span></div><div style="display:flex;align-items:center;gap:6px"><input type="number" id="sl-fl" min="0" max="100" placeholder="—" style="width:100%;padding:8px 10px;background:#18181F;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#F4F4F8;font-size:15px;font-weight:700;outline:none;text-align:center"><span style="font-size:12px;color:#44445A;flex-shrink:0">%</span></div></div>
+        <div class="slider-item"><div class="slider-header"><span class="slider-lbl">Pasajero Delantero</span></div><div style="display:flex;align-items:center;gap:6px"><input type="number" id="sl-fr" min="0" max="100" placeholder="—" style="width:100%;padding:8px 10px;background:#18181F;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#F4F4F8;font-size:15px;font-weight:700;outline:none;text-align:center"><span style="font-size:12px;color:#44445A;flex-shrink:0">%</span></div></div>
+        <div class="slider-item"><div class="slider-header"><span class="slider-lbl">Conductor Trasero</span></div><div style="display:flex;align-items:center;gap:6px"><input type="number" id="sl-rl" min="0" max="100" placeholder="—" style="width:100%;padding:8px 10px;background:#18181F;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#F4F4F8;font-size:15px;font-weight:700;outline:none;text-align:center"><span style="font-size:12px;color:#44445A;flex-shrink:0">%</span></div></div>
+        <div class="slider-item"><div class="slider-header"><span class="slider-lbl">Pasajero Trasero</span></div><div style="display:flex;align-items:center;gap:6px"><input type="number" id="sl-rr" min="0" max="100" placeholder="—" style="width:100%;padding:8px 10px;background:#18181F;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#F4F4F8;font-size:15px;font-weight:700;outline:none;text-align:center"><span style="font-size:12px;color:#44445A;flex-shrink:0">%</span></div></div>
+      </div>
+
+      <div class="modal-section">Pastillas de freno <span style="font-size:11px;color:#44445A;font-weight:400">(0 = agotado · 100 = nuevo)</span></div>
+      <div class="slider-row">
+        <div class="slider-item"><div class="slider-header"><span class="slider-lbl">Frenos delanteros</span></div><div style="display:flex;align-items:center;gap:6px"><input type="number" id="sl-bf" min="0" max="100" placeholder="—" style="width:100%;padding:8px 10px;background:#18181F;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#F4F4F8;font-size:15px;font-weight:700;outline:none;text-align:center"><span style="font-size:12px;color:#44445A;flex-shrink:0">%</span></div></div>
+        <div class="slider-item"><div class="slider-header"><span class="slider-lbl">Frenos traseros</span></div><div style="display:flex;align-items:center;gap:6px"><input type="number" id="sl-br" min="0" max="100" placeholder="—" style="width:100%;padding:8px 10px;background:#18181F;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#F4F4F8;font-size:15px;font-weight:700;outline:none;text-align:center"><span style="font-size:12px;color:#44445A;flex-shrink:0">%</span></div></div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-modal-confirm" onclick="confirmComplete()">✓ Guardar y completar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tech password modal -->
+  <div class="modal-backdrop" id="tech-pass-modal" style="display:none;align-items:center;justify-content:center" onclick="if(event.target===this)closeTechPassModal()">
+    <div class="modal" style="max-width:380px">
+      <button class="modal-close" onclick="closeTechPassModal()" aria-label="Cerrar">✕</button>
+      <div class="modal-title">🔑 Cambiar contraseña</div>
+      <div class="modal-sub" id="tech-pass-name" style="margin-bottom:20px"></div>
+      <div style="margin-bottom:14px">
+        <label class="nf-label">Nueva contraseña</label>
+        <input class="nf-field" type="password" id="tp-pass" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+      </div>
+      <div style="margin-bottom:6px">
+        <label class="nf-label">Confirmar contraseña</label>
+        <input class="nf-field" type="password" id="tp-confirm" placeholder="Repite la contraseña" autocomplete="new-password">
+      </div>
+      <div id="tp-error" style="font-size:12px;color:#FF8090;margin-bottom:14px;display:none"></div>
+      <div class="modal-actions" style="margin-top:10px">
+        <button class="btn-modal-confirm" onclick="saveTechPassword()">Guardar contraseña</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function esc(s) { return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    const _CN = {'#1a1a1a':'Negro','#F5F5F0':'Blanco','#9ca3af':'Gris plata','#6b7280':'Gris oscuro','#b91c1c':'Rojo','#1d4ed8':'Azul','#0f766e':'Verde','#d97706':'Dorado','#92400e':'Café','#7c3aed':'Morado','#0e7490':'Azul marino','#be185d':'Borgoña','#f97316':'Naranja','#713f12':'Bronce','#4a5568':'Gris pizarra','#c0c0c0':'Plata'};
+    function cname(h){ return _CN[h] || h; }
+    function daysDiff(dateStr) {
+      const t=new Date();t.setHours(0,0,0,0);
+      const d=new Date(dateStr+'T12:00:00');d.setHours(0,0,0,0);
+      return Math.round((d-t)/86400000);
+    }
+    function fmtDate(dateStr) { return new Date(dateStr+'T12:00:00').toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'}); }
+    function urgencyChip(days) {
+      if(days===0) return '<span class="urgency-chip u-today">Hoy</span>';
+      if(days===1) return '<span class="urgency-chip u-tomorrow">Mañana</span>';
+      if(days<=7)  return '<span class="urgency-chip u-week">Esta semana</span>';
+      return '<span class="urgency-chip u-later">Próxima semana</span>';
+    }
+    function urgencyClass(days) { return days<=1?'urgent':days<=3?'warning':''; }
+
+    const ALL_TABS = ['upcoming','all','new','techs','config','pagos'];
+
+    function switchTab(t) {
+      ALL_TABS.forEach(tab => {
+        document.getElementById('tb-'+tab).classList.toggle('active', tab===t);
+        document.getElementById('panel-'+tab).classList.toggle('active', tab===t);
+      });
+      if(t==='all')    loadAll();
+      if(t==='new')    initNewForm();
+      if(t==='techs')  loadTechs();
+      if(t==='config') loadSendGridConfig();
+      if(t==='pagos')  loadPayPalConfig();
+    }
+
+    function toggleApiKey() {
+      const f = document.getElementById('sg-api-key');
+      f.type = f.type === 'password' ? 'text' : 'password';
+    }
+
+    // ── PayPal config ──────────────────────────────────────────────────────────
+    let _ppMode = 'sandbox';
+
+    function setPPMode(mode) {
+      _ppMode = mode;
+      document.getElementById('pp-mode').value = mode;
+      const sandboxBtn = document.getElementById('pp-mode-sandbox');
+      const liveBtn    = document.getElementById('pp-mode-live');
+      if (mode === 'sandbox') {
+        sandboxBtn.style.background = 'rgba(204,41,54,0.12)'; sandboxBtn.style.borderColor = 'rgba(204,41,54,0.3)'; sandboxBtn.style.color = '#CC2936';
+        liveBtn.style.background    = 'rgba(255,255,255,0.04)'; liveBtn.style.borderColor = 'rgba(255,255,255,0.07)'; liveBtn.style.color = '#606078';
+      } else {
+        liveBtn.style.background    = 'rgba(56,161,105,0.12)'; liveBtn.style.borderColor = 'rgba(56,161,105,0.3)'; liveBtn.style.color = '#38A169';
+        sandboxBtn.style.background = 'rgba(255,255,255,0.04)'; sandboxBtn.style.borderColor = 'rgba(255,255,255,0.07)'; sandboxBtn.style.color = '#606078';
+      }
+    }
+
+    function togglePPSecret() {
+      const f = document.getElementById('pp-client-secret');
+      f.type = f.type === 'password' ? 'text' : 'password';
+    }
+
+    async function loadPayPalConfig() {
+      try {
+        const d = await fetch('/api/admin/settings/paypal').then(r => r.json());
+        document.getElementById('pp-client-id').value = d.client_id || '';
+        setPPMode(d.mode || 'sandbox');
+        document.getElementById('pp-status').innerHTML = d.configured
+          ? `<div style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:rgba(56,161,105,0.1);border:1px solid rgba(56,161,105,0.25);border-radius:8px;font-size:13px;color:#38A169">✅ PayPal configurado — pagos activos en modo <strong>${d.mode}</strong></div>`
+          : `<div style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:rgba(217,119,6,0.1);border:1px solid rgba(217,119,6,0.25);border-radius:8px;font-size:13px;color:#D97706">⚠️ PayPal no configurado — ingresa tu Client ID y Secret para activar los pagos</div>`;
+        if (d.client_secret_set) {
+          document.getElementById('pp-client-secret').placeholder = '●●●●●●●● (guardado)';
+        }
+      } catch {}
+    }
+
+    async function savePayPalConfig() {
+      const client_id     = document.getElementById('pp-client-id').value.trim();
+      const client_secret = document.getElementById('pp-client-secret').value.trim();
+      const mode          = document.getElementById('pp-mode').value;
+      const errEl = document.getElementById('pp-error');
+      const okEl  = document.getElementById('pp-ok');
+      errEl.style.display = 'none'; okEl.style.display = 'none';
+      if (!client_id) { errEl.textContent = 'El Client ID es requerido'; errEl.style.display = 'block'; return; }
+      try {
+        const r = await fetch('/api/admin/settings/paypal', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ client_id, client_secret, mode })
+        });
+        const d = await r.json();
+        if (!r.ok) { errEl.textContent = d.error || 'Error guardando'; errEl.style.display = 'block'; return; }
+        okEl.textContent = '✅ Configuración guardada. Los pagos están activos.';
+        okEl.style.display = 'block';
+        loadPayPalConfig();
+      } catch { errEl.textContent = 'Error de red'; errEl.style.display = 'block'; }
+    }
+
+    async function loadSendGridConfig() {
+      try {
+        const d = await fetch('/api/admin/settings/sendgrid').then(r=>r.json());
+        document.getElementById('sg-from-email').value = d.from_email || '';
+        document.getElementById('sg-from-name').value  = d.from_name  || '';
+        document.getElementById('sg-status').innerHTML = d.configured
+          ? `<div style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:rgba(56,161,105,0.1);border:1px solid rgba(56,161,105,0.25);border-radius:8px;font-size:13px;color:#38A169">✅ Resend configurado — correos activos desde <strong>${d.from_email}</strong></div>`
+          : `<div style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:rgba(204,41,54,0.08);border:1px solid rgba(204,41,54,0.2);border-radius:8px;font-size:13px;color:#FF8090">⚠️ Resend no configurado — ingresa tu API key para activar los correos</div>`;
+        loadTemplates();
+      } catch {}
+    }
+
+    async function saveSendGridConfig() {
+      const api_key    = document.getElementById('sg-api-key').value.trim();
+      const from_email = document.getElementById('sg-from-email').value.trim();
+      const from_name  = document.getElementById('sg-from-name').value.trim();
+      const errEl = document.getElementById('sg-error');
+      const okEl  = document.getElementById('sg-ok');
+      errEl.style.display = 'none'; okEl.style.display = 'none';
+      if (!from_email) { errEl.textContent = 'El correo de envío es requerido.'; errEl.style.display='block'; return; }
+      try {
+        const r = await fetch('/api/admin/settings/sendgrid', {
+          method:'PUT', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ api_key, from_email, from_name })
+        }).then(r=>r.json());
+        if (r.success) {
+          document.getElementById('sg-api-key').value = '';
+          okEl.textContent = r.configured ? '✅ Configuración guardada. Resend activo.' : '✅ Guardado. Ingresa una API key válida para activar envíos.';
+          okEl.style.display = 'block';
+          loadSendGridConfig();
+        } else { errEl.textContent = r.error || 'Error al guardar.'; errEl.style.display='block'; }
+      } catch { errEl.textContent = 'Error de conexión.'; errEl.style.display='block'; }
+    }
+
+    async function testSendGrid() {
+      const okEl  = document.getElementById('sg-ok');
+      const errEl = document.getElementById('sg-error');
+      okEl.style.display='none'; errEl.style.display='none';
+      okEl.textContent = '⏳ Enviando correo de prueba…'; okEl.style.display='block';
+      try {
+        const r = await fetch('/api/admin/settings/sendgrid/test', { method:'POST' }).then(r=>r.json());
+        if (r.success) { okEl.textContent = '✅ Correo de prueba enviado — revisa tu bandeja de entrada.'; }
+        else { okEl.style.display='none'; errEl.textContent = r.error || 'No se pudo enviar.'; errEl.style.display='block'; }
+      } catch { okEl.style.display='none'; errEl.textContent = 'Error de conexión.'; errEl.style.display='block'; }
+    }
+
+    // ── Template management ──────────────────────────────────────────────────
+    const TPL_TYPES = ['appointment_confirmed','forgot_password','email_verification'];
+
+    function switchTplTab(type) {
+      TPL_TYPES.forEach(t => {
+        document.getElementById('tpltab-'+t).classList.toggle('active', t===type);
+        document.getElementById('tpl-panel-'+t).style.display = t===type ? 'block' : 'none';
+      });
+    }
+
+    async function loadTemplates() {
+      try {
+        const data = await fetch('/api/admin/email-templates').then(r=>r.json());
+        TPL_TYPES.forEach(type => {
+          if (!data[type]) return;
+          document.getElementById('tpl-subj-'+type).value = data[type].subject || '';
+          document.getElementById('tpl-body-'+type).value = data[type].body    || '';
+        });
+      } catch {}
+    }
+
+    async function saveTpl(type) {
+      const subject = document.getElementById('tpl-subj-'+type).value.trim();
+      const body    = document.getElementById('tpl-body-'+type).value.trim();
+      const okEl    = document.getElementById('tpl-ok-'+type);
+      const errEl   = document.getElementById('tpl-err-'+type);
+      okEl.style.display='none'; errEl.style.display='none';
+      if (!subject || !body) { errEl.textContent='Asunto y cuerpo son requeridos.'; errEl.style.display='block'; return; }
+      try {
+        const r = await fetch('/api/admin/email-templates/'+type, {
+          method:'PUT', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ subject, body })
+        }).then(r=>r.json());
+        if (r.success) { okEl.textContent='✅ Plantilla guardada.'; okEl.style.display='block'; }
+        else { errEl.textContent = r.error || 'Error al guardar.'; errEl.style.display='block'; }
+      } catch { errEl.textContent='Error de conexión.'; errEl.style.display='block'; }
+    }
+
+    async function resetTpl(type) {
+      if (!confirm('¿Restaurar la plantilla por defecto?')) return;
+      try {
+        const r = await fetch('/api/admin/email-templates/'+type, { method:'DELETE' }).then(r=>r.json());
+        if (r.success && r.default) {
+          document.getElementById('tpl-subj-'+type).value = r.default.subject;
+          document.getElementById('tpl-body-'+type).value = r.default.body;
+          const okEl = document.getElementById('tpl-ok-'+type);
+          okEl.textContent = '↺ Plantilla restaurada al diseño por defecto.'; okEl.style.display='block';
+          setTimeout(()=>{ okEl.style.display='none'; }, 3000);
+        }
+      } catch {}
+    }
+
+    function previewTpl(type) {
+      const body = document.getElementById('tpl-body-'+type).value;
+      const subj = document.getElementById('tpl-subj-'+type).value;
+      const friendly = {
+        '[nombre del cliente]': 'María García',
+        '[fecha]': 'Lunes 5 de enero de 2026',
+        '[hora]': '10:00 AM',
+        '[vehículo]': 'Honda Civic 2021',
+        '[tipo de aceite]': 'Sintético — $85',
+        '[dirección]': '📍 123 Main St',
+        '[notas]': '📝 Revisar filtro de aceite',
+        '[enlace de recuperación]': 'https://ejemplo.com/reset-password?token=abc123',
+        '[enlace de verificación]': 'https://ejemplo.com/verify-email?token=abc123',
+      };
+      let preview = body;
+      for (const [k, v] of Object.entries(friendly)) preview = preview.split(k).join(v);
+      preview = preview.replace(/\{\{(\w+)\}\}/g, (_, k) => friendly['['+k+']'] || k);
+
+      if (!preview.trim().startsWith('<')) {
+        const meta = {
+          appointment_confirmed: { icon:'🛢️', title:'¡Cita Confirmada!' },
+          forgot_password:       { icon:'🔑', title:'Restablecer contraseña' },
+          email_verification:    { icon:'✉️', title:'Confirma tu correo' },
+        };
+        const { icon, title } = meta[type] || { icon:'📧', title:'Mensaje' };
+        const inner = preview.split('\n').map(line => {
+          const t = line.trim();
+          if (!t) return '<div style="height:6px"></div>';
+          if (t.startsWith('http://') || t.startsWith('https://'))
+            return `<div style="text-align:center;margin:16px 0"><a href="${t}" style="display:inline-block;background:linear-gradient(135deg,#CC2936,#A31F2B);color:white;padding:13px 28px;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px">Abrir enlace</a></div>`;
+          return `<p style="font-size:15px;color:#333;margin:0 0 10px;line-height:1.5">${t}</p>`;
+        }).join('');
+        preview = `<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;border-radius:16px;overflow:hidden"><div style="background:linear-gradient(135deg,#CC2936,#A31F2B);padding:32px;text-align:center"><div style="font-size:48px">${icon}</div><h1 style="color:white;font-size:22px;margin:12px 0 0;font-family:Arial,sans-serif">${title}</h1></div><div style="background:#f8f9fa;padding:28px;border:1px solid #e9ecef;border-top:none;border-radius:0 0 16px 16px">${inner}<p style="text-align:center;font-size:12px;color:#999;margin:16px 0 0">¡Gracias por tu preferencia!</p></div></div>`;
+      }
+      const win = window.open('','_blank','width=640,height=700');
+      win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Vista previa — ${esc(subj)}</title><style>body{margin:0;padding:24px;background:#e9ecef;font-family:Arial,sans-serif}</style></head><body>${preview}</body></html>`);
+      win.document.close();
+    }
+
+    function insertVar(fieldId, v) {
+      const el = document.getElementById(fieldId);
+      const s = el.selectionStart, e = el.selectionEnd;
+      el.value = el.value.slice(0,s) + v + el.value.slice(e);
+      el.selectionStart = el.selectionEnd = s + v.length;
+      el.focus();
+    }
+
+    // ── Stats ──────────────────────────────────────────────────────────────────
+    async function loadStats() {
+      try {
+        const s = await fetch('/api/admin/stats').then(r=>r.json());
+        document.getElementById('s-today').textContent  = s.today;
+        document.getElementById('s-week').textContent   = s.week;
+        document.getElementById('s-14').textContent     = s.twoWeeks;
+        document.getElementById('s-all').textContent    = s.pending;
+        document.getElementById('s-users').textContent  = s.customers ?? s.users ?? '–';
+        document.getElementById('s-techs').textContent  = s.technicians ?? '–';
+      } catch {}
+    }
+
+    function statClick(type) {
+      document.querySelectorAll('.stat-card').forEach(c=>c.classList.remove('stat-active'));
+      const map={today:'sc-today',week:'sc-week',two:'sc-two',pending:'sc-pending',users:'sc-users',techs:'sc-techs'};
+      document.getElementById(map[type])?.classList.add('stat-active');
+      if(type==='pending') {
+        switchTab('all');
+        document.getElementById('f-status').value='pending';
+        loadAll();
+      } else if(type==='users') {
+        switchTab('all');
+        document.getElementById('f-status').value='';
+        loadAll();
+      } else if(type==='techs') {
+        switchTab('techs');
+      } else {
+        _upcomingFilter=type;
+        switchTab('upcoming');
+        loadUpcoming();
+      }
+      setTimeout(()=>document.querySelector('.tab-bar').scrollIntoView({behavior:'smooth',block:'start'}),80);
+    }
+
+    // ── Technicians cache ──────────────────────────────────────────────────────
+    let _techs = [];
+
+    async function fetchTechs() {
+      try { _techs = await fetch('/api/admin/technicians').then(r=>r.json()); } catch {}
+    }
+
+    function renderTechOptions(selectedId) {
+      return '<option value="">Sin asignar</option>' +
+        _techs.map(t=>`<option value="${t.id}"${t.id==selectedId?' selected':''}>${esc(t.name)}</option>`).join('');
+    }
+
+    async function assignTech(apptId, techId) {
+      try {
+        await fetch(`/api/admin/appointments/${apptId}/assign`,{
+          method:'PUT', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ technician_id: techId || null })
+        });
+      } catch { alert('Error al asignar técnico'); }
+    }
+
+    // ── Upcoming ───────────────────────────────────────────────────────────────
+    let _upcomingFilter = null;
+
+    async function loadUpcoming() {
+      const wrap = document.getElementById('upcoming-list');
+      try {
+        let appts = await fetch('/api/admin/appointments/upcoming').then(r=>r.json());
+        if(_upcomingFilter) {
+          const todayStr=new Date().toISOString().split('T')[0];
+          const d7=new Date(); d7.setDate(d7.getDate()+7);
+          if(_upcomingFilter==='today') appts=appts.filter(a=>a.date===todayStr);
+          else if(_upcomingFilter==='week') appts=appts.filter(a=>a.date<=d7.toISOString().split('T')[0]);
+        }
+        const zipQ=(document.getElementById('f-zip-upcoming')?.value||'').trim().toLowerCase();
+        if(zipQ) appts=appts.filter(a=>(a.location||'').toLowerCase().includes(zipQ));
+        const filterLabel=_upcomingFilter==='today'?'— solo hoy':_upcomingFilter==='week'?'— esta semana':'';
+        wrap.innerHTML = filterLabel
+          ? `<div style="font-size:12px;color:#44445A;margin-bottom:16px;font-weight:600">Filtro activo: ${filterLabel}
+               <button onclick="_upcomingFilter=null;document.querySelectorAll('.stat-card').forEach(c=>c.classList.remove('stat-active'));loadUpcoming()"
+                 style="margin-left:8px;color:#CC2936;background:none;border:none;cursor:pointer;font-size:12px;font-weight:700">✕ quitar</button></div>`
+          : '';
+        if(!appts.length){wrap.innerHTML+='<div class="empty"><div class="empty-icon">📭</div><p style="color:#33334A;font-size:14px">No hay citas en este rango</p></div>';return;}
+        const groups={};
+        appts.forEach(a=>{(groups[a.date]=groups[a.date]||[]).push(a);});
+        let html='';
+        Object.keys(groups).sort().forEach(date=>{
+          const days=daysDiff(date),list=groups[date];
+          html+=`<div class="date-group"><div class="date-head"><span class="date-str">${fmtDate(date)}</span>${urgencyChip(days)}<span class="count-lbl">${list.length} cita${list.length>1?'s':''}</span></div>`;
+          list.forEach(a=>{
+            html+=`<div class="appt-card ${urgencyClass(days)}" id="card-${a.id}">
+              <div class="time-pill">${esc(a.time)}</div>
+              <div class="appt-info">
+                <div class="a-name">${esc(a.name)}</div>
+                <div class="a-detail">📞 ${esc(a.phone)}${a.email?' · ✉️ '+esc(a.email):''}</div>
+                <div class="a-vehicle" style="display:flex;align-items:center;gap:7px">
+                  <span style="width:14px;height:14px;border-radius:3px;background:${a.vehicle_color||'#33334A'};border:1px solid rgba(255,255,255,0.18);display:inline-block;flex-shrink:0" title="${a.vehicle_color?cname(a.vehicle_color):'Sin color'}"></span>
+                  🚗 ${esc(a.vehicle)}${a.vehicle_color?` <span style="font-size:11px;color:#606078">${cname(a.vehicle_color)}</span>`:''}
+                </div>
+                ${a.location?`<div class="a-detail" style="margin-top:3px">📍 ${esc(a.location)}</div>`:''}
+                <div class="badge-row">
+                  <span class="badge b-oil">${esc(a.oil_type)}</span>
+                  ${a.is_recurring?`<span class="badge b-rec">Recurrente /${a.recurrence_weeks}sem</span>`:'<span class="badge b-new">Nueva</span>'}
+                  ${a.technician_name?`<span class="badge b-tech">👨‍🔧 ${esc(a.technician_name)}</span>`:''}
+                </div>
+                ${a.notes?`<div class="a-notes">${esc(a.notes)}</div>`:''}
+                <div class="tech-assign">
+                  <span class="tech-assign-lbl">Técnico:</span>
+                  <select class="tech-select" onchange="assignTech(${a.id},this.value)">${renderTechOptions(a.technician_id)}</select>
+                </div>
+              </div>
+              <div class="appt-actions">
+                <button class="btn-done" onclick="completeAppt(${a.id})">✓ Completar</button>
+                <button class="btn-del"  onclick="cancelAppt(${a.id})">✕ Cancelar</button>
+              </div>
+            </div>`;
+          });
+          html+='</div>';
+        });
+        wrap.innerHTML += html;
+      } catch { wrap.innerHTML='<div class="empty" style="color:#CC2936">Error al cargar</div>'; }
+    }
+
+    // ── All appointments ───────────────────────────────────────────────────────
+    async function loadAll() {
+      const status=document.getElementById('f-status').value;
+      try {
+        let appts=await fetch('/api/admin/appointments').then(r=>r.json());
+        if(status) appts=appts.filter(a=>a.status===status);
+        const tbody=document.getElementById('all-tbody');
+        const smap={pending:'Pendiente',completed:'Completada',cancelled:'Cancelada'};
+        if(!appts.length){tbody.innerHTML='<tr><td colspan="10" style="text-align:center;color:#33334A;padding:32px">No hay citas</td></tr>';return;}
+        tbody.innerHTML=appts.map(a=>`
+          <tr data-name="${esc(a.name).toLowerCase()}" data-location="${(a.location||'').toLowerCase()}">
+            <td>${fmtDate(a.date)}</td>
+            <td style="font-weight:700;color:#F4F4F8">${esc(a.time)}</td>
+            <td style="color:#F4F4F8;font-weight:600">${esc(a.name)}</td>
+            <td>${esc(a.phone)}</td>
+            <td>${a.location?`<span style="color:#8888A0">📍 ${esc(a.location)}</span>`:'<span style="color:#33334A">—</span>'}</td>
+            <td><div style="display:flex;align-items:center;gap:6px">${a.vehicle_color?`<span style="width:13px;height:13px;border-radius:3px;background:${a.vehicle_color};border:1px solid rgba(255,255,255,0.2);display:inline-block;flex-shrink:0" title="${cname(a.vehicle_color)}"></span>`:''}<span>${esc(a.vehicle)}</span></div></td>
+            <td>${esc(a.oil_type)}</td>
+            <td>${a.technician_name?`<span style="color:#0D9488">👨‍🔧 ${esc(a.technician_name)}</span>`:'<span style="color:#33334A">—</span>'}</td>
+            <td><span class="s-${a.status}">${smap[a.status]||a.status}</span></td>
+            <td>${a.status==='pending'
+              ?`<button class="btn-done" style="padding:4px 10px;font-size:11px" onclick="completeAppt(${a.id})">✓</button>
+                 <button class="btn-del"  style="padding:4px 10px;font-size:11px;margin-left:4px" onclick="cancelAppt(${a.id})">✕</button>`
+              :'—'}</td>
+          </tr>`).join('');
+      } catch {}
+    }
+
+    function filterRows() {
+      const q=document.getElementById('f-search').value.toLowerCase();
+      const z=document.getElementById('f-zip').value.toLowerCase().trim();
+      document.querySelectorAll('#all-tbody tr').forEach(r=>{
+        const nameOk = !q || (r.dataset.name||'').includes(q);
+        const zipOk  = !z || (r.dataset.location||'').includes(z);
+        r.style.display = (nameOk && zipOk) ? '' : 'none';
+      });
+    }
+
+    // ── Complete modal ─────────────────────────────────────────────────────────
+    let _pendingCompleteId = null;
+
+    function completeAppt(id) {
+      _pendingCompleteId = id;
+      ['fl','fr','rl','rr','bf','br'].forEach(k=>{
+        const sl=document.getElementById('sl-'+k);
+        const lv=document.getElementById('lv-'+k);
+        if(sl){sl.value=75;lv.textContent='75%';}
+      });
+      document.getElementById('sl-mileage').value='';
+      document.getElementById('modal-appt-info').textContent='Registra el estado del vehículo (opcional)';
+      document.getElementById('health-modal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('health-modal').classList.remove('open');
+      _pendingCompleteId=null;
+    }
+
+    async function doComplete(healthData) {
+      const id=_pendingCompleteId;
+      closeModal();
+      if(!id) return;
+      try {
+        const body=healthData?JSON.stringify(healthData):'{}';
+        const data=await fetch(`/api/admin/appointments/${id}/complete`,{
+          method:'PUT', headers:{'Content-Type':'application/json'}, body
+        }).then(r=>r.json());
+        if(data.success){
+          if(data.nextDate){
+            const ds=new Date(data.nextDate+'T12:00:00').toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+            alert(`✓ Completada.\n↺ Próxima cita recurrente: ${ds}`);
+          }
+          loadUpcoming(); loadStats(); if(document.getElementById('panel-all').classList.contains('active')) loadAll();
+        }
+      } catch { alert('Error al completar la cita'); }
+    }
+
+    function confirmComplete() {
+      const mileageRaw = document.getElementById('sl-mileage').value.trim();
+      if (!mileageRaw || parseInt(mileageRaw) <= 0) {
+        document.getElementById('modal-mileage-err').style.display = 'block';
+        document.getElementById('sl-mileage').focus();
+        return;
+      }
+      doComplete({
+        mileage:     parseInt(mileageRaw),
+        tire_fl:     parseInt(document.getElementById('sl-fl').value),
+        tire_fr:     parseInt(document.getElementById('sl-fr').value),
+        tire_rl:     parseInt(document.getElementById('sl-rl').value),
+        tire_rr:     parseInt(document.getElementById('sl-rr').value),
+        brake_front: parseInt(document.getElementById('sl-bf').value),
+        brake_rear:  parseInt(document.getElementById('sl-br').value),
+      });
+    }
+
+    document.getElementById('health-modal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+
+    async function cancelAppt(id) {
+      if(!confirm('¿Cancelar esta cita?')) return;
+      try {
+        const data=await fetch(`/api/admin/appointments/${id}`,{method:'DELETE'}).then(r=>r.json());
+        if(data.success){loadUpcoming();loadStats();}
+      } catch { alert('Error'); }
+    }
+
+    // ── Nueva cita ─────────────────────────────────────────────────────────────
+    const TIME_SLOTS = ['8:00','9:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'];
+
+    function initNewForm() {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate()+1);
+      document.getElementById('nf-date').min = tomorrow.toISOString().split('T')[0];
+      document.getElementById('nf-date').value = '';
+      document.getElementById('nf-time').innerHTML = '<option value="">— Selecciona una fecha primero —</option>';
+      const techSel = document.getElementById('nf-tech');
+      techSel.innerHTML = renderTechOptions('');
+    }
+
+    async function loadSlots() {
+      const date = document.getElementById('nf-date').value;
+      const sel  = document.getElementById('nf-time');
+      if(!date) { sel.innerHTML='<option value="">— Selecciona una fecha primero —</option>'; return; }
+      sel.innerHTML='<option value="">Cargando…</option>';
+      try {
+        const data = await fetch(`/api/appointments/available-slots?date=${date}`).then(r=>r.json());
+        if(!data.available||!data.available.length){
+          sel.innerHTML='<option value="">No hay horarios disponibles</option>';
+          return;
+        }
+        sel.innerHTML='<option value="">— Seleccionar hora —</option>'+
+          data.available.map(s=>`<option value="${s}">${s}</option>`).join('');
+      } catch {
+        sel.innerHTML = TIME_SLOTS.map(s=>`<option value="${s}">${s}</option>`).join('');
+      }
+    }
+
+    async function submitNewAppt() {
+      const name     = document.getElementById('nf-name').value.trim();
+      const phone    = document.getElementById('nf-phone').value.trim();
+      const email    = document.getElementById('nf-email').value.trim();
+      const vehicle  = document.getElementById('nf-vehicle').value.trim();
+      const oil_type = document.getElementById('nf-oil').value;
+      const location = document.getElementById('nf-location').value.trim();
+      const date     = document.getElementById('nf-date').value;
+      const time     = document.getElementById('nf-time').value;
+      const notes    = document.getElementById('nf-notes').value.trim();
+      const techId   = document.getElementById('nf-tech').value;
+      const errBox   = document.getElementById('nf-error');
+
+      errBox.classList.remove('show');
+      if(!name||!phone||!vehicle||!date||!time){
+        errBox.textContent='Por favor completa los campos obligatorios (*)';
+        errBox.classList.add('show');
+        return;
+      }
+
+      try {
+        const data = await fetch('/api/admin/appointments',{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({name,phone,email,vehicle,oil_type,date,time,notes,location,technician_id:techId||null})
+        }).then(r=>r.json());
+        if(data.error){ errBox.textContent=data.error; errBox.classList.add('show'); return; }
+        // Clear form
+        ['nf-name','nf-phone','nf-email','nf-vehicle','nf-location','nf-notes'].forEach(id=>document.getElementById(id).value='');
+        document.getElementById('nf-date').value='';
+        document.getElementById('nf-oil').selectedIndex=0;
+        document.getElementById('nf-time').innerHTML='<option value="">— Selecciona una fecha primero —</option>';
+        document.getElementById('nf-tech').innerHTML=renderTechOptions('');
+        loadStats();
+        switchTab('upcoming');
+        loadUpcoming();
+      } catch { errBox.textContent='Error al crear la cita. Intenta de nuevo.'; errBox.classList.add('show'); }
+    }
+
+    // ── Técnicos ───────────────────────────────────────────────────────────────
+    async function loadTechs() {
+      await fetchTechs();
+      const list=document.getElementById('techs-list');
+      if(!_techs.length){
+        list.innerHTML='<div class="empty"><div class="empty-icon" style="font-size:32px">👨‍🔧</div><p style="color:#33334A;font-size:14px">No hay técnicos registrados</p></div>';
+        return;
+      }
+      list.innerHTML=_techs.map(t=>`
+        <div class="tech-card">
+          <div class="tech-avatar">👨‍🔧</div>
+          <div class="tech-info">
+            <div class="tech-name">${esc(t.name)}</div>
+            <div class="tech-meta">${esc(t.email)}${t.phone?' · '+esc(t.phone):''}</div>
+          </div>
+          <button class="btn-pass-tech" onclick="openTechPassModal(${t.id},'${esc(t.name)}')">Contraseña</button>
+          <button class="btn-del-tech" onclick="deleteTech(${t.id},'${esc(t.name)}')">Eliminar</button>
+        </div>`).join('');
+    }
+
+    async function addTech() {
+      const name  = document.getElementById('tf-name').value.trim();
+      const phone = document.getElementById('tf-phone').value.trim();
+      const email = document.getElementById('tf-email').value.trim();
+      const pass  = document.getElementById('tf-pass').value;
+      const err   = document.getElementById('tf-error');
+      err.classList.remove('show');
+      if(!name||!email||!pass){ err.textContent='Nombre, correo y contraseña son requeridos'; err.classList.add('show'); return; }
+      if(pass.length<6){ err.textContent='La contraseña debe tener al menos 6 caracteres'; err.classList.add('show'); return; }
+      try {
+        const data=await fetch('/api/admin/technicians',{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({name,phone,email,password:pass})
+        }).then(r=>r.json());
+        if(data.error){ err.textContent=data.error; err.classList.add('show'); return; }
+        ['tf-name','tf-phone','tf-email','tf-pass'].forEach(id=>document.getElementById(id).value='');
+        loadTechs(); loadStats();
+      } catch { err.textContent='Error al añadir técnico'; err.classList.add('show'); }
+    }
+
+    async function deleteTech(id,name) {
+      if(!confirm(`¿Eliminar al técnico ${name}?`)) return;
+      try {
+        await fetch(`/api/admin/technicians/${id}`,{method:'DELETE'});
+        loadTechs(); loadStats();
+      } catch { alert('Error al eliminar técnico'); }
+    }
+
+    let _techPassId = null;
+    function openTechPassModal(id, name) {
+      _techPassId = id;
+      document.getElementById('tech-pass-name').textContent = name;
+      document.getElementById('tp-pass').value = '';
+      document.getElementById('tp-confirm').value = '';
+      document.getElementById('tp-error').style.display = 'none';
+      const m = document.getElementById('tech-pass-modal');
+      m.style.display = 'flex';
+      setTimeout(() => document.getElementById('tp-pass').focus(), 50);
+    }
+    function closeTechPassModal() {
+      document.getElementById('tech-pass-modal').style.display = 'none';
+      _techPassId = null;
+    }
+    async function saveTechPassword() {
+      const pass = document.getElementById('tp-pass').value;
+      const confirm = document.getElementById('tp-confirm').value;
+      const errEl = document.getElementById('tp-error');
+      errEl.style.display = 'none';
+      if (!pass || !confirm) { errEl.textContent = 'Completa ambos campos'; errEl.style.display = 'block'; return; }
+      if (pass !== confirm) { errEl.textContent = 'Las contraseñas no coinciden'; errEl.style.display = 'block'; return; }
+      if (pass.length < 6) { errEl.textContent = 'Mínimo 6 caracteres'; errEl.style.display = 'block'; return; }
+      try {
+        const data = await fetch(`/api/admin/technicians/${_techPassId}/password`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pass })
+        }).then(r => r.json());
+        if (data.error) { errEl.textContent = data.error; errEl.style.display = 'block'; return; }
+        closeTechPassModal();
+      } catch { errEl.textContent = 'Error al guardar contraseña'; errEl.style.display = 'block'; }
+    }
+
+    // ── Init ───────────────────────────────────────────────────────────────────
+    (async function init() {
+      await fetchTechs();
+      loadStats();
+      loadUpcoming();
+      setInterval(()=>{ loadStats(); loadUpcoming(); }, 5*60*1000);
+    })();
+  </script>
+</body>
+</html>

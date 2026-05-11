@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acceso Técnicos – Cambio de Aceite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box}
+    body{font-family:'DM Sans',sans-serif;background:#09090B;color:#F4F4F8;min-height:100vh}
+    .grain{position:fixed;inset:0;pointer-events:none;z-index:40;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E")}
+    .orb-1{position:fixed;width:640px;height:640px;border-radius:50%;top:-260px;right:-180px;pointer-events:none;background:radial-gradient(circle,rgba(13,148,136,0.13) 0%,transparent 68%)}
+    .orb-2{position:fixed;width:480px;height:480px;border-radius:50%;bottom:-180px;left:-140px;pointer-events:none;background:radial-gradient(circle,rgba(13,148,136,0.07) 0%,transparent 68%)}
+    .card{background:#111118;border:1px solid rgba(255,255,255,0.07);box-shadow:0 0 0 1px rgba(255,255,255,0.03) inset,0 8px 48px rgba(0,0,0,0.7),0 2px 8px rgba(0,0,0,0.5);border-radius:20px}
+    .field-label{display:block;font-size:11px;font-weight:600;color:#5A5A78;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:7px}
+    .field{width:100%;padding:11px 14px;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#F4F4F8;font-family:'DM Sans',sans-serif;font-size:15px;outline:none;transition:border-color 0.18s ease,box-shadow 0.18s ease}
+    .field::placeholder{color:#333345}
+    .field:focus{border-color:rgba(13,148,136,0.55);box-shadow:0 0 0 3px rgba(13,148,136,0.09)}
+    .btn-primary{width:100%;padding:13px;background:linear-gradient(135deg,#0D9488 0%,#0F766E 100%);border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;letter-spacing:0.01em;box-shadow:0 0 24px rgba(13,148,136,0.22),0 2px 8px rgba(0,0,0,0.45);transition:transform 0.22s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.22s ease}
+    .btn-primary:hover{transform:translateY(-2px) scale(1.01);box-shadow:0 0 32px rgba(13,148,136,0.32),0 6px 16px rgba(0,0,0,0.5)}
+    .btn-primary:active{transform:translateY(0) scale(0.99)}
+    .btn-primary:focus-visible{outline:2px solid rgba(13,148,136,0.7);outline-offset:3px;border-radius:10px}
+    .error-box{background:rgba(204,41,54,0.08);border:1px solid rgba(204,41,54,0.22);border-radius:8px;padding:10px 14px;color:#FF8590;font-size:13px;margin-bottom:18px;display:none}
+    .error-box.show{display:block}
+    .form-group{margin-bottom:16px}
+    .logo-ring{display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:16px;margin-bottom:16px;background:linear-gradient(135deg,rgba(13,148,136,0.18),rgba(13,148,136,0.07));border:1px solid rgba(13,148,136,0.25);box-shadow:0 0 24px rgba(13,148,136,0.12)}
+    .tech-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:3px 10px;border-radius:20px;background:rgba(13,148,136,0.1);border:1px solid rgba(13,148,136,0.25);color:#0D9488;margin-top:8px}
+  </style>
+</head>
+<body>
+  <div class="grain"></div>
+  <div class="orb-1"></div>
+  <div class="orb-2"></div>
+
+  <div class="min-h-screen flex items-center justify-center px-4 py-12 relative z-10">
+    <div class="card w-full max-w-[380px] p-10">
+
+      <div class="text-center mb-8">
+        <div class="logo-ring"><span style="font-size:26px">👨‍🔧</span></div>
+        <h1 style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;letter-spacing:-0.03em;color:#F4F4F8">Portal Técnicos</h1>
+        <div class="tech-badge">🛢️ Cambio de Aceite</div>
+        <p style="font-size:13px;color:#44445A;margin-top:10px">Ingresa con tus credenciales de técnico</p>
+      </div>
+
+      <div class="error-box" id="login-error"></div>
+
+      <form method="POST" action="/auth/login">
+        <input type="hidden" name="role_hint" value="technician">
+        <div class="form-group">
+          <label class="field-label">Correo electrónico</label>
+          <input class="field" type="email" name="email" required autofocus autocomplete="email" placeholder="tecnico@ejemplo.com">
+        </div>
+        <div class="form-group" style="margin-bottom:24px">
+          <label class="field-label">Contraseña</label>
+          <input class="field" type="password" name="password" required autocomplete="current-password" placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn-primary">Entrar →</button>
+      </form>
+
+    </div>
+  </div>
+
+  <script>
+    const errors = {
+      credenciales: 'Correo o contraseña incorrectos.',
+      campos: 'Por favor completa todos los campos.',
+      norole: 'Esta cuenta no tiene acceso de técnico.'
+    };
+    const p = new URLSearchParams(location.search);
+    const err = p.get('error');
+    if (err) {
+      const box = document.getElementById('login-error');
+      box.textContent = errors[err] || 'Ocurrió un error. Intenta de nuevo.';
+      box.classList.add('show');
+    }
+  </script>
+</body>
+</html>

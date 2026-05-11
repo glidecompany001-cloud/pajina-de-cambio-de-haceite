@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cambio de Aceite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box}
+    body{font-family:'DM Sans',sans-serif;background:#09090B;color:#F4F4F8;min-height:100vh}
+    .grain{position:fixed;inset:0;pointer-events:none;z-index:40;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E")}
+    .orb-1{position:fixed;width:700px;height:700px;border-radius:50%;top:-300px;right:-200px;pointer-events:none;background:radial-gradient(circle,rgba(204,41,54,0.1) 0%,transparent 65%)}
+    .orb-2{position:fixed;width:500px;height:500px;border-radius:50%;bottom:-200px;left:-150px;pointer-events:none;background:radial-gradient(circle,rgba(204,41,54,0.06) 0%,transparent 65%)}
+
+    .topbar{background:#111118;border-bottom:1px solid rgba(255,255,255,0.06);padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30}
+    .topbar-brand{display:flex;align-items:center;gap:10px;cursor:pointer}
+    .brand-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:-0.02em}
+    .avatar{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,rgba(204,41,54,0.3),rgba(204,41,54,0.12));border:1px solid rgba(204,41,54,0.28);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#CC2936;flex-shrink:0}
+    .user-area{display:flex;align-items:center;gap:10px}
+    .user-name{font-size:13px;color:#606078}
+    @media(max-width:460px){.user-name{display:none}}
+    .btn-logout{padding:6px 13px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:#606078;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;transition:background 0.15s ease,color 0.15s ease,transform 0.15s ease;display:inline-block}
+    .btn-logout:hover{background:rgba(255,255,255,0.08);color:#C0C0D0;transform:translateY(-1px)}
+    .btn-logout:active{transform:translateY(0)}
+    .btn-logout:focus-visible{outline:2px solid rgba(255,255,255,0.15);outline-offset:2px;border-radius:8px}
+
+    .page{max-width:680px;margin:0 auto;padding:28px 16px 80px;position:relative;z-index:10}
+
+    /* ── Vehicle list view ─────────────────────────── */
+    .hero-greeting{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;letter-spacing:-0.03em;margin-bottom:4px}
+    .hero-sub{font-size:14px;color:#44445A;margin-bottom:28px}
+    .section-label{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#44445A;margin-bottom:12px}
+
+    .vehicle-card{display:flex;align-items:center;gap:14px;background:#111118;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:18px;margin-bottom:12px;cursor:pointer;transition:border-color 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.15s ease;overflow:hidden;position:relative}
+    .vehicle-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:transparent;transition:background 0.2s ease}
+    .vehicle-card.has-color::before{background:var(--v-color,#CC2936)}
+    .vehicle-card:hover{border-color:rgba(204,41,54,0.35);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,0.5)}
+    .vehicle-card:active{transform:translateY(0)}
+    .vehicle-card:focus-visible{outline:2px solid rgba(204,41,54,0.4);outline-offset:2px;border-radius:16px}
+    .v-icon-wrap{width:44px;height:44px;border-radius:12px;background:rgba(204,41,54,0.08);border:1px solid rgba(204,41,54,0.15);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+    .v-info{flex:1;min-width:0}
+    .v-name{font-size:15px;font-weight:700;color:#F4F4F8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .v-color-chip{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;padding:2px 8px 2px 5px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);color:#C8C8D8;flex-shrink:0}
+    .btn-del-v{padding:7px 13px;border-radius:8px;background:rgba(204,41,54,0.07);border:1px solid rgba(204,41,54,0.18);color:#CC2936;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1)}
+    .btn-del-v:hover{background:rgba(204,41,54,0.14);transform:scale(1.04)}
+    .btn-del-v:active{transform:scale(0.97)}
+    .btn-del-v:focus-visible{outline:2px solid rgba(204,41,54,0.5);outline-offset:2px;border-radius:8px}
+    .v-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:5px}
+    .v-oil-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:rgba(202,138,4,0.1);border:1px solid rgba(202,138,4,0.18);color:#CA8A04}
+    .v-loc{font-size:12px;color:#44445A}
+    .v-last{font-size:12px;color:#38A169;margin-top:4px}
+    .v-arrow{font-size:18px;color:#33334A;flex-shrink:0;transition:color 0.15s ease,transform 0.15s ease}
+    .vehicle-card:hover .v-arrow{color:#CC2936;transform:translateX(3px)}
+
+    .btn-add-v{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.1);border-radius:14px;color:#44445A;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.15s ease,border-color 0.15s ease,color 0.15s ease,transform 0.18s cubic-bezier(0.34,1.56,0.64,1);margin-top:4px}
+    .btn-add-v:hover{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.18);color:#8888A0;transform:translateY(-1px)}
+    .btn-add-v:active{transform:translateY(0)}
+    .btn-add-v:focus-visible{outline:2px solid rgba(255,255,255,0.15);outline-offset:2px;border-radius:14px}
+
+    .add-v-wrap{background:#111118;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:20px;margin-bottom:12px}
+    .add-v-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#C8C8D8;margin-bottom:16px}
+
+    /* ── Vehicle detail view ───────────────────────── */
+    .detail-topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+    .btn-back{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:#C0C0D0;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.15s ease,transform 0.15s ease}
+    .btn-back:hover{background:rgba(255,255,255,0.08);transform:translateX(-2px)}
+    .btn-back:active{transform:translateX(0)}
+    .btn-back:focus-visible{outline:2px solid rgba(255,255,255,0.15);outline-offset:2px;border-radius:9px}
+
+    .detail-vehicle-card{background:#111118;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:20px;margin-bottom:16px}
+    .detail-v-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.02em;margin-bottom:10px}
+    .detail-v-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+    .section-card{background:#111118;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:20px;margin-bottom:16px}
+    .section-card-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#C8C8D8;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+
+    .pending-row{display:flex;align-items:center;gap:12px;padding:11px;background:#18181F;border:1px solid rgba(255,255,255,0.06);border-radius:10px;margin-bottom:8px;transition:border-color 0.15s ease}
+    .pending-row:hover{border-color:rgba(255,255,255,0.1)}
+    .time-pill{background:#22222E;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:5px 10px;font-size:13px;font-weight:700;color:#F4F4F8;flex-shrink:0;font-variant-numeric:tabular-nums}
+    .pending-meta{flex:1;min-width:0}
+    .pending-date{font-size:13px;font-weight:600;color:#C8C8D8}
+    .pending-sub{font-size:12px;color:#44445A;margin-top:1px}
+    .btn-cancel-appt{padding:5px 10px;border-radius:7px;background:rgba(204,41,54,0.08);border:1px solid rgba(204,41,54,0.15);color:#CC2936;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;transition:background 0.15s ease,transform 0.18s cubic-bezier(0.34,1.56,0.64,1)}
+    .btn-cancel-appt:hover{background:rgba(204,41,54,0.14);transform:scale(1.04)}
+    .btn-cancel-appt:active{transform:scale(0.97)}
+    .btn-cancel-appt:focus-visible{outline:2px solid rgba(204,41,54,0.5);outline-offset:2px;border-radius:7px}
+
+    /* History cards */
+    .history-entry{background:#18181F;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:16px;margin-bottom:10px;border-left:3px solid transparent}
+    .history-entry.good{border-left-color:#38A169}
+    .history-entry.warn{border-left-color:#D97706}
+    .history-entry.crit{border-left-color:#CC2936}
+    .he-date{font-size:13px;font-weight:700;color:#C8C8D8}
+    .he-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:6px}
+    .he-km{font-size:13px;font-weight:600;color:#F4F4F8}
+    .he-oil{display:inline-block;font-size:10px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:rgba(202,138,4,0.1);border:1px solid rgba(202,138,4,0.18);color:#CA8A04}
+    .he-tech{font-size:12px;color:#44445A}
+    .health-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+    .health-block{background:rgba(0,0,0,0.2);border-radius:8px;padding:10px}
+    .hb-label{font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#44445A;margin-bottom:8px}
+    .wear-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+    .wear-lbl{font-size:11px;color:#606078;width:50px;flex-shrink:0}
+    .wear-bar-wrap{flex:1;height:5px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden}
+    .wear-bar-fill{height:100%;border-radius:3px}
+    .wear-pct{font-size:11px;font-weight:700;width:30px;text-align:right;flex-shrink:0}
+
+    /* Common form elements */
+    .field-label{display:block;font-size:11px;font-weight:600;color:#5A5A78;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:7px}
+    .field{width:100%;padding:11px 14px;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#F4F4F8;font-family:'DM Sans',sans-serif;font-size:15px;outline:none;transition:border-color 0.18s ease,box-shadow 0.18s ease}
+    .field::placeholder{color:#2A2A3A}
+    .field:focus{border-color:rgba(204,41,54,0.55);box-shadow:0 0 0 3px rgba(204,41,54,0.09)}
+    select.field{cursor:pointer}
+    textarea.field{resize:vertical}
+    .form-group{margin-bottom:16px}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media(max-width:520px){.form-row{grid-template-columns:1fr}}
+
+    .slots-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px}
+    .slot{padding:10px 4px;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:9px;text-align:center;font-size:13px;font-weight:600;color:#888898;cursor:pointer;transition:background 0.15s ease,border-color 0.15s ease,color 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1)}
+    .slot:hover:not(.taken){background:rgba(204,41,54,0.1);border-color:rgba(204,41,54,0.35);color:#F4F4F8;transform:scale(1.05)}
+    .slot:active:not(.taken){transform:scale(0.97)}
+    .slot:focus-visible{outline:2px solid rgba(204,41,54,0.5);outline-offset:2px;border-radius:9px}
+    .slot.selected{background:rgba(204,41,54,0.18);border-color:rgba(204,41,54,0.55);color:#FF8090;box-shadow:0 0 12px rgba(204,41,54,0.12)}
+    .slot.taken{background:#141418;border-color:rgba(255,255,255,0.03);color:#2A2A3A;cursor:not-allowed;text-decoration:line-through}
+    .slot-ph{grid-column:span 5;text-align:center;font-size:13px;color:#33334A;padding:12px 0}
+
+    .btn-primary{width:100%;padding:13px;background:linear-gradient(135deg,#CC2936 0%,#A31F2B 100%);border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;letter-spacing:0.01em;box-shadow:0 0 24px rgba(204,41,54,0.22),0 2px 8px rgba(0,0,0,0.45);transition:transform 0.22s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.22s ease,opacity 0.15s ease}
+    .btn-primary:hover{transform:translateY(-2px) scale(1.01);box-shadow:0 0 32px rgba(204,41,54,0.32),0 6px 16px rgba(0,0,0,0.5)}
+    .btn-primary:active{transform:translateY(0) scale(0.99)}
+    .btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none}
+    .btn-primary:focus-visible{outline:2px solid rgba(204,41,54,0.7);outline-offset:3px;border-radius:10px}
+
+    .btn-ghost-sm{padding:8px 16px;border-radius:9px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:#606078;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.15s ease,color 0.15s ease,transform 0.15s ease}
+    .btn-ghost-sm:hover{background:rgba(255,255,255,0.08);color:#C0C0D0;transform:translateY(-1px)}
+    .btn-ghost-sm:active{transform:translateY(0)}
+    .btn-ghost-sm:focus-visible{outline:2px solid rgba(255,255,255,0.15);outline-offset:2px;border-radius:9px}
+
+    .field-err{font-size:12px;color:#FF8090;margin-top:5px;display:none}
+    .field-err.show{display:block}
+    .empty-state{text-align:center;padding:16px 0;font-size:13px;color:#33334A}
+
+    /* Address section in vehicle form */
+    .addr-section-label{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#5A5A78;margin:18px 0 12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.05)}
+
+    /* Color picker */
+    .color-picker-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-bottom:8px}
+    @media(max-width:480px){.color-picker-grid{grid-template-columns:repeat(6,1fr)}}
+    .color-swatch{width:100%;aspect-ratio:1;border-radius:8px;border:2px solid rgba(255,255,255,0.08);cursor:pointer;transition:transform 0.18s cubic-bezier(0.34,1.56,0.64,1),border-color 0.15s ease,box-shadow 0.15s ease;padding:0;outline:none}
+    .color-swatch:hover{transform:scale(1.15);border-color:rgba(255,255,255,0.3)}
+    .color-swatch:active{transform:scale(0.95)}
+    .color-swatch.selected{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,0.25),0 0 12px rgba(255,255,255,0.1);transform:scale(1.12)}
+    .color-swatch:focus-visible{outline:2px solid rgba(204,41,54,0.6);outline-offset:2px}
+    .v-color-dot{width:10px;height:10px;border-radius:50%;display:inline-block;border:1px solid rgba(255,255,255,0.15);flex-shrink:0;margin-right:2px}
+
+    /* Car schematic */
+    .car-schematic{display:grid;grid-template-columns:auto 1fr auto;grid-template-rows:auto auto auto;gap:10px;align-items:center;max-width:340px;margin:0 auto;padding:4px 0}
+    .t-gauge{text-align:center}
+    .t-gauge-lbl{font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#33334A;margin-top:3px}
+    .brake-indicator{background:#18181F;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:8px 10px}
+    .brake-ind-lbl{font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#33334A;margin-bottom:5px}
+    .brake-ind-bar-wrap{height:5px;background:rgba(255,255,255,0.04);border-radius:3px;overflow:hidden;margin-bottom:4px}
+    .brake-ind-bar-fill{height:100%;border-radius:3px;transition:width 0.4s ease}
+    .brake-ind-pct{font-size:12px;font-weight:700;text-align:center}
+
+    /* Modals */
+    .modal-bd{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:100;display:none;align-items:flex-end;justify-content:center;padding:0}
+    .modal-bd.open{display:flex}
+    @media(min-width:560px){.modal-bd{align-items:center;padding:16px}}
+    .modal{background:#111118;border:1px solid rgba(255,255,255,0.08);border-radius:20px 20px 0 0;padding:24px;width:100%;max-width:480px;box-shadow:0 -8px 48px rgba(0,0,0,0.7);position:relative;max-height:92vh;overflow-y:auto}
+    @media(min-width:560px){.modal{border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,0.7)}}
+    .modal-handle{width:36px;height:4px;background:rgba(255,255,255,0.12);border-radius:2px;margin:0 auto 20px;display:block}
+    @media(min-width:560px){.modal-handle{display:none}}
+    .modal-close{position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);color:#606078;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s ease,color 0.15s ease}
+    .modal-close:hover{background:rgba(255,255,255,0.1);color:#F4F4F8}
+    .modal-close:focus-visible{outline:2px solid rgba(255,255,255,0.15);outline-offset:2px;border-radius:8px}
+    .modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;letter-spacing:-0.02em;margin-bottom:4px}
+    .modal-sub{font-size:13px;color:#44445A;margin-bottom:20px}
+
+    .vehicle-summary-box{background:#18181F;border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px 14px;margin-bottom:18px}
+    .vsb-name{font-size:15px;font-weight:700;color:#F4F4F8}
+    .vsb-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:5px;align-items:center}
+
+    /* Language picker overlay */
+    .lang-overlay{position:fixed;inset:0;background:#09090B;z-index:200;display:flex;align-items:center;justify-content:center;padding:24px}
+    .lang-overlay.hidden{display:none}
+    .lang-card{background:#111118;border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:40px 32px;width:100%;max-width:360px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.8)}
+    .lang-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.02em;margin:14px 0 6px;color:#F4F4F8}
+    .lang-sub{font-size:13px;color:#44445A;margin-bottom:28px;line-height:1.6}
+    .lang-options{display:flex;gap:12px}
+    .lang-btn{flex:1;padding:16px 10px;border-radius:14px;border:1px solid rgba(255,255,255,0.07);background:#18181F;cursor:pointer;transition:border-color 0.15s ease,background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1);font-family:'DM Sans',sans-serif}
+    .lang-btn:hover{border-color:rgba(204,41,54,0.5);background:rgba(204,41,54,0.07);transform:translateY(-3px)}
+    .lang-btn:active{transform:translateY(0)}
+    .lang-flag{font-size:30px;margin-bottom:8px}
+    .lang-name{font-size:14px;font-weight:700;color:#F4F4F8}
+    .lang-native{font-size:11px;color:#44445A;margin-top:3px}
+    .btn-lang{padding:5px 10px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:#606078;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s ease,color 0.15s ease;letter-spacing:0.04em}
+    .btn-lang:hover{background:rgba(255,255,255,0.08);color:#C0C0D0}
+
+    /* Service type selector */
+    .service-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
+    .service-card{position:relative;padding:12px 10px;border-radius:12px;border:1px solid rgba(255,255,255,0.07);background:#18181F;cursor:pointer;text-align:center;transition:border-color 0.15s ease,background 0.15s ease}
+    .service-card.active{border-color:rgba(204,41,54,0.5);background:rgba(204,41,54,0.07)}
+    .service-card.soon{cursor:default;opacity:0.45}
+    .service-card-icon{font-size:22px;margin-bottom:4px}
+    .service-card-name{font-size:12px;font-weight:700;color:#C8C8D8;line-height:1.3}
+    .service-card.active .service-card-name{color:#FF8090}
+    .service-soon-badge{position:absolute;top:6px;right:6px;font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#44445A}
+  </style>
+</head>
+<body>
+  <div class="grain"></div>
+  <div class="orb-1"></div>
+  <div class="orb-2"></div>
+
+  <!-- Language picker -->
+  <div class="lang-overlay" id="lang-overlay">
+    <div class="lang-card">
+      <div style="font-size:44px">🛢️</div>
+      <div class="lang-title">Oil Change · Cambio de Aceite</div>
+      <div class="lang-sub">¿En qué idioma prefieres la página?<br>In which language do you prefer the page?</div>
+      <div class="lang-options">
+        <button class="lang-btn" onclick="setLang('es')">
+          <div class="lang-flag">🇲🇽</div>
+          <div class="lang-name">Español</div>
+          <div class="lang-native">Spanish</div>
+        </button>
+        <button class="lang-btn" onclick="setLang('en')">
+          <div class="lang-flag">🇺🇸</div>
+          <div class="lang-name">English</div>
+          <div class="lang-native">Inglés</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking modal -->
+  <div class="modal-bd" id="book-modal">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <button class="modal-close" onclick="closeBookModal()">✕</button>
+      <div class="modal-title" data-i18n="bm_title">🛢️ Nueva cita</div>
+      <div id="bm-vehicle-box" class="vehicle-summary-box" style="display:none"></div>
+      <div id="bm-form-wrap">
+        <div class="field-label" style="margin-bottom:10px" data-i18n="bm_service">Tipo de servicio</div>
+        <div class="service-grid">
+          <div class="service-card active">
+            <div class="service-card-icon">🛢️</div>
+            <div class="service-card-name" data-i18n="svc_oil">Cambio de aceite</div>
+          </div>
+          <div class="service-card soon">
+            <span class="service-soon-badge">Coming soon</span>
+            <div class="service-card-icon">🛑</div>
+            <div class="service-card-name" data-i18n="svc_brakes">Cambio de frenos</div>
+          </div>
+          <div class="service-card soon">
+            <span class="service-soon-badge">Coming soon</span>
+            <div class="service-card-icon">🔧</div>
+            <div class="service-card-name" data-i18n="svc_tires">Cambio de llantas</div>
+          </div>
+          <div class="service-card soon">
+            <span class="service-soon-badge">Coming soon</span>
+            <div class="service-card-icon">🪟</div>
+            <div class="service-card-name" data-i18n="svc_glass">Cambio de cristales</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="field-label"><span data-i18n="bm_date">Fecha *</span> <span style="color:#44445A;font-size:10px;font-weight:400;text-transform:none;letter-spacing:0" data-i18n="bm_date_hint">(mínimo mañana)</span></label>
+          <input class="field" type="date" id="bm-date">
+        </div>
+        <div class="form-group">
+          <label class="field-label" data-i18n="bm_time">Horario *</label>
+          <div class="slots-grid" id="bm-slots"><div class="slot-ph" data-i18n="slot_select">Selecciona una fecha primero</div></div>
+          <input type="hidden" id="bm-time">
+          <div class="field-err" id="bm-time-err" data-i18n="err_time">Selecciona un horario disponible</div>
+        </div>
+        <div class="form-group">
+          <label class="field-label" data-i18n="bm_notes">Notas adicionales</label>
+          <textarea class="field" id="bm-notes" rows="2" placeholder="Algún detalle adicional…" data-i18n-ph="bm_ph_notes"></textarea>
+        </div>
+        <!-- Payment section (shown when PayPal is configured) -->
+        <div id="bm-payment-wrap" style="display:none">
+          <div id="bm-price-display" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;margin-bottom:14px">
+            <div>
+              <div style="font-size:11px;font-weight:600;color:#44445A;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:2px">Total a pagar</div>
+              <div id="bm-price-amount" style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#F4F4F8;letter-spacing:-0.02em">$65</div>
+            </div>
+            <div style="text-align:right;font-size:12px;color:#44445A" id="bm-price-detail"></div>
+          </div>
+          <div style="font-size:11px;color:#44445A;text-align:center;margin-bottom:10px">Pago seguro · Elige tu método</div>
+          <div id="paypal-button-container"></div>
+        </div>
+
+        <button class="btn-primary" id="bm-submit" onclick="submitBooking()" data-i18n="bm_submit">Confirmar cita →</button>
+      </div>
+      <div id="bm-success" style="display:none;text-align:center;padding:24px 0">
+        <div style="font-size:52px">✅</div>
+        <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin:10px 0 6px" data-i18n="bm_confirmed">¡Cita confirmada!</div>
+        <div id="bm-success-msg" style="font-size:14px;color:#66667A;line-height:1.7"></div>
+        <button onclick="closeBookModal()" style="margin-top:16px;padding:10px 24px;background:rgba(204,41,54,0.12);border:1px solid rgba(204,41,54,0.25);border-radius:10px;color:#CC2936;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.15s ease" onmouseover="this.style.background='rgba(204,41,54,0.2)'" onmouseout="this.style.background='rgba(204,41,54,0.12)'" data-i18n="bm_close">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div class="topbar-brand" onclick="showList()" role="button" tabindex="0" onkeydown="if(event.key==='Enter')showList()">
+      <span style="font-size:20px">🛢️</span>
+      <span class="brand-name" data-i18n="brand">Cambio de Aceite</span>
+    </div>
+    <div class="user-area">
+      <span class="user-name" id="user-name">—</span>
+      <div class="avatar" id="user-avatar">?</div>
+      <button class="btn-lang" id="lang-toggle" onclick="toggleLang()">EN</button>
+      <a href="/auth/logout" class="btn-logout" data-i18n="logout">Salir</a>
+    </div>
+  </header>
+
+  <!-- ── Email verification banner ──────────────────── -->
+  <div id="verify-banner" style="display:none;background:linear-gradient(135deg,rgba(204,41,54,0.12),rgba(204,41,54,0.06));border-bottom:1px solid rgba(204,41,54,0.2);padding:12px 20px;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;position:relative;z-index:20">
+    <span style="font-size:20px">✉️</span>
+    <div style="flex:1;min-width:200px">
+      <div style="font-size:14px;font-weight:600;color:#F4F4F8" id="verify-banner-title">Confirma tu correo electrónico</div>
+      <div style="font-size:12px;color:#606078;margin-top:2px" id="verify-banner-sub">Necesitas confirmar tu correo para poder agendar una cita</div>
+    </div>
+    <button id="verify-resend-btn" onclick="resendVerification()" style="padding:8px 16px;background:rgba(204,41,54,0.15);border:1px solid rgba(204,41,54,0.3);border-radius:8px;color:#FF8090;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background 0.15s ease">Reenviar correo</button>
+  </div>
+
+  <div class="page">
+    <!-- ── View: Vehicle List ────────────────────────── -->
+    <div id="view-list">
+      <div class="hero-greeting" id="hero-greeting">Hola 👋</div>
+      <div class="hero-sub" id="hero-sub" data-i18n="hero_sub">Selecciona un vehículo para ver su historial o agendar una cita</div>
+      <div class="section-label" data-i18n="my_vehicles">Mis vehículos</div>
+      <div id="vehicle-cards"></div>
+      <div id="add-v-wrap" style="display:none">
+        <div class="add-v-wrap">
+          <div class="add-v-title" data-i18n="add_v_title">Agregar vehículo</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="field-label" data-i18n="lbl_vehicle">Vehículo (año, marca, modelo) *</label>
+              <input class="field" type="text" id="nv-vehicle" placeholder="2022 Honda Civic" data-i18n-ph="ph_vehicle">
+            </div>
+            <div class="form-group">
+              <label class="field-label" data-i18n="lbl_oil">Tipo de aceite</label>
+              <select class="field" id="nv-oil">
+                <option value="Convencional">Convencional — $65 · 20% desc.</option>
+                <option value="Semi-sintético">Semi-sintético — $75 · 20% desc.</option>
+                <option value="Sintético total">Sintético total — $85 · 20% desc.</option>
+              </select>
+              <div style="font-size:11px;color:#44445A;margin-top:5px" data-i18n="oil_note">Precio por 4.4 quarts de aceite</div>
+            </div>
+          </div>
+          <div class="addr-section-label" data-i18n="lbl_addr">📍 Dirección de servicio</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="field-label" data-i18n="lbl_street">Calle *</label>
+              <input class="field" type="text" id="nv-street" placeholder="Av. Reforma" data-i18n-ph="ph_street">
+            </div>
+            <div class="form-group">
+              <label class="field-label" data-i18n="lbl_number">Número</label>
+              <input class="field" type="text" id="nv-number" placeholder="123">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="field-label" data-i18n="lbl_city">Ciudad *</label>
+              <input class="field" type="text" id="nv-city" placeholder="Monterrey" data-i18n-ph="ph_city">
+            </div>
+            <div class="form-group">
+              <label class="field-label" data-i18n="lbl_state">Estado *</label>
+              <input class="field" type="text" id="nv-state" placeholder="PA" data-i18n-ph="ph_state">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="field-label" data-i18n="lbl_zip">Código postal *</label>
+            <input class="field" type="text" id="nv-zip" placeholder="64000" maxlength="10" inputmode="numeric" data-i18n-ph="ph_zip">
+          </div>
+          <div class="form-group">
+            <label class="field-label" data-i18n="lbl_color">Color del vehículo</label>
+            <select id="nv-color" style="display:none">
+              <option value="">— Sin color —</option>
+              <option value="#1a1a1a">Negro</option>
+              <option value="#F5F5F0">Blanco</option>
+              <option value="#9ca3af">Gris plata</option>
+              <option value="#6b7280">Gris oscuro</option>
+              <option value="#b91c1c">Rojo</option>
+              <option value="#1d4ed8">Azul</option>
+              <option value="#0f766e">Verde</option>
+              <option value="#d97706">Dorado</option>
+              <option value="#92400e">Café</option>
+              <option value="#7c3aed">Morado</option>
+              <option value="#0e7490">Azul marino</option>
+              <option value="#be185d">Borgoña</option>
+              <option value="#f97316">Naranja</option>
+              <option value="#713f12">Bronce</option>
+              <option value="#4a5568">Gris pizarra</option>
+              <option value="#c0c0c0">Plata</option>
+            </select>
+            <div class="color-picker-grid">
+              <button type="button" class="color-swatch" style="background:#1a1a1a"        title="Negro"        onclick="pickColor(this,'#1a1a1a')"></button>
+              <button type="button" class="color-swatch" style="background:#F5F5F0"        title="Blanco"       onclick="pickColor(this,'#F5F5F0')"></button>
+              <button type="button" class="color-swatch" style="background:#9ca3af"        title="Gris plata"   onclick="pickColor(this,'#9ca3af')"></button>
+              <button type="button" class="color-swatch" style="background:#6b7280"        title="Gris oscuro"  onclick="pickColor(this,'#6b7280')"></button>
+              <button type="button" class="color-swatch" style="background:#b91c1c"        title="Rojo"         onclick="pickColor(this,'#b91c1c')"></button>
+              <button type="button" class="color-swatch" style="background:#1d4ed8"        title="Azul"         onclick="pickColor(this,'#1d4ed8')"></button>
+              <button type="button" class="color-swatch" style="background:#0f766e"        title="Verde"        onclick="pickColor(this,'#0f766e')"></button>
+              <button type="button" class="color-swatch" style="background:#d97706"        title="Dorado"       onclick="pickColor(this,'#d97706')"></button>
+              <button type="button" class="color-swatch" style="background:#92400e"        title="Café"         onclick="pickColor(this,'#92400e')"></button>
+              <button type="button" class="color-swatch" style="background:#7c3aed"        title="Morado"       onclick="pickColor(this,'#7c3aed')"></button>
+              <button type="button" class="color-swatch" style="background:#0e7490"        title="Azul marino"  onclick="pickColor(this,'#0e7490')"></button>
+              <button type="button" class="color-swatch" style="background:#be185d"        title="Borgoña"      onclick="pickColor(this,'#be185d')"></button>
+              <button type="button" class="color-swatch" style="background:#f97316"        title="Naranja"      onclick="pickColor(this,'#f97316')"></button>
+              <button type="button" class="color-swatch" style="background:#713f12"        title="Bronce"       onclick="pickColor(this,'#713f12')"></button>
+              <button type="button" class="color-swatch" style="background:#4a5568"        title="Gris pizarra" onclick="pickColor(this,'#4a5568')"></button>
+              <button type="button" class="color-swatch" style="background:#c0c0c0"        title="Plata"        onclick="pickColor(this,'#c0c0c0')"></button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="field-label">Notas del vehículo</label>
+            <textarea class="field" id="nv-notes" rows="2" placeholder="Transmisión, motor, etc."></textarea>
+          </div>
+          <div class="field-err" id="nv-err" data-i18n="err_fields">Completa todos los campos requeridos (*)</div>
+          <div style="display:flex;gap:10px;margin-top:4px">
+            <button class="btn-primary" id="nv-save-btn" onclick="saveVehicle()" style="flex:1" data-i18n="btn_save">Guardar vehículo</button>
+            <button class="btn-ghost-sm" onclick="toggleAddVehicle(false)" data-i18n="btn_cancel">Cancelar</button>
+          </div>
+        </div>
+      </div>
+      <button class="btn-add-v" id="add-v-btn" onclick="toggleAddVehicle(true)" data-i18n="btn_add_v">＋ Agregar vehículo</button>
+
+      <div style="text-align:center;margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.05)">
+        <button onclick="openDeleteAccount()" style="background:none;border:none;color:#44445A;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;padding:4px 8px;border-radius:6px;transition:color 0.15s ease" onmouseover="this.style.color='#CC2936'" onmouseout="this.style.color='#44445A'" data-i18n="btn_del_account">Eliminar cuenta</button>
+      </div>
+    </div>
+
+    <!-- ── Delete account modal ─────────────────────── -->
+    <div id="delete-account-modal" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
+      <div style="background:#111118;border:1px solid rgba(204,41,54,0.3);border-radius:20px;padding:28px;max-width:420px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,0.6)">
+        <div style="font-size:36px;text-align:center;margin-bottom:12px">⚠️</div>
+        <h3 id="del-acct-title" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;text-align:center;margin:0 0 10px;color:#F4F4F8">Eliminar cuenta</h3>
+        <p id="del-acct-body" style="font-size:14px;color:#808098;text-align:center;margin:0 0 24px;line-height:1.5">Esta acción eliminará tu cuenta, vehículos y cancelará tus citas pendientes. No se puede deshacer.</p>
+        <div style="display:flex;gap:10px">
+          <button onclick="closeDeleteAccount()" style="flex:1;padding:12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:#C0C0D0;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer" data-i18n="btn_cancel">Cancelar</button>
+          <button id="del-acct-confirm-btn" onclick="confirmDeleteAccount()" style="flex:1;padding:12px;border-radius:10px;background:rgba(204,41,54,0.15);border:1px solid rgba(204,41,54,0.35);color:#FF6070;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.15s ease" data-i18n="btn_del_confirm">Sí, eliminar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── View: Vehicle Detail ──────────────────────── -->
+    <div id="view-detail" style="display:none">
+      <div class="detail-topbar">
+        <button class="btn-back" onclick="showList()" data-i18n="btn_back">← Mis vehículos</button>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn-del-v" id="detail-del-btn" onclick="deleteVehicle()" data-i18n="btn_delete">Eliminar</button>
+          <button class="btn-primary" id="detail-book-btn" style="width:auto;padding:9px 20px;font-size:14px" onclick="openBookModal()" data-i18n="btn_book">🛢️ Agendar cita</button>
+        </div>
+      </div>
+      <div class="detail-vehicle-card" id="detail-vehicle-info"></div>
+      <div class="section-card" id="detail-status-section" style="display:none">
+        <div class="section-card-title" data-i18n="sec_status">📊 Estado actual del vehículo</div>
+        <div id="detail-status-content"></div>
+      </div>
+      <div class="section-card" id="detail-pending-section">
+        <div class="section-card-title" data-i18n="sec_pending">📅 Citas pendientes</div>
+        <div id="detail-pending-list"></div>
+      </div>
+      <div class="section-card">
+        <div class="section-card-title" data-i18n="sec_history">🔧 Historial de servicios</div>
+        <div id="detail-history-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Translations ───────────────────────────────────
+    const STRINGS = {
+      es: {
+        brand:'Cambio de Aceite', logout:'Salir',
+        hero_sub:'Selecciona un vehículo para ver su historial o agendar una cita',
+        my_vehicles:'Mis vehículos', add_v_title:'Agregar vehículo',
+        lbl_vehicle:'Vehículo (año, marca, modelo) *', ph_vehicle:'2022 Honda Civic',
+        lbl_oil:'Tipo de aceite', oil_note:'Precio por 4.4 quarts de aceite',
+        lbl_addr:'📍 Dirección de servicio',
+        lbl_street:'Calle *', ph_street:'Av. Reforma',
+        lbl_number:'Número',
+        lbl_city:'Ciudad *', ph_city:'Monterrey',
+        lbl_state:'Estado *', ph_state:'Nuevo León',
+        lbl_zip:'Código postal *', ph_zip:'64000',
+        lbl_color:'Color del vehículo',
+        lbl_notes:'Notas del vehículo', ph_notes:'Transmisión, motor, etc.',
+        err_fields:'Completa todos los campos requeridos (*)',
+        btn_save:'Guardar vehículo', btn_cancel:'Cancelar',
+        btn_add_v:'＋ Agregar vehículo', btn_back:'← Mis vehículos',
+        btn_delete:'Eliminar', btn_book:'🛢️ Agendar cita',
+        sec_status:'📊 Estado actual del vehículo',
+        sec_pending:'📅 Citas pendientes', sec_history:'🔧 Historial de servicios',
+        bm_title:'🛢️ Nueva cita', bm_service:'Tipo de servicio',
+        bm_date:'Fecha *', bm_date_hint:'(mínimo mañana)', bm_time:'Horario *',
+        bm_notes:'Notas adicionales', bm_ph_notes:'Algún detalle adicional…',
+        bm_submit:'Confirmar cita →', bm_confirmed:'¡Cita confirmada!', bm_close:'Cerrar',
+        err_time:'Selecciona un horario disponible',
+        svc_oil:'Cambio de aceite', svc_brakes:'Cambio de frenos',
+        svc_tires:'Cambio de llantas', svc_glass:'Cambio de cristales',
+        hello:'Hola', loading:'Cargando…',
+        no_vehicles:'Aún no tienes vehículos registrados.<br>Agrega tu primer vehículo para comenzar.',
+        no_pending:'No hay citas pendientes', no_history:'Aún no hay servicios registrados',
+        no_color:'Sin color', cancel_appt:'Cancelar',
+        saving:'Guardando…', deleting:'Eliminando…',
+        last_svc:'Último servicio:', mileage_lbl:'🔧 Millaje:', no_mileage:'Sin registrar',
+        slot_select:'Selecciona una fecha primero', slot_loading:'Cargando horarios…',
+        no_sunday:'No atendemos los domingos.',
+        confirm_delete:'¿Eliminar "{v}"?\nSe borrarán también sus citas pendientes. Esta acción no se puede deshacer.',
+        confirm_cancel:'¿Cancelar esta cita?',
+        appt_success:'Tu cita es el {date} a las {time} hrs.',
+        appt_email:' Recibirás confirmación por correo.',
+        driver_front:'Conductor Del.', pass_front:'Pasajero Del.',
+        driver_rear:'Conductor Tra.', pass_rear:'Pasajero Tra.',
+        brakes_front:'Frenos delanteros', brakes_rear:'Frenos traseros',
+        oil_conv:'Convencional — $65 · 20% desc.', oil_semi:'Semi-sintético — $75 · 20% desc.',
+        oil_sint:'Sintético total — $85 · 20% desc.',
+        btn_del_account:'Eliminar cuenta', btn_del_confirm:'Sí, eliminar',
+        del_acct_title:'Eliminar cuenta',
+        del_acct_body:'Esta acción eliminará tu cuenta, vehículos y cancelará tus citas pendientes. No se puede deshacer.',
+        del_acct_deleting:'Eliminando…',
+      },
+      en: {
+        brand:'Oil Change Service', logout:'Sign Out',
+        hero_sub:'Select a vehicle to view its history or book an appointment',
+        my_vehicles:'My Vehicles', add_v_title:'Add vehicle',
+        lbl_vehicle:'Vehicle (year, make, model) *', ph_vehicle:'2022 Honda Civic',
+        lbl_oil:'Oil type', oil_note:'Price per 4.4 quarts of oil',
+        lbl_addr:'📍 Service address',
+        lbl_street:'Street *', ph_street:'Main St',
+        lbl_number:'Number',
+        lbl_city:'City *', ph_city:'Philadelphia',
+        lbl_state:'State *', ph_state:'PA',
+        lbl_zip:'ZIP code *', ph_zip:'19135',
+        lbl_color:'Vehicle color',
+        lbl_notes:'Vehicle notes', ph_notes:'Transmission, engine, etc.',
+        err_fields:'Please fill in all required fields (*)',
+        btn_save:'Save vehicle', btn_cancel:'Cancel',
+        btn_add_v:'＋ Add vehicle', btn_back:'← My vehicles',
+        btn_delete:'Delete', btn_book:'🛢️ Book appointment',
+        sec_status:'📊 Current vehicle status',
+        sec_pending:'📅 Pending appointments', sec_history:'🔧 Service history',
+        bm_title:'🛢️ New appointment', bm_service:'Service type',
+        bm_date:'Date *', bm_date_hint:'(minimum tomorrow)', bm_time:'Time *',
+        bm_notes:'Additional notes', bm_ph_notes:'Any extra details…',
+        bm_submit:'Confirm appointment →', bm_confirmed:'Appointment confirmed!', bm_close:'Close',
+        err_time:'Please select an available time slot',
+        svc_oil:'Oil change', svc_brakes:'Brake service',
+        svc_tires:'Tire change', svc_glass:'Windshield replacement',
+        hello:'Hello', loading:'Loading…',
+        no_vehicles:"You don't have any vehicles yet.<br>Add your first vehicle to get started.",
+        no_pending:'No pending appointments', no_history:'No services recorded yet',
+        no_color:'No color', cancel_appt:'Cancel',
+        saving:'Saving…', deleting:'Deleting…',
+        last_svc:'Last service:', mileage_lbl:'🔧 Mileage:', no_mileage:'Not recorded',
+        slot_select:'Select a date first', slot_loading:'Loading time slots…',
+        no_sunday:'We are closed on Sundays.',
+        confirm_delete:'Delete "{v}"?\nPending appointments will also be removed. This cannot be undone.',
+        confirm_cancel:'Cancel this appointment?',
+        appt_success:'Your appointment is on {date} at {time}.',
+        appt_email:' You will receive a confirmation by email.',
+        driver_front:'Driver Front', pass_front:'Passenger Front',
+        driver_rear:'Driver Rear', pass_rear:'Passenger Rear',
+        brakes_front:'Front brakes', brakes_rear:'Rear brakes',
+        oil_conv:'Conventional — $65 · 20% off', oil_semi:'Semi-synthetic — $75 · 20% off',
+        oil_sint:'Full synthetic — $85 · 20% off',
+        btn_del_account:'Delete account', btn_del_confirm:'Yes, delete',
+        del_acct_title:'Delete account',
+        del_acct_body:'This will permanently delete your account, vehicles, and cancel your pending appointments. This cannot be undone.',
+        del_acct_deleting:'Deleting…',
+      }
+    };
+
+    let _lang = localStorage.getItem('lang');
+    function t(key){ return STRINGS[_lang||'es'][key] ?? key; }
+
+    function setLang(lang){
+      _lang = lang;
+      localStorage.setItem('lang', lang);
+      document.getElementById('lang-overlay').classList.add('hidden');
+      document.documentElement.lang = lang;
+      document.getElementById('lang-toggle').textContent = lang === 'es' ? 'EN' : 'ES';
+      applyLang();
+    }
+
+    function toggleLang(){
+      setLang(_lang === 'en' ? 'es' : 'en');
+      loadVehicles();
+      if (_activeVehicle) showDetail(_vehicles.indexOf(_activeVehicle));
+    }
+
+    function applyLang(){
+      document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+      document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+      const oil = document.getElementById('nv-oil');
+      if(oil){ oil.options[0].text=t('oil_conv'); oil.options[1].text=t('oil_semi'); oil.options[2].text=t('oil_sint'); }
+      document.title = t('brand');
+      if(_me.name) document.getElementById('hero-greeting').textContent = `${t('hello')}, ${_me.name.split(' ')[0]} 👋`;
+      const vbt = document.getElementById('verify-banner-title');
+      const vbs = document.getElementById('verify-banner-sub');
+      const vrb = document.getElementById('verify-resend-btn');
+      if (vbt) vbt.textContent = _lang==='en' ? 'Confirm your email address' : 'Confirma tu correo electrónico';
+      if (vbs) vbs.textContent = _lang==='en' ? 'You need to confirm your email to book an appointment' : 'Necesitas confirmar tu correo para poder agendar una cita';
+      if (vrb && !vrb.disabled) vrb.textContent = _lang==='en' ? 'Resend email' : 'Reenviar correo';
+    }
+
+    // ── App state ──────────────────────────────────────
+    let _me = {}, _vehicles = [], _activeVehicle = null;
+
+    function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+    function wearColor(p){ return p==null?'#2A2A3A':p>=60?'#38A169':p>=30?'#D97706':'#CC2936' }
+    function wearSeverity(vals){ const v=vals.filter(x=>x!=null); if(!v.length)return''; const m=Math.min(...v); return m>=60?'good':m>=30?'warn':'crit' }
+
+    function fmtDate(ds){ const loc=_lang==='en'?'en-US':'es-MX'; return new Date(ds+'T12:00:00').toLocaleDateString(loc,{weekday:'long',day:'numeric',month:'long',year:'numeric'}) }
+    function fmtShort(ds){ const loc=_lang==='en'?'en-US':'es-MX'; return new Date(ds+'T12:00:00').toLocaleDateString(loc,{weekday:'short',day:'numeric',month:'short'}) }
+
+    function pickColor(el, hex) {
+      document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+      el.classList.add('selected');
+      document.getElementById('nv-color').value = hex;
+    }
+
+    const COLOR_NAMES = {
+      es: {'#1a1a1a':'Negro','#F5F5F0':'Blanco','#9ca3af':'Gris plata','#6b7280':'Gris oscuro','#b91c1c':'Rojo','#1d4ed8':'Azul','#0f766e':'Verde','#d97706':'Dorado','#92400e':'Café','#7c3aed':'Morado','#0e7490':'Azul marino','#be185d':'Borgoña','#f97316':'Naranja','#713f12':'Bronce','#4a5568':'Gris pizarra','#c0c0c0':'Plata'},
+      en: {'#1a1a1a':'Black','#F5F5F0':'White','#9ca3af':'Silver gray','#6b7280':'Dark gray','#b91c1c':'Red','#1d4ed8':'Blue','#0f766e':'Green','#d97706':'Gold','#92400e':'Brown','#7c3aed':'Purple','#0e7490':'Navy blue','#be185d':'Burgundy','#f97316':'Orange','#713f12':'Bronze','#4a5568':'Slate gray','#c0c0c0':'Silver'}
+    };
+    function colorName(hex){ return (COLOR_NAMES[_lang||'es']||COLOR_NAMES.es)[hex] || hex; }
+
+    const OIL_DISPLAY = {
+      'Convencional':   {es:'Convencional',   en:'Conventional'},
+      'Semi-sintético': {es:'Semi-sintético',  en:'Semi-synthetic'},
+      'Sintético total':{es:'Sintético total', en:'Full synthetic'},
+    };
+    function oilName(v){ return (OIL_DISPLAY[v]||{})[_lang||'es'] || v; }
+
+    // ── Init ───────────────────────────────────────────
+    // ── PayPal integration ─────────────────────────────────────────────────────
+    let _paypalConfig = null;
+    let _paypalLoaded = false;
+    const OIL_PRICES_MAP = { 'Convencional': 65, 'Semi-sintético': 75, 'Sintético total': 85 };
+
+    async function initPayPal() {
+      try {
+        _paypalConfig = await fetch('/api/settings/paypal-client').then(r => r.json());
+        if (_paypalConfig.enabled && _paypalConfig.client_id) {
+          const script = document.createElement('script');
+          script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(_paypalConfig.client_id)}&currency=USD&intent=capture&enable-funding=googlepay,applepay,venmo&components=buttons`;
+          script.onload  = () => { _paypalLoaded = true; };
+          script.onerror = () => { _paypalLoadFailed = true; };
+          document.head.appendChild(script);
+        }
+      } catch {}
+    }
+    let _paypalLoadFailed = false;
+
+    function renderPayPalButtons() {
+      const container = document.getElementById('paypal-button-container');
+      container.innerHTML = '<div style="text-align:center;padding:20px;color:#66667A;font-size:13px">⏳ Cargando métodos de pago…</div>';
+      if (!window.paypal) {
+        let attempts = 0;
+        const wait = setInterval(() => {
+          attempts++;
+          if (window.paypal) {
+            clearInterval(wait);
+            _doRenderPayPalButtons();
+          } else if (_paypalLoadFailed || attempts > 20) {
+            clearInterval(wait);
+            container.innerHTML = `
+              <div style="text-align:center;padding:16px">
+                <div style="font-size:13px;color:#FF8090;margin-bottom:12px">⚠️ No se pudo cargar PayPal.<br>Verifica el Client ID en <a href="/admin" style="color:#4A7EC8">Admin → Pagos</a>.</div>
+                <button onclick="submitBookingFallback()" style="padding:12px 24px;background:linear-gradient(135deg,#CC2936,#A31F2B);border:none;border-radius:10px;color:white;font-size:14px;font-weight:700;cursor:pointer">Confirmar cita sin pago →</button>
+              </div>`;
+          }
+        }, 500);
+        return;
+      }
+      _doRenderPayPalButtons();
+    }
+
+    async function submitBookingFallback() {
+      const v = _activeVehicle;
+      const data = {
+        name: _me.name||'', email: _me.email||'', phone: _me.phone||'',
+        vehicle: v.vehicle, oil_type: v.oil_type, location: v.location||'',
+        vehicle_id: v.id, date: document.getElementById('bm-date').value,
+        time: document.getElementById('bm-time').value,
+        notes: document.getElementById('bm-notes').value.trim(),
+        is_recurring: false, recurrence_weeks: 12
+      };
+      try {
+        const res = await fetch('/api/appointments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+        const result = await res.json();
+        if (!res.ok) { alert('Error: '+(result.error||'Error')); return; }
+        document.getElementById('bm-success-msg').textContent =
+          t('appt_success').replace('{date}',fmtDate(data.date)).replace('{time}',data.time) +
+          (data.email ? t('appt_email') : '');
+        document.getElementById('bm-form-wrap').style.display = 'none';
+        document.getElementById('bm-success').style.display = 'block';
+        refreshAll();
+      } catch(e) { alert('Error: '+e.message); }
+    }
+
+    function _doRenderPayPalButtons() {
+      const container = document.getElementById('paypal-button-container');
+      container.innerHTML = '';
+      window.paypal.Buttons({
+        style: { layout: 'vertical', shape: 'rect', color: 'gold', height: 44 },
+        createOrder: async () => {
+          const time = document.getElementById('bm-time').value;
+          if (!time) { document.getElementById('bm-time-err').classList.add('show'); throw new Error('Selecciona un horario'); }
+          const res = await fetch('/api/payments/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ oil_type: _activeVehicle.oil_type })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Error creando orden');
+          return data.order_id;
+        },
+        onApprove: async (data) => {
+          const v = _activeVehicle;
+          const apptData = {
+            order_id: data.orderID,
+            name: _me.name || '', email: _me.email || '', phone: _me.phone || '',
+            vehicle: v.vehicle, oil_type: v.oil_type, location: v.location || '',
+            vehicle_id: v.id,
+            date: document.getElementById('bm-date').value,
+            time: document.getElementById('bm-time').value,
+            notes: document.getElementById('bm-notes').value.trim(),
+          };
+          const res = await fetch('/api/payments/capture-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(apptData)
+          });
+          const result = await res.json();
+          if (!res.ok) { alert('Error: ' + (result.error || 'Error al procesar el pago')); return; }
+          document.getElementById('bm-success-msg').textContent =
+            t('appt_success').replace('{date}', fmtDate(apptData.date)).replace('{time}', apptData.time) +
+            (apptData.email ? t('appt_email') : '');
+          document.getElementById('bm-form-wrap').style.display = 'none';
+          document.getElementById('bm-success').style.display = 'block';
+          refreshAll();
+        },
+        onError: (err) => {
+          console.error('PayPal error:', err);
+          alert(_lang === 'en' ? 'Payment error. Please try again.' : 'Error en el pago. Inténtalo de nuevo.');
+        }
+      }).render('#paypal-button-container');
+    }
+
+    async function init(){
+      try {
+        const me = await fetch('/api/me').then(r=>{ if(r.status===401){location.href='/auth';throw 0;} return r.json(); });
+        _me = me;
+        document.getElementById('user-name').textContent = me.name;
+        document.getElementById('user-avatar').textContent = (me.name||'?')[0].toUpperCase();
+        document.getElementById('hero-greeting').textContent = `${t('hello')}, ${me.name.split(' ')[0]} 👋`;
+        if (!me.email_verified) showVerifyBanner();
+      } catch {}
+      await loadVehicles();
+      initPayPal();
+    }
+
+    function showVerifyBanner(){
+      const b = document.getElementById('verify-banner');
+      if (b) b.style.display = 'flex';
+    }
+
+    async function resendVerification(){
+      const btn = document.getElementById('verify-resend-btn');
+      btn.disabled = true; btn.textContent = _lang==='en' ? 'Sending…' : 'Enviando…';
+      try {
+        await fetch('/api/me/resend-verification', { method:'POST' });
+        btn.textContent = _lang==='en' ? '✅ Email sent!' : '✅ ¡Correo enviado!';
+      } catch {
+        btn.disabled = false;
+        btn.textContent = _lang==='en' ? 'Resend email' : 'Reenviar correo';
+      }
+    }
+
+    // ── Vehicles list ──────────────────────────────────
+    async function loadVehicles(){
+      const wrap = document.getElementById('vehicle-cards');
+      wrap.innerHTML = `<div class="empty-state">${t('loading')}</div>`;
+      try {
+        _vehicles = await fetch('/api/vehicles').then(r=>r.json());
+        if (!_vehicles.length){
+          wrap.innerHTML = `<div class="empty-state" style="padding:32px 0">${t('no_vehicles')}</div>`;
+          return;
+        }
+        wrap.innerHTML = _vehicles.map((v,i) => `
+          <div class="vehicle-card${v.color?' has-color':''}" tabindex="0" role="button"
+            style="${v.color?`--v-color:${v.color}`:''}"
+            onclick="showDetail(${i})"
+            onkeydown="if(event.key==='Enter'||event.key===' ')showDetail(${i})">
+            <div class="v-icon-wrap" style="${v.color?`background:${v.color};border-color:${v.color}`:''}" title="${v.color?colorName(v.color):''}">🚗</div>
+            <div class="v-info">
+              <div class="v-name">${esc(v.vehicle)}</div>
+              <div class="v-meta">
+                <span class="v-oil-badge">${oilName(v.oil_type)}</span>
+                <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#C8C8D8"><span style="width:12px;height:12px;border-radius:3px;background:${v.color||'#44445A'};border:1px solid rgba(255,255,255,0.2);display:inline-block;flex-shrink:0"></span>${v.color?colorName(v.color):t('no_color')}</span>
+                ${v.location ? `<span class="v-loc">📍 ${esc(v.location)}</span>` : ''}
+              </div>
+            </div>
+            <div class="v-arrow">›</div>
+          </div>`).join('');
+      } catch { wrap.innerHTML = `<div class="empty-state" style="color:#CC2936">${t('loading')} error</div>`; }
+    }
+
+    function toggleAddVehicle(show){
+      document.getElementById('add-v-wrap').style.display = show ? 'block' : 'none';
+      document.getElementById('add-v-btn').style.display  = show ? 'none'  : 'flex';
+      if (show) setTimeout(()=>document.getElementById('nv-vehicle').focus(), 50);
+    }
+
+
+    async function saveVehicle(){
+      const vehicle  = document.getElementById('nv-vehicle').value.trim();
+      const oil_type = document.getElementById('nv-oil').value;
+      const street   = document.getElementById('nv-street').value.trim();
+      const number   = document.getElementById('nv-number').value.trim();
+      const city     = document.getElementById('nv-city').value.trim();
+      const state    = document.getElementById('nv-state').value.trim();
+      const zip      = document.getElementById('nv-zip').value.trim();
+      const notes    = document.getElementById('nv-notes').value.trim();
+      const color = document.getElementById('nv-color').value;
+      const errEl    = document.getElementById('nv-err');
+
+      if (!vehicle || !street || !city || !state || !zip){
+        errEl.classList.add('show');
+        if (!vehicle) document.getElementById('nv-vehicle').focus();
+        else if (!street) document.getElementById('nv-street').focus();
+        else if (!city)   document.getElementById('nv-city').focus();
+        else if (!state)  document.getElementById('nv-state').focus();
+        else              document.getElementById('nv-zip').focus();
+        return;
+      }
+      errEl.classList.remove('show');
+
+      const locationParts = [street];
+      if (number) locationParts.push('#' + number);
+      locationParts.push(city, state, zip);
+      const location = locationParts.join(', ');
+
+      const btn = document.getElementById('nv-save-btn');
+      btn.disabled = true; btn.textContent = t('saving');
+      try {
+        const r = await fetch('/api/vehicles',{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({vehicle,oil_type,location,notes,color})});
+        if (r.ok){
+          ['nv-vehicle','nv-street','nv-number','nv-city','nv-state','nv-zip','nv-notes']
+            .forEach(id => { document.getElementById(id).value = ''; });
+          document.getElementById('nv-color').value = '';
+          document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+          toggleAddVehicle(false);
+          await loadVehicles();
+        }
+      } finally { btn.disabled=false; btn.textContent=t('btn_save'); }
+    }
+
+    // ── Vehicle detail ─────────────────────────────────
+    function showList(){
+      document.getElementById('view-list').style.display = 'block';
+      document.getElementById('view-detail').style.display = 'none';
+      _activeVehicle = null;
+    }
+
+    async function deleteVehicle(){
+      if (!_activeVehicle) return;
+      if (!confirm(t('confirm_delete').replace('{v}', _activeVehicle.vehicle))) return;
+      const btn = document.getElementById('detail-del-btn');
+      btn.disabled = true; btn.textContent = t('deleting');
+      try {
+        const r = await fetch(`/api/vehicles/${_activeVehicle.id}`, { method: 'DELETE' });
+        if (r.ok) { showList(); await loadVehicles(); }
+      } catch {}
+      finally { btn.disabled = false; btn.textContent = t('btn_delete'); }
+    }
+
+    async function showDetail(idx){
+      _activeVehicle = _vehicles[idx];
+      document.getElementById('view-list').style.display = 'none';
+      document.getElementById('view-detail').style.display = 'block';
+      window.scrollTo({top:0,behavior:'smooth'});
+      const v = _activeVehicle;
+      document.getElementById('detail-vehicle-info').innerHTML = `
+        <div class="detail-v-name">${esc(v.vehicle)}</div>
+        <div class="detail-v-meta">
+          <span class="v-oil-badge">${oilName(v.oil_type)}</span>
+          ${v.color ? `<span class="v-color-chip"><span style="width:10px;height:10px;border-radius:50%;background:${v.color};border:1px solid rgba(255,255,255,0.15);flex-shrink:0;display:inline-block"></span>${colorName(v.color)}</span>` : ''}
+          ${v.location ? `<span class="v-loc">📍 ${esc(v.location)}</span>` : ''}
+          ${v.notes    ? `<span class="v-loc" style="font-style:italic">${esc(v.notes)}</span>` : ''}
+        </div>`;
+      loadPending(v.id);
+      loadHistory(v.id);
+    }
+
+    async function loadPending(vehicleId){
+      const wrap = document.getElementById('detail-pending-list');
+      wrap.innerHTML = `<div class="empty-state">${t('loading')}</div>`;
+      try {
+        const appts = await fetch(`/api/vehicles/${vehicleId}/appointments`).then(r=>r.json());
+        if (!appts.length){ wrap.innerHTML=`<div class="empty-state">${t('no_pending')}</div>`; return; }
+        wrap.innerHTML = appts.map(a => `
+          <div class="pending-row" id="prow-${a.id}">
+            <div class="time-pill">${esc(a.time)}</div>
+            <div class="pending-meta">
+              <div class="pending-date">${fmtShort(a.date)}</div>
+              <div class="pending-sub">${oilName(a.oil_type)}</div>
+            </div>
+            <button class="btn-cancel-appt" onclick="cancelAppt(${a.id})">${t('cancel_appt')}</button>
+          </div>`).join('');
+      } catch { wrap.innerHTML=`<div class="empty-state" style="color:#CC2936">Error</div>`; }
+    }
+
+    async function cancelAppt(id){
+      if (!confirm(t('confirm_cancel'))) return;
+      const r = await fetch(`/api/my-appointments/${id}`,{method:'DELETE'}).then(r=>r.json());
+      if (r.success){ document.getElementById('prow-'+id)?.remove(); loadPending(_activeVehicle.id); }
+    }
+
+    async function loadHistory(vehicleId){
+      const wrap = document.getElementById('detail-history-list');
+      const statusSec = document.getElementById('detail-status-section');
+      wrap.innerHTML = `<div class="empty-state">${t('loading')}</div>`;
+      try {
+        const items = await fetch(`/api/vehicles/${vehicleId}/history`).then(r=>r.json());
+        if (!items.length){
+          wrap.innerHTML=`<div class="empty-state">${t('no_history')}</div>`;
+          statusSec.style.display = 'none';
+          return;
+        }
+        // Show current status from most recent entry
+        const latest = items[0];
+        const hasLatestHealth = [latest.tire_fl,latest.tire_fr,latest.tire_rl,latest.tire_rr,latest.brake_front,latest.brake_rear].some(v=>v!=null);
+        if (hasLatestHealth){
+          statusSec.style.display = 'block';
+          document.getElementById('detail-status-content').innerHTML =
+            `<div style="font-size:11px;color:#44445A;margin-bottom:12px">${t('last_svc')} ${fmtShort(latest.date)}</div>`+
+            renderCarSchematic(latest);
+        } else {
+          statusSec.style.display = 'none';
+        }
+        wrap.innerHTML = items.map(a => renderHistoryEntry(a)).join('');
+      } catch { wrap.innerHTML='<div class="empty-state" style="color:#CC2936">Error al cargar historial</div>'; }
+    }
+
+    // ── Car schematic ──────────────────────────────────
+    function renderCarSchematic(data){
+      const { tire_fl, tire_fr, tire_rl, tire_rr, brake_front, brake_rear } = data || {};
+
+      function tireArc(pct){
+        const r=26, circ=2*Math.PI*r;
+        const fill = pct!=null ? (pct/100)*circ : 0;
+        const c = wearColor(pct);
+        const label = pct!=null ? pct+'%' : '—';
+        return `<svg viewBox="0 0 60 60" width="58" height="58" style="display:block">
+          <circle cx="30" cy="30" r="${r}" fill="rgba(0,0,0,0.25)" stroke="rgba(255,255,255,0.04)" stroke-width="5"/>
+          <circle cx="30" cy="30" r="${r}" fill="none" stroke="${c}" stroke-width="5"
+            stroke-dasharray="${fill.toFixed(1)} ${circ.toFixed(1)}" stroke-linecap="round"
+            transform="rotate(-90 30 30)"/>
+          <text x="30" y="34" text-anchor="middle" font-family="'DM Sans',sans-serif"
+            font-size="11" font-weight="700" fill="${c}">${label}</text>
+        </svg>`;
+      }
+
+      function brakeBar(pct, label){
+        const c = wearColor(pct);
+        const w = pct!=null ? Math.max(3,pct) : 0;
+        return `<div class="brake-indicator">
+          <div class="brake-ind-lbl">${label}</div>
+          <div class="brake-ind-bar-wrap">
+            <div class="brake-ind-bar-fill" style="width:${w}%;background:${c}"></div>
+          </div>
+          <div class="brake-ind-pct" style="color:${c}">${pct!=null?pct+'%':'—'}</div>
+        </div>`;
+      }
+
+      return `<div class="car-schematic">
+        <!-- row 1: FL / front brake / FR -->
+        <div class="t-gauge">${tireArc(tire_fl)}<div class="t-gauge-lbl">${t('driver_front')}</div></div>
+        ${brakeBar(brake_front,t('brakes_front'))}
+        <div class="t-gauge">${tireArc(tire_fr)}<div class="t-gauge-lbl">${t('pass_front')}</div></div>
+
+        <!-- row 2: empty / car body / empty -->
+        <div></div>
+        <div style="display:flex;justify-content:center;padding:2px 0">
+          <svg viewBox="0 0 72 110" width="72" height="110">
+            <rect x="4" y="5" width="64" height="100" rx="22" fill="#1A1A24" stroke="rgba(255,255,255,0.09)" stroke-width="1.5"/>
+            <rect x="9" y="11" width="54" height="34" rx="10" fill="rgba(74,126,200,0.11)" stroke="rgba(74,126,200,0.16)" stroke-width="1"/>
+            <rect x="9" y="65" width="54" height="26" rx="8" fill="rgba(74,126,200,0.07)" stroke="rgba(74,126,200,0.11)" stroke-width="1"/>
+            <line x1="6" y1="54" x2="66" y2="54" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <rect x="29" y="48" width="14" height="12" rx="3" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+          </svg>
+        </div>
+        <div></div>
+
+        <!-- row 3: RL / rear brake / RR -->
+        <div class="t-gauge">${tireArc(tire_rl)}<div class="t-gauge-lbl">${t('driver_rear')}</div></div>
+        ${brakeBar(brake_rear,t('brakes_rear'))}
+        <div class="t-gauge">${tireArc(tire_rr)}<div class="t-gauge-lbl">${t('pass_rear')}</div></div>
+      </div>`;
+    }
+
+    function renderHistoryEntry(a){
+      const hasHealth = [a.tire_fl,a.tire_fr,a.tire_rl,a.tire_rr,a.brake_front,a.brake_rear].some(v=>v!=null);
+      const sev = wearSeverity([a.tire_fl,a.tire_fr,a.tire_rl,a.tire_rr,a.brake_front,a.brake_rear]);
+      const kmStr = a.mileage
+        ? `<strong style="color:#F4F4F8">${Number(a.mileage).toLocaleString('en-US')} mi</strong>`
+        : `<span style="color:#33334A">${t('no_mileage')}</span>`;
+      return `<div class="history-entry ${sev}">
+        <div class="he-date">📅 ${fmtDate(a.date)} · ${esc(a.time)}</div>
+        <div class="he-meta" style="margin-bottom:4px">
+          <span class="he-km">${t('mileage_lbl')} ${kmStr}</span>
+          <span class="he-oil">${oilName(a.oil_type)}</span>
+        </div>
+        ${hasHealth ? renderCarSchematic(a) : ''}
+      </div>`;
+    }
+
+    // ── Booking modal ──────────────────────────────────
+    function openBookModal(){
+      const v = _activeVehicle;
+      document.getElementById('bm-vehicle-box').style.display = 'block';
+      document.getElementById('bm-vehicle-box').innerHTML = `
+        <div class="vsb-name">${esc(v.vehicle)}</div>
+        <div class="vsb-meta">
+          <span class="v-oil-badge">${oilName(v.oil_type)}</span>
+          ${v.location ? `<span class="v-loc">📍 ${esc(v.location)}</span>` : ''}
+        </div>
+        <div style="font-size:12px;color:#44445A;margin-top:6px">👤 ${esc(_me.name)} · 📞 ${esc(_me.phone||'—')}</div>`;
+      const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
+      document.getElementById('bm-date').min = tomorrow.toISOString().split('T')[0];
+      document.getElementById('bm-date').value = '';
+      document.getElementById('bm-slots').innerHTML = `<div class="slot-ph">${t('slot_select')}</div>`;
+      document.getElementById('bm-time').value = '';
+      document.getElementById('bm-notes').value = '';
+      document.getElementById('bm-form-wrap').style.display = 'block';
+      document.getElementById('bm-success').style.display = 'none';
+      document.getElementById('bm-submit').disabled = false;
+      document.getElementById('bm-submit').textContent = t('bm_submit');
+      document.getElementById('book-modal').classList.add('open');
+    }
+
+    function closeBookModal(){
+      document.getElementById('book-modal').classList.remove('open');
+      // Reset payment step
+      document.getElementById('bm-payment-wrap').style.display = 'none';
+      document.getElementById('bm-submit').style.display = '';
+      document.getElementById('paypal-button-container').innerHTML = '';
+      document.getElementById('bm-form-wrap').style.display = '';
+      document.getElementById('bm-success').style.display = 'none';
+      if (_activeVehicle) loadPending(_activeVehicle.id);
+    }
+
+    document.getElementById('bm-date').addEventListener('input', function(){
+      const d = new Date(this.value+'T12:00:00');
+      if (d.getDay()===0){ this.value=''; alert(t('no_sunday')); return; }
+      loadBmSlots(this.value);
+    });
+
+    async function loadBmSlots(date){
+      const wrap = document.getElementById('bm-slots');
+      wrap.innerHTML = `<div class="slot-ph">${t('slot_loading')}</div>`;
+      document.getElementById('bm-time').value = '';
+      try {
+        const {taken} = await fetch(`/api/appointments/available-slots?date=${date}`).then(r=>r.json());
+        const all = ['8:00','9:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'];
+        wrap.innerHTML = '';
+        all.forEach(s=>{
+          const el = document.createElement('div');
+          el.className = 'slot'+(taken.includes(s)?' taken':'');
+          el.textContent = s;
+          if (!taken.includes(s)) el.addEventListener('click',()=>{
+            document.querySelectorAll('#bm-slots .slot').forEach(x=>x.classList.remove('selected'));
+            el.classList.add('selected');
+            document.getElementById('bm-time').value = s;
+            document.getElementById('bm-time-err').classList.remove('show');
+          });
+          wrap.appendChild(el);
+        });
+      } catch { wrap.innerHTML='<div class="slot-ph" style="color:#CC2936">Error al cargar</div>'; }
+    }
+
+    async function submitBooking(){
+      const time = document.getElementById('bm-time').value;
+      if (!time){ document.getElementById('bm-time-err').classList.add('show'); return; }
+
+      // If PayPal is configured, show payment step instead
+      if (_paypalConfig?.enabled) {
+        const v = _activeVehicle;
+        const price = OIL_PRICES_MAP[v.oil_type] || 65;
+        document.getElementById('bm-price-amount').textContent = `$${price}`;
+        document.getElementById('bm-price-detail').innerHTML =
+          `${v.vehicle}<br><span style="color:#CC2936">${v.oil_type}</span>`;
+        document.getElementById('bm-payment-wrap').style.display = 'block';
+        document.getElementById('bm-submit').style.display = 'none';
+        renderPayPalButtons();
+        return;
+      }
+
+      const btn = document.getElementById('bm-submit');
+      btn.disabled=true; btn.textContent=t('saving');
+      const v = _activeVehicle;
+      const data = {
+        name: _me.name||'', email: _me.email||'', phone: _me.phone||'',
+        vehicle: v.vehicle, oil_type: v.oil_type, location: v.location||'',
+        vehicle_id: v.id, date: document.getElementById('bm-date').value,
+        time, notes: document.getElementById('bm-notes').value.trim(),
+        is_recurring: false, recurrence_weeks: 12
+      };
+      try {
+        const res = await fetch('/api/appointments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+        const result = await res.json();
+        if (res.status === 403 && result.error === 'verify_email') {
+          btn.disabled=false; btn.textContent=t('bm_submit');
+          showVerifyBanner();
+          closeBookModal();
+          alert(_lang==='en'
+            ? '✉️ Please confirm your email address before booking. Check your inbox.'
+            : '✉️ Debes confirmar tu correo electrónico antes de agendar. Revisa tu bandeja de entrada.');
+          return;
+        }
+        if (!res.ok) throw new Error(result.error||'Error');
+        document.getElementById('bm-success-msg').textContent =
+          t('appt_success').replace('{date}',fmtDate(data.date)).replace('{time}',data.time) +
+          (data.email ? t('appt_email') : '');
+        document.getElementById('bm-form-wrap').style.display = 'none';
+        document.getElementById('bm-success').style.display = 'block';
+      } catch(err){
+        alert('Error: '+err.message);
+        btn.disabled=false; btn.textContent=t('bm_submit');
+      }
+    }
+
+    // Close modals on backdrop click
+    document.getElementById('book-modal').addEventListener('click',e=>{ if(e.target===document.getElementById('book-modal')) closeBookModal(); });
+
+    // Language init (must run after all let declarations)
+    if (!_lang) {
+      document.getElementById('lang-overlay').classList.remove('hidden');
+    } else {
+      document.getElementById('lang-overlay').classList.add('hidden');
+      document.getElementById('lang-toggle').textContent = _lang === 'es' ? 'EN' : 'ES';
+      document.documentElement.lang = _lang;
+      applyLang();
+    }
+
+    // ── Delete account ─────────────────────────────────
+    function openDeleteAccount(){
+      document.getElementById('del-acct-title').textContent = t('del_acct_title');
+      document.getElementById('del-acct-body').textContent  = t('del_acct_body');
+      document.getElementById('del-acct-confirm-btn').textContent = t('btn_del_confirm');
+      const modal = document.getElementById('delete-account-modal');
+      modal.style.display = 'flex';
+    }
+    function closeDeleteAccount(){
+      document.getElementById('delete-account-modal').style.display = 'none';
+    }
+    async function confirmDeleteAccount(){
+      const btn = document.getElementById('del-acct-confirm-btn');
+      btn.disabled = true; btn.textContent = t('del_acct_deleting');
+      try {
+        await fetch('/api/me', { method:'DELETE' });
+        location.href = '/auth';
+      } catch {
+        btn.disabled = false; btn.textContent = t('btn_del_confirm');
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
