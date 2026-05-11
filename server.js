@@ -706,16 +706,19 @@ async function getPayPalBase() {
 async function getPayPalToken() {
   const clientId = await getSetting('paypal_client_id');
   const secret   = await getSetting('paypal_client_secret');
-  if (!clientId || !secret) return null;
+  if (!clientId || !secret) { console.error('PayPal: client_id o secret vacíos'); return null; }
+  const base = await getPayPalBase();
   const auth = Buffer.from(`${clientId}:${secret}`).toString('base64');
   try {
-    const r = await fetch(`${await getPayPalBase()}/v1/oauth2/token`, {
+    const r = await fetch(`${base}/v1/oauth2/token`, {
       method: 'POST',
       headers: { Authorization: `Basic ${auth}`, 'Content-Type': 'application/x-www-form-urlencoded' },
       body: 'grant_type=client_credentials'
     });
-    return (await r.json()).access_token || null;
-  } catch { return null; }
+    const d = await r.json();
+    if (!d.access_token) console.error('PayPal token error:', JSON.stringify(d));
+    return d.access_token || null;
+  } catch(e) { console.error('PayPal fetch error:', e.message); return null; }
 }
 
 app.get('/api/settings/paypal-client', async (_req, res) => {
