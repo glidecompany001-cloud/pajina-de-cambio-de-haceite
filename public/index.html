@@ -648,7 +648,7 @@
         _paypalConfig = await fetch('/api/settings/paypal-client').then(r => r.json());
         if (_paypalConfig.enabled && _paypalConfig.client_id) {
           const script = document.createElement('script');
-          script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(_paypalConfig.client_id)}&currency=USD&intent=capture&enable-funding=googlepay,applepay,venmo`;
+          script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(_paypalConfig.client_id)}&currency=USD&intent=capture&enable-funding=venmo`;
           script.onload  = () => { _paypalLoaded = true; };
           script.onerror = () => { _paypalLoadFailed = true; };
           document.head.appendChild(script);
