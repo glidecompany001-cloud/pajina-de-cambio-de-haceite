@@ -1158,7 +1158,126 @@
       }
     }
 
+    // ── Payment pending polling ────────────────────────
+    let _paymentModalShown = false;
+
+    async function pollPaymentPending() {
+      if (_paymentModalShown) return;
+      try {
+        const r = await fetch('/api/my-appointments/payment-pending');
+        if (!r.ok) return;
+        const data = await r.json();
+        if (data.pending) {
+          _paymentModalShown = true;
+          showPaymentModal(data);
+        }
+      } catch {}
+    }
+
+    function showPaymentModal(info) {
+      document.getElementById('pm-vehicle').textContent = info.vehicle;
+      document.getElementById('pm-service').textContent = `Cambio de aceite — ${info.oil_type}`;
+      document.getElementById('pm-price').textContent = `$${info.price} USD`;
+      document.getElementById('pm-modal').style.display = 'flex';
+      document.getElementById('pm-btn-cash').onclick = () => doPayCash(info.payment_token);
+      if (info.paypal_enabled && info.paypal_client_id) {
+        loadPayPalForPayment(info.paypal_client_id, info.payment_token);
+      } else {
+        document.getElementById('pm-divider').style.display = 'none';
+      }
+    }
+
+    async function doPayCash(token) {
+      const btn = document.getElementById('pm-btn-cash');
+      btn.disabled = true; btn.textContent = 'Registrando…';
+      try {
+        const r = await fetch(`/api/pay/${token}/cash`, { method: 'POST' });
+        if (r.ok) showPaymentSuccess('cash');
+        else { btn.disabled = false; btn.innerHTML = '💵 Pagar en efectivo'; }
+      } catch { btn.disabled = false; }
+    }
+
+    function loadPayPalForPayment(clientId, token) {
+      if (window.paypal) { renderPayPalForPayment(token); return; }
+      const s = document.createElement('script');
+      s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=USD&intent=capture&enable-funding=venmo,applepay`;
+      s.onload = () => renderPayPalForPayment(token);
+      s.onerror = () => { document.getElementById('pm-divider').style.display = 'none'; document.getElementById('pm-paypal-wrap').innerHTML = ''; };
+      document.head.appendChild(s);
+    }
+
+    function renderPayPalForPayment(token) {
+      if (!window.paypal) return;
+      window.paypal.Buttons({
+        style: { layout: 'vertical', shape: 'rect', color: 'gold', height: 44 },
+        createOrder: async () => {
+          const r = await fetch(`/api/pay/${token}/create-paypal-order`, { method: 'POST' });
+          const d = await r.json();
+          if (!r.ok) throw new Error(d.error || 'Error');
+          return d.order_id;
+        },
+        onApprove: async (data) => {
+          const r = await fetch(`/api/pay/${token}/capture-paypal`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ order_id: data.orderID })
+          });
+          if (r.ok) showPaymentSuccess('online');
+          else { const d = await r.json(); alert('Error: ' + (d.error || 'Intenta de nuevo')); }
+        },
+        onError: () => alert('Error con PayPal. Por favor paga en efectivo.')
+      }).render('#pm-paypal-wrap');
+    }
+
+    function showPaymentSuccess(method) {
+      document.getElementById('pm-content').style.display = 'none';
+      document.getElementById('pm-success').style.display = 'block';
+      document.getElementById('pm-success-icon').textContent = method === 'cash' ? '💵' : '✅';
+      document.getElementById('pm-success-msg').textContent = method === 'cash'
+        ? '¡Listo! Le avisamos al técnico que pagarás en efectivo.'
+        : '¡Pago completado! El técnico completará el servicio ahora.';
+    }
+
     init();
+    setInterval(pollPaymentPending, 10000);
+    pollPaymentPending();
   </script>
+
+  <!-- Payment pending modal -->
+  <div id="pm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:200;align-items:center;justify-content:center;padding:20px">
+    <div style="background:#111118;border:1px solid rgba(255,255,255,0.09);border-radius:24px;padding:32px;width:100%;max-width:400px;box-shadow:0 32px 80px rgba(0,0,0,0.7)">
+      <div id="pm-content">
+        <div style="text-align:center;margin-bottom:24px">
+          <div style="font-size:44px;margin-bottom:12px">🛢️</div>
+          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.02em;margin-bottom:6px">¡Tu técnico llegó!</div>
+          <div style="font-size:13px;color:#44445A">Selecciona cómo quieres pagar</div>
+        </div>
+        <div style="background:#18181F;border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:16px;margin-bottom:24px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+            <span style="font-size:12px;color:#44445A">Vehículo</span>
+            <span id="pm-vehicle" style="font-size:14px;color:#C8C8D8;font-weight:600"></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+            <span style="font-size:12px;color:#44445A">Servicio</span>
+            <span id="pm-service" style="font-size:13px;color:#C8C8D8;font-weight:500"></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px">
+            <span style="font-size:13px;color:#8888A0">Total</span>
+            <span id="pm-price" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#F4F4F8"></span>
+          </div>
+        </div>
+        <button id="pm-btn-cash" style="width:100%;padding:14px;background:#18181F;border:2px solid rgba(255,255,255,0.08);border-radius:12px;color:#C8C8D8;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px;transition:border-color 0.15s,background 0.15s" onmouseover="this.style.borderColor='rgba(255,255,255,0.18)';this.style.background='#1E1E28'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.background='#18181F'">
+          <span style="font-size:20px">💵</span> Pagar en efectivo
+        </button>
+        <div id="pm-divider" style="display:flex;align-items:center;gap:12px;margin:12px 0;color:#2A2A3A;font-size:12px">
+          <div style="flex:1;height:1px;background:rgba(255,255,255,0.05)"></div>o<div style="flex:1;height:1px;background:rgba(255,255,255,0.05)"></div>
+        </div>
+        <div id="pm-paypal-wrap"></div>
+      </div>
+      <div id="pm-success" style="display:none;text-align:center;padding:16px 0">
+        <div id="pm-success-icon" style="font-size:56px;margin-bottom:16px"></div>
+        <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.02em;margin-bottom:8px">¡Confirmado!</div>
+        <div id="pm-success-msg" style="font-size:14px;color:#44445A;line-height:1.6"></div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

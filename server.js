@@ -403,6 +403,18 @@ app.get('/api/my-appointments', requireCustomer, async (req, res) => {
   res.json(await dbAll("SELECT * FROM appointments WHERE user_id=? AND date>=? AND status='pending' ORDER BY date,time", [req.session.customerId, today]));
 });
 
+app.get('/api/my-appointments/payment-pending', requireCustomer, async (req, res) => {
+  const appt = await dbGet(
+    `SELECT id, name, vehicle, oil_type, payment_token, payment_status FROM appointments
+     WHERE user_id=? AND arrival_confirmed=1 AND payment_status='pending' AND status='pending' LIMIT 1`,
+    [req.session.customerId]
+  );
+  if (!appt) return res.json({ pending: false });
+  const price = OIL_PRICES[appt.oil_type] || '65.00';
+  const clientId = await getSetting('paypal_client_id');
+  res.json({ pending: true, ...appt, price, paypal_client_id: clientId || '', paypal_enabled: !!clientId });
+});
+
 const TIME_SLOTS = ['8:00','9:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'];
 
 app.get('/api/appointments/available-slots', requireCustomer, async (req, res) => {
