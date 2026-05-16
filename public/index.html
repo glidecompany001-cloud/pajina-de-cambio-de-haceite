@@ -1211,7 +1211,6 @@
         doc.text(v.vehicle||'—', M+6, y+9);
         doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(100,100,140);
         doc.text((lang==='en'?'Oil type: ':'Tipo de aceite: ')+(v.oil_type||'—'), M+6, y+16);
-        if (v.location) doc.text('📍 '+v.location, M+80, y+16);
 
         // ── Health score ─────────────────────────────────
         y+=30;
