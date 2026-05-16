@@ -69,6 +69,11 @@
     html.light .addr-hint{color:#9090B0}
     html.light .divider-line{border-top-color:rgba(0,0,0,0.06)}
     html.light .card [style*="color:#ffffff"]{color:#0A0A1A!important}
+    /* ── Guest form light mode ── */
+    #city-toggle-wrap{background:#18181F;border:1px solid rgba(255,255,255,0.07)}
+    html.light #city-toggle-wrap{background:#F0F3FF;border-color:rgba(0,0,0,0.1)}
+    .g-addr-divider{color:#5A5A78;border-bottom:1px solid rgba(255,255,255,0.05)}
+    html.light .g-addr-divider{color:#7070A0;border-bottom-color:rgba(0,0,0,0.08)}
   </style>
 </head>
 <body>
@@ -185,7 +190,7 @@
             </div>
             <input type="hidden" id="g-time">
           </div>
-          <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#5A5A78;margin:14px 0 10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.05)" data-i18n="lbl_addr">📍 Dirección de servicio</div>
+          <div class="g-addr-divider" style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;margin:14px 0 10px;padding-bottom:6px" data-i18n="lbl_addr">📍 Dirección de servicio</div>
           <div class="form-row">
             <div class="form-group">
               <label class="field-label" data-i18n="lbl_street">Calle *</label>
@@ -200,9 +205,9 @@
             <label class="field-label" data-i18n="lbl_city">Ciudad *</label>
             <input type="hidden" id="g-city" value="New Jersey">
             <input type="hidden" id="g-state" value="NJ">
-            <div style="display:flex;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:4px;gap:4px;position:relative">
-              <button type="button" id="city-btn-nj" onclick="selectCity('New Jersey','NJ')" style="flex:1;padding:9px 0;border-radius:7px;border:none;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:background 0.18s ease,color 0.18s ease;background:linear-gradient(135deg,#007bff,#0056b3);color:#fff;box-shadow:0 2px 8px rgba(0,123,255,0.3)">New Jersey</button>
-              <button type="button" id="city-btn-phi" onclick="selectCity('Philadelphia','PA')" style="flex:1;padding:9px 0;border-radius:7px;border:none;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:background 0.18s ease,color 0.18s ease;background:transparent;color:#44445A">Philadelphia</button>
+            <div id="city-toggle-wrap" style="display:flex;border-radius:10px;padding:4px;gap:4px">
+              <button type="button" id="city-btn-nj" onclick="selectCity('New Jersey','NJ')" style="flex:1;padding:9px 0;border-radius:7px;border:none;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.18s ease,color 0.18s ease;background:linear-gradient(135deg,#007bff,#0056b3);color:#fff;box-shadow:0 2px 8px rgba(0,123,255,0.3)">New Jersey</button>
+              <button type="button" id="city-btn-phi" onclick="selectCity('Philadelphia','PA')" style="flex:1;padding:9px 0;border-radius:7px;border:none;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.18s ease,color 0.18s ease;background:transparent;color:#44445A">Philadelphia</button>
             </div>
           </div>
           <div class="form-group" style="margin-bottom:20px">
@@ -510,6 +515,12 @@
       if(!strip)return;
       strip.innerHTML='';
       document.getElementById('g-date').value='';
+      const light=document.documentElement.classList.contains('light');
+      const btnBg=light?'#F0F3FF':'#18181F';
+      const btnBorder=light?'rgba(0,0,0,0.08)':'rgba(255,255,255,0.07)';
+      const dayCol=light?'#9090B0':'#44445A';
+      const numCol=light?'#0A0A1A':'#F4F4F8';
+      const monCol=light?'#9090B0':'#606078';
       const days=_lang==='en'?G_DAYS_EN:G_DAYS;
       const mons=_lang==='en'?G_MONS_EN:G_MONS;
       const today=new Date(); let d=new Date(today); d.setDate(d.getDate()+1);
@@ -518,10 +529,10 @@
           const yyyy=d.getFullYear(),mm=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');
           const ds=`${yyyy}-${mm}-${dd}`;
           const btn=document.createElement('div');
-          btn.style.cssText='flex-shrink:0;width:48px;padding:8px 4px;border-radius:9px;background:#18181F;border:1px solid rgba(255,255,255,0.07);cursor:pointer;text-align:center;user-select:none';
-          btn.innerHTML=`<div style="font-size:8px;font-weight:700;color:#44445A;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:3px">${days[d.getDay()]}</div><div style="font-size:16px;font-weight:800;font-family:'Montserrat',sans-serif;color:#F4F4F8;line-height:1">${d.getDate()}</div><div style="font-size:8px;color:#606078;margin-top:3px;text-transform:uppercase">${mons[d.getMonth()]}</div>`;
+          btn.style.cssText=`flex-shrink:0;width:48px;padding:8px 4px;border-radius:9px;background:${btnBg};border:1px solid ${btnBorder};cursor:pointer;text-align:center;user-select:none`;
+          btn.innerHTML=`<div style="font-size:8px;font-weight:700;color:${dayCol};letter-spacing:0.07em;text-transform:uppercase;margin-bottom:3px">${days[d.getDay()]}</div><div style="font-size:16px;font-weight:800;font-family:'Montserrat',sans-serif;color:${numCol};line-height:1">${d.getDate()}</div><div style="font-size:8px;color:${monCol};margin-top:3px;text-transform:uppercase">${mons[d.getMonth()]}</div>`;
           btn.addEventListener('click',()=>{
-            strip.querySelectorAll('div').forEach(b=>{b.style.background='#18181F';b.style.borderColor='rgba(255,255,255,0.07)';});
+            strip.querySelectorAll('div').forEach(b=>{b.style.background=btnBg;b.style.borderColor=btnBorder;});
             btn.style.background='rgba(0,123,255,0.18)'; btn.style.borderColor='rgba(0,123,255,0.55)';
             document.getElementById('g-date').value=ds;
             loadGuestSlots(ds);
@@ -535,8 +546,15 @@
 
     async function loadGuestSlots(date){
       const wrap=document.getElementById('g-slots');
-      wrap.innerHTML=`<div style="grid-column:span 5;text-align:center;font-size:13px;color:#33334A;padding:10px 0">Cargando…</div>`;
+      const light=document.documentElement.classList.contains('light');
+      wrap.innerHTML=`<div style="grid-column:span 5;text-align:center;font-size:13px;color:${light?'#9090B0':'#33334A'};padding:10px 0">Cargando…</div>`;
       document.getElementById('g-time').value='';
+      const availBg=light?'#F0F3FF':'#18181F';
+      const availBorder=light?'rgba(0,0,0,0.08)':'rgba(255,255,255,0.07)';
+      const availCol=light?'#5A5A80':'#888898';
+      const takenBg=light?'#E8EAF6':'#141418';
+      const takenBorder=light?'rgba(0,0,0,0.04)':'rgba(255,255,255,0.03)';
+      const takenCol=light?'#C0C0D8':'#2A2A3A';
       try {
         const {taken}=await fetch(`/api/guest/available-slots?date=${date}`).then(r=>r.json());
         const all=['8:00','9:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'];
@@ -544,10 +562,10 @@
         all.forEach(s=>{
           const el=document.createElement('div');
           const tk=taken.includes(s);
-          el.style.cssText=`padding:9px 4px;border-radius:8px;background:${tk?'#141418':'#18181F'};border:1px solid ${tk?'rgba(255,255,255,0.03)':'rgba(255,255,255,0.07)'};text-align:center;font-size:12px;font-weight:600;color:${tk?'#2A2A3A':'#888898'};cursor:${tk?'not-allowed':'pointer'};${tk?'text-decoration:line-through':''}`;
+          el.style.cssText=`padding:9px 4px;border-radius:8px;background:${tk?takenBg:availBg};border:1px solid ${tk?takenBorder:availBorder};text-align:center;font-size:12px;font-weight:600;color:${tk?takenCol:availCol};cursor:${tk?'not-allowed':'pointer'};${tk?'text-decoration:line-through':''}`;
           el.textContent=s;
           if(!tk) el.addEventListener('click',()=>{
-            wrap.querySelectorAll('div').forEach(x=>{x.style.background='#18181F';x.style.borderColor='rgba(255,255,255,0.07)';x.style.color='#888898';});
+            wrap.querySelectorAll('div').forEach(x=>{x.style.background=availBg;x.style.borderColor=availBorder;x.style.color=availCol;});
             el.style.background='rgba(0,123,255,0.18)'; el.style.borderColor='rgba(0,123,255,0.55)'; el.style.color='#007bff';
             document.getElementById('g-time').value=s;
           });
