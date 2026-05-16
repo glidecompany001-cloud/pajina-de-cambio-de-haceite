@@ -74,6 +74,22 @@
     html.light #city-toggle-wrap{background:#F0F3FF;border-color:rgba(0,0,0,0.1)}
     .g-addr-divider{color:#5A5A78;border-bottom:1px solid rgba(255,255,255,0.05)}
     html.light .g-addr-divider{color:#7070A0;border-bottom-color:rgba(0,0,0,0.08)}
+    /* Date strip */
+    .g-date-btn{flex-shrink:0;width:48px;padding:8px 4px;border-radius:9px;background:#18181F;border:1px solid rgba(255,255,255,0.07);cursor:pointer;text-align:center;user-select:none;transition:background 0.15s ease,border-color 0.15s ease}
+    .g-date-btn.sel{background:rgba(0,123,255,0.18)!important;border-color:rgba(0,123,255,0.55)!important}
+    .g-date-day{font-size:8px;font-weight:700;color:#44445A;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:3px}
+    .g-date-num{font-size:16px;font-weight:800;font-family:'Montserrat',sans-serif;color:#F4F4F8;line-height:1}
+    .g-date-mon{font-size:8px;color:#606078;margin-top:3px;text-transform:uppercase}
+    html.light .g-date-btn{background:#F0F3FF;border-color:rgba(0,0,0,0.08)}
+    html.light .g-date-day{color:#9090B0}
+    html.light .g-date-num{color:#0A0A1A}
+    html.light .g-date-mon{color:#9090B0}
+    /* Time slots */
+    .g-slot{padding:9px 4px;border-radius:8px;background:#18181F;border:1px solid rgba(255,255,255,0.07);text-align:center;font-size:12px;font-weight:600;color:#888898;cursor:pointer;transition:background 0.15s ease,border-color 0.15s ease,color 0.15s ease}
+    .g-slot.sel{background:rgba(0,123,255,0.18)!important;border-color:rgba(0,123,255,0.55)!important;color:#007bff!important}
+    .g-slot-taken{padding:9px 4px;border-radius:8px;background:#141418;border:1px solid rgba(255,255,255,0.03);text-align:center;font-size:12px;font-weight:600;color:#2A2A3A;cursor:not-allowed;text-decoration:line-through}
+    html.light .g-slot{background:#F0F3FF;border-color:rgba(0,0,0,0.08);color:#5A5A80}
+    html.light .g-slot-taken{background:#E8EAF6;border-color:rgba(0,0,0,0.04);color:#C0C0D8}
   </style>
 </head>
 <body>
@@ -515,12 +531,6 @@
       if(!strip)return;
       strip.innerHTML='';
       document.getElementById('g-date').value='';
-      const light=document.documentElement.classList.contains('light');
-      const btnBg=light?'#F0F3FF':'#18181F';
-      const btnBorder=light?'rgba(0,0,0,0.08)':'rgba(255,255,255,0.07)';
-      const dayCol=light?'#9090B0':'#44445A';
-      const numCol=light?'#0A0A1A':'#F4F4F8';
-      const monCol=light?'#9090B0':'#606078';
       const days=_lang==='en'?G_DAYS_EN:G_DAYS;
       const mons=_lang==='en'?G_MONS_EN:G_MONS;
       const today=new Date(); let d=new Date(today); d.setDate(d.getDate()+1);
@@ -529,11 +539,11 @@
           const yyyy=d.getFullYear(),mm=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');
           const ds=`${yyyy}-${mm}-${dd}`;
           const btn=document.createElement('div');
-          btn.style.cssText=`flex-shrink:0;width:48px;padding:8px 4px;border-radius:9px;background:${btnBg};border:1px solid ${btnBorder};cursor:pointer;text-align:center;user-select:none`;
-          btn.innerHTML=`<div style="font-size:8px;font-weight:700;color:${dayCol};letter-spacing:0.07em;text-transform:uppercase;margin-bottom:3px">${days[d.getDay()]}</div><div style="font-size:16px;font-weight:800;font-family:'Montserrat',sans-serif;color:${numCol};line-height:1">${d.getDate()}</div><div style="font-size:8px;color:${monCol};margin-top:3px;text-transform:uppercase">${mons[d.getMonth()]}</div>`;
+          btn.className='g-date-btn';
+          btn.innerHTML=`<div class="g-date-day">${days[d.getDay()]}</div><div class="g-date-num">${d.getDate()}</div><div class="g-date-mon">${mons[d.getMonth()]}</div>`;
           btn.addEventListener('click',()=>{
-            strip.querySelectorAll('div').forEach(b=>{b.style.background=btnBg;b.style.borderColor=btnBorder;});
-            btn.style.background='rgba(0,123,255,0.18)'; btn.style.borderColor='rgba(0,123,255,0.55)';
+            strip.querySelectorAll('.g-date-btn').forEach(b=>b.classList.remove('sel'));
+            btn.classList.add('sel');
             document.getElementById('g-date').value=ds;
             loadGuestSlots(ds);
           });
@@ -546,15 +556,8 @@
 
     async function loadGuestSlots(date){
       const wrap=document.getElementById('g-slots');
-      const light=document.documentElement.classList.contains('light');
-      wrap.innerHTML=`<div style="grid-column:span 5;text-align:center;font-size:13px;color:${light?'#9090B0':'#33334A'};padding:10px 0">Cargando…</div>`;
+      wrap.innerHTML=`<div style="grid-column:span 5;text-align:center;font-size:13px;color:#888898;padding:10px 0">Cargando…</div>`;
       document.getElementById('g-time').value='';
-      const availBg=light?'#F0F3FF':'#18181F';
-      const availBorder=light?'rgba(0,0,0,0.08)':'rgba(255,255,255,0.07)';
-      const availCol=light?'#5A5A80':'#888898';
-      const takenBg=light?'#E8EAF6':'#141418';
-      const takenBorder=light?'rgba(0,0,0,0.04)':'rgba(255,255,255,0.03)';
-      const takenCol=light?'#C0C0D8':'#2A2A3A';
       try {
         const {taken}=await fetch(`/api/guest/available-slots?date=${date}`).then(r=>r.json());
         const all=['8:00','9:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'];
@@ -562,11 +565,11 @@
         all.forEach(s=>{
           const el=document.createElement('div');
           const tk=taken.includes(s);
-          el.style.cssText=`padding:9px 4px;border-radius:8px;background:${tk?takenBg:availBg};border:1px solid ${tk?takenBorder:availBorder};text-align:center;font-size:12px;font-weight:600;color:${tk?takenCol:availCol};cursor:${tk?'not-allowed':'pointer'};${tk?'text-decoration:line-through':''}`;
+          el.className=tk?'g-slot-taken':'g-slot';
           el.textContent=s;
           if(!tk) el.addEventListener('click',()=>{
-            wrap.querySelectorAll('div').forEach(x=>{x.style.background=availBg;x.style.borderColor=availBorder;x.style.color=availCol;});
-            el.style.background='rgba(0,123,255,0.18)'; el.style.borderColor='rgba(0,123,255,0.55)'; el.style.color='#007bff';
+            wrap.querySelectorAll('.g-slot').forEach(x=>x.classList.remove('sel'));
+            el.classList.add('sel');
             document.getElementById('g-time').value=s;
           });
           wrap.appendChild(el);
