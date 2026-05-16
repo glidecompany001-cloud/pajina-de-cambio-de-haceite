@@ -287,6 +287,7 @@
       <button class="tab-btn"        id="tb-config"   onclick="switchTab('config')">⚙️ Configuración</button>
       <button class="tab-btn"        id="tb-pagos"    onclick="switchTab('pagos')">💳 Pagos</button>
       <button class="tab-btn"        id="tb-servicios" onclick="switchTab('servicios')">🔧 Servicios</button>
+      <button class="tab-btn"        id="tb-sms"       onclick="switchTab('sms')">📱 SMS</button>
     </div>
     <div class="panel-wrap">
 
@@ -610,6 +611,117 @@
 
       </div>
 
+      <!-- ── SMS ── -->
+      <div class="panel" id="panel-sms">
+
+        <div id="sms-status" style="margin-bottom:18px"></div>
+
+        <div class="form-section-title" style="margin-top:0">📱 Twilio — Credenciales</div>
+        <p style="font-size:13px;color:#44445A;margin-bottom:20px;line-height:1.6">
+          Obtén tus credenciales en <a href="https://console.twilio.com/" target="_blank" rel="noopener" style="color:#4A7EC8;text-decoration:underline">console.twilio.com</a> → Account info. El número de teléfono debe ser uno comprado o verificado en Twilio.
+        </p>
+
+        <div class="nf-row">
+          <div class="nf-group">
+            <label class="nf-label">Account SID</label>
+            <input class="nf-field" id="sms-sid" type="text" placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+          </div>
+          <div class="nf-group">
+            <label class="nf-label">Auth Token</label>
+            <div style="position:relative">
+              <input class="nf-field" id="sms-token" type="password" placeholder="Déjalo vacío para no cambiar" autocomplete="off" style="padding-right:44px">
+              <button onclick="document.getElementById('sms-token').type=document.getElementById('sms-token').type==='password'?'text':'password'" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#606078;cursor:pointer;font-size:14px;padding:2px 4px">👁</button>
+            </div>
+          </div>
+        </div>
+        <div class="nf-group" style="max-width:320px">
+          <label class="nf-label">Número de teléfono From</label>
+          <input class="nf-field" id="sms-from" type="text" placeholder="+15551234567">
+          <div style="font-size:11px;color:#44445A;margin-top:5px">Formato E.164: +1 y diez dígitos</div>
+        </div>
+
+        <div id="sms-cred-error" style="font-size:13px;color:#FF8090;margin-bottom:8px;display:none"></div>
+        <div id="sms-cred-ok"    style="font-size:13px;color:#68D391;margin-bottom:8px;display:none"></div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+          <button class="btn-primary-form" style="margin-top:0;padding:10px 22px;font-size:13px" onclick="saveSmsSettings()">💾 Guardar credenciales</button>
+        </div>
+
+        <!-- SMS Templates -->
+        <div class="form-section-title" style="margin-top:32px">💬 Mensajes automáticos</div>
+        <p style="font-size:13px;color:#44445A;margin-bottom:16px;line-height:1.6">
+          Personaliza cada mensaje. Usa los chips para insertar datos del cliente automáticamente.
+        </p>
+
+        <!-- Template: booking confirmation -->
+        <div style="background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;margin-bottom:14px">
+          <div style="font-size:12px;font-weight:700;color:#8888A0;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px">📅 Confirmación de cita</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+            <span class="var-chip" onclick="insertSmsVar('sms-tpl-booking','{name}')">Nombre</span>
+            <span class="var-chip" onclick="insertSmsVar('sms-tpl-booking','{date}')">Fecha</span>
+            <span class="var-chip" onclick="insertSmsVar('sms-tpl-booking','{time}')">Hora</span>
+          </div>
+          <textarea class="nf-field" id="sms-tpl-booking" rows="3" style="resize:vertical;line-height:1.6;font-size:13px" placeholder="Hola {name}, tu cita en GLIDE está confirmada para el {date} a las {time}. ¡Hasta pronto!"></textarea>
+        </div>
+
+        <!-- Template: arriving -->
+        <div style="background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;margin-bottom:14px">
+          <div style="font-size:12px;font-weight:700;color:#8888A0;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px">🚗 Técnico en camino</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+            <span class="var-chip" onclick="insertSmsVar('sms-tpl-arriving','{name}')">Nombre</span>
+          </div>
+          <textarea class="nf-field" id="sms-tpl-arriving" rows="3" style="resize:vertical;line-height:1.6;font-size:13px" placeholder="Hola {name}, tu técnico de GLIDE va en camino. ¡Llegará en breve!"></textarea>
+        </div>
+
+        <!-- Template: payment link -->
+        <div style="background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;margin-bottom:14px">
+          <div style="font-size:12px;font-weight:700;color:#8888A0;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px">💳 Link de pago (al llegar)</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+            <span class="var-chip" onclick="insertSmsVar('sms-tpl-payment','{name}')">Nombre</span>
+            <span class="var-chip" onclick="insertSmsVar('sms-tpl-payment','{link}')">Link de pago</span>
+          </div>
+          <textarea class="nf-field" id="sms-tpl-payment" rows="3" style="resize:vertical;line-height:1.6;font-size:13px" placeholder="Hola {name}, tu técnico llegó. Paga tu servicio aquí: {link}"></textarea>
+        </div>
+
+        <!-- Template: service complete -->
+        <div style="background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;margin-bottom:14px">
+          <div style="font-size:12px;font-weight:700;color:#8888A0;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px">✅ Servicio completado</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+            <span class="var-chip" onclick="insertSmsVar('sms-tpl-complete','{name}')">Nombre</span>
+          </div>
+          <textarea class="nf-field" id="sms-tpl-complete" rows="3" style="resize:vertical;line-height:1.6;font-size:13px" placeholder="¡Listo, {name}! Tu cambio de aceite fue completado. ¡Gracias por elegir GLIDE!"></textarea>
+        </div>
+
+        <!-- Template: reminder -->
+        <div style="background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;margin-bottom:14px">
+          <div style="font-size:12px;font-weight:700;color:#8888A0;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px">⏰ Recordatorio (24h antes)</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+            <span class="var-chip" onclick="insertSmsVar('sms-tpl-reminder','{name}')">Nombre</span>
+            <span class="var-chip" onclick="insertSmsVar('sms-tpl-reminder','{time}')">Hora</span>
+          </div>
+          <textarea class="nf-field" id="sms-tpl-reminder" rows="3" style="resize:vertical;line-height:1.6;font-size:13px" placeholder="Hola {name}, mañana tienes tu cita en GLIDE a las {time}. ¡Te esperamos!"></textarea>
+        </div>
+
+        <div id="sms-tpl-error" style="font-size:13px;color:#FF8090;margin-bottom:8px;display:none"></div>
+        <div id="sms-tpl-ok"    style="font-size:13px;color:#68D391;margin-bottom:8px;display:none"></div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+          <button class="btn-primary-form" style="margin-top:0;padding:10px 22px;font-size:13px" onclick="saveSmsTpls()">💾 Guardar mensajes</button>
+        </div>
+
+        <!-- Test SMS -->
+        <div class="form-section-title" style="margin-top:32px">🧪 Enviar SMS de prueba</div>
+        <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;max-width:480px">
+          <div class="nf-group" style="flex:1;margin-bottom:0">
+            <label class="nf-label">Número destino</label>
+            <input class="nf-field" id="sms-test-to" type="tel" placeholder="+15551234567">
+          </div>
+          <button onclick="testSms()" style="padding:10px 18px;background:rgba(13,148,136,0.1);border:1px solid rgba(13,148,136,0.22);border-radius:9px;color:#0D9488;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.15s ease;margin-bottom:14px">📤 Enviar prueba</button>
+        </div>
+        <div id="sms-test-result" style="font-size:13px;margin-top:6px;display:none"></div>
+
+      </div>
+
       <!-- ── Servicios ── -->
       <div class="panel" id="panel-servicios">
         <div class="form-section-title" style="margin-top:0">🔧 Activar / desactivar servicios</div>
@@ -747,7 +859,7 @@
     }
     function urgencyClass(days) { return days<=1?'urgent':days<=3?'warning':''; }
 
-    const ALL_TABS = ['upcoming','all','new','techs','config','pagos','servicios'];
+    const ALL_TABS = ['upcoming','all','new','techs','config','pagos','servicios','sms'];
 
     function switchTab(t) {
       ALL_TABS.forEach(tab => {
@@ -760,6 +872,7 @@
       if(t==='config')    loadSendGridConfig();
       if(t==='pagos')     loadPayPalConfig();
       if(t==='servicios') loadSvcSettings();
+      if(t==='sms')       loadSmsSettings();
     }
 
     // ── Services settings ──────────────────────────────
@@ -1399,6 +1512,96 @@
         if (data.error) { errEl.textContent = data.error; errEl.style.display = 'block'; return; }
         closeTechPassModal();
       } catch { errEl.textContent = 'Error al guardar contraseña'; errEl.style.display = 'block'; }
+    }
+
+    // ── SMS settings ───────────────────────────────────────────────────────────
+    function insertSmsVar(id, v) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const s = el.selectionStart, e = el.selectionEnd;
+      el.value = el.value.slice(0, s) + v + el.value.slice(e);
+      el.selectionStart = el.selectionEnd = s + v.length;
+      el.focus();
+    }
+
+    async function loadSmsSettings() {
+      try {
+        const r = await fetch('/api/admin/settings/sms');
+        if (!r.ok) return;
+        const d = await r.json();
+        if (d.twilio_sid)  document.getElementById('sms-sid').value   = d.twilio_sid;
+        if (d.twilio_from) document.getElementById('sms-from').value  = d.twilio_from;
+        const tplMap = {
+          sms_booking:  'sms-tpl-booking',
+          sms_arriving: 'sms-tpl-arriving',
+          sms_payment:  'sms-tpl-payment',
+          sms_complete: 'sms-tpl-complete',
+          sms_reminder: 'sms-tpl-reminder',
+        };
+        Object.entries(tplMap).forEach(([key, elId]) => {
+          if (d[key] !== undefined) document.getElementById(elId).value = d[key];
+        });
+      } catch(e) { console.error(e); }
+    }
+
+    async function saveSmsSettings() {
+      const sid   = document.getElementById('sms-sid').value.trim();
+      const token = document.getElementById('sms-token').value.trim();
+      const from  = document.getElementById('sms-from').value.trim();
+      const errEl = document.getElementById('sms-cred-error');
+      const okEl  = document.getElementById('sms-cred-ok');
+      errEl.style.display = 'none'; okEl.style.display = 'none';
+      try {
+        const r = await fetch('/api/admin/settings/sms', {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ twilio_sid: sid, twilio_token: token, twilio_from: from })
+        });
+        const d = await r.json();
+        if (!r.ok) { errEl.textContent = d.error || 'Error al guardar'; errEl.style.display = 'block'; return; }
+        okEl.textContent = '✓ Credenciales guardadas'; okEl.style.display = 'block';
+        setTimeout(() => { okEl.style.display = 'none'; }, 3000);
+        document.getElementById('sms-token').value = '';
+      } catch { errEl.textContent = 'Error de conexión'; errEl.style.display = 'block'; }
+    }
+
+    async function saveSmsTpls() {
+      const errEl = document.getElementById('sms-tpl-error');
+      const okEl  = document.getElementById('sms-tpl-ok');
+      errEl.style.display = 'none'; okEl.style.display = 'none';
+      const templates = {
+        sms_booking:  document.getElementById('sms-tpl-booking').value,
+        sms_arriving: document.getElementById('sms-tpl-arriving').value,
+        sms_payment:  document.getElementById('sms-tpl-payment').value,
+        sms_complete: document.getElementById('sms-tpl-complete').value,
+        sms_reminder: document.getElementById('sms-tpl-reminder').value,
+      };
+      try {
+        const r = await fetch('/api/admin/settings/sms', {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(templates)
+        });
+        const d = await r.json();
+        if (!r.ok) { errEl.textContent = d.error || 'Error al guardar'; errEl.style.display = 'block'; return; }
+        okEl.textContent = '✓ Mensajes guardados'; okEl.style.display = 'block';
+        setTimeout(() => { okEl.style.display = 'none'; }, 3000);
+      } catch { errEl.textContent = 'Error de conexión'; errEl.style.display = 'block'; }
+    }
+
+    async function testSms() {
+      const to = document.getElementById('sms-test-to').value.trim();
+      const resEl = document.getElementById('sms-test-result');
+      resEl.style.display = 'none';
+      if (!to) { resEl.textContent = 'Ingresa un número de teléfono'; resEl.style.color = '#FF8090'; resEl.style.display = 'block'; return; }
+      try {
+        const r = await fetch('/api/admin/sms/test', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ to })
+        });
+        const d = await r.json();
+        if (r.ok) { resEl.textContent = '✓ SMS enviado correctamente'; resEl.style.color = '#68D391'; }
+        else       { resEl.textContent = '✗ ' + (d.error || 'Error al enviar'); resEl.style.color = '#FF8090'; }
+        resEl.style.display = 'block';
+      } catch { resEl.textContent = 'Error de conexión'; resEl.style.color = '#FF8090'; resEl.style.display = 'block'; }
     }
 
     // ── Init ───────────────────────────────────────────────────────────────────

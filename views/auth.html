@@ -90,6 +90,7 @@
       <div class="flex" style="border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:24px">
         <button class="tab-btn active" id="tab-login-btn" onclick="showTab('login')" data-i18n="tabLogin">Iniciar sesión</button>
         <button class="tab-btn" id="tab-register-btn" onclick="showTab('register')" data-i18n="tabRegister">Crear cuenta</button>
+        <button class="tab-btn" id="tab-guest-btn" onclick="showTab('guest')" data-i18n="tabGuest">Sin cuenta</button>
       </div>
 
       <!-- LOGIN -->
@@ -136,6 +137,82 @@
         <hr class="divider-line" style="margin-top:16px">
         <p style="text-align:center;font-size:12px;color:#33334A;margin-bottom:10px" data-i18n="noAccount">¿No tienes cuenta?</p>
         <button class="btn-ghost" onclick="showTab('register')" data-i18n="createFree">Crear cuenta gratis</button>
+      </div>
+
+      <!-- GUEST BOOKING -->
+      <div class="tab-panel" id="tab-guest">
+        <div class="error-box" id="guest-error"></div>
+        <div id="guest-success" style="display:none;text-align:center;padding:20px 0">
+          <div style="font-size:48px;margin-bottom:12px">✅</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:18px;font-weight:800;margin-bottom:6px" data-i18n="guestConfirmed">¡Cita confirmada!</div>
+          <div id="guest-success-msg" style="font-size:13px;color:#44445A;line-height:1.6"></div>
+          <button onclick="resetGuestForm()" style="margin-top:16px;padding:9px 20px;background:rgba(0,123,255,0.1);border:1px solid rgba(0,123,255,0.25);border-radius:9px;color:#007bff;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;cursor:pointer" data-i18n="guestAnother">Agendar otra cita</button>
+        </div>
+        <div id="guest-form-wrap">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="field-label" data-i18n="name">Nombre *</label>
+              <input class="field" type="text" id="g-name" placeholder="Juan García" required>
+            </div>
+            <div class="form-group">
+              <label class="field-label" data-i18n="gPhone">Teléfono *</label>
+              <input class="field" type="tel" id="g-phone" placeholder="555-123-4567" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="field-label" data-i18n="gVehicle">Vehículo *</label>
+              <input class="field" type="text" id="g-vehicle" placeholder="2020 Honda Civic">
+            </div>
+            <div class="form-group">
+              <label class="field-label" data-i18n="gOil">Tipo de aceite</label>
+              <select class="field" id="g-oil">
+                <option value="Convencional">Convencional — $65</option>
+                <option value="Semi-sintético">Semi-sintético — $75</option>
+                <option value="Sintético total">Sintético total — $85</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="field-label" data-i18n="bm_date">Fecha *</label>
+            <div id="g-date-strip" style="display:flex;gap:6px;overflow-x:auto;padding:4px 2px 6px;scrollbar-width:none"></div>
+            <input type="hidden" id="g-date">
+          </div>
+          <div class="form-group">
+            <label class="field-label" data-i18n="bm_time">Horario *</label>
+            <div id="g-slots" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:4px">
+              <div style="grid-column:span 5;text-align:center;font-size:13px;color:#33334A;padding:10px 0" data-i18n="slot_select">Selecciona una fecha primero</div>
+            </div>
+            <input type="hidden" id="g-time">
+          </div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#5A5A78;margin:14px 0 10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.05)" data-i18n="lbl_addr">📍 Dirección de servicio</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="field-label" data-i18n="lbl_street">Calle *</label>
+              <input class="field" type="text" id="g-street" placeholder="Av. Reforma">
+            </div>
+            <div class="form-group">
+              <label class="field-label" data-i18n="lbl_number">Número</label>
+              <input class="field" type="text" id="g-number" placeholder="123">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="field-label" data-i18n="lbl_city">Ciudad *</label>
+              <input class="field" type="text" id="g-city" placeholder="Monterrey">
+            </div>
+            <div class="form-group">
+              <label class="field-label" data-i18n="lbl_state">Estado *</label>
+              <input class="field" type="text" id="g-state" placeholder="PA">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:20px">
+            <label class="field-label" data-i18n="lbl_zip">Código postal *</label>
+            <input class="field" type="text" id="g-zip" placeholder="64000" maxlength="10" inputmode="numeric">
+          </div>
+          <button class="btn-primary" id="g-submit" onclick="submitGuest()" data-i18n="guestSubmit">Confirmar cita →</button>
+          <p style="text-align:center;font-size:11px;color:#33334A;margin-top:10px" data-i18n="guestSmsNote">Recibirás confirmación por SMS al número indicado</p>
+        </div>
       </div>
 
       <!-- REGISTER -->
@@ -220,6 +297,13 @@
         verifiedOk: '✅ ¡Correo confirmado! Ya puedes iniciar sesión.',
         verifiedError: 'El enlace no es válido o ha expirado.',
         resendVerify: 'Reenviar correo de confirmación',
+        tabGuest: 'Sin cuenta', gPhone: 'Teléfono *', gVehicle: 'Vehículo *', gOil: 'Tipo de aceite',
+        guestSubmit: 'Confirmar cita →', guestConfirmed: '¡Cita confirmada!',
+        guestAnother: 'Agendar otra cita', guestSmsNote: 'Recibirás confirmación por SMS al número indicado',
+        slot_select: 'Selecciona una fecha primero',
+        lbl_addr: '📍 Dirección de servicio', lbl_street: 'Calle *', lbl_number: 'Número',
+        lbl_city: 'Ciudad *', lbl_state: 'Estado *', lbl_zip: 'Código postal *',
+        bm_date: 'Fecha *', bm_time: 'Horario *',
       },
       en: {
         brand: 'Oil Change Service',
@@ -264,6 +348,13 @@
         verifiedOk: '✅ Email confirmed! You can now sign in.',
         verifiedError: 'The link is invalid or has expired.',
         resendVerify: 'Resend confirmation email',
+        tabGuest: 'Book now', gPhone: 'Phone *', gVehicle: 'Vehicle *', gOil: 'Oil type',
+        guestSubmit: 'Confirm appointment →', guestConfirmed: 'Appointment confirmed!',
+        guestAnother: 'Book another', guestSmsNote: 'You will receive confirmation via SMS',
+        slot_select: 'Select a date first',
+        lbl_addr: '📍 Service address', lbl_street: 'Street *', lbl_number: 'Number',
+        lbl_city: 'City *', lbl_state: 'State *', lbl_zip: 'ZIP code *',
+        bm_date: 'Date *', bm_time: 'Time *',
       }
     };
 
@@ -389,6 +480,117 @@
     }
     function toggleTheme(){var l=document.documentElement.classList.toggle('light');localStorage.setItem('glide-theme',l?'light':'dark');var b=document.getElementById('theme-btn');if(b)b.textContent=l?'☀️':'🌙'}
     (function(){var b=document.getElementById('theme-btn');if(b&&document.documentElement.classList.contains('light'))b.textContent='☀️'})();
+
+    // ── Guest booking ──────────────────────────────────
+    const G_DAYS=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    const G_MONS=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    const G_DAYS_EN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const G_MONS_EN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    function buildGuestDateStrip(){
+      const strip=document.getElementById('g-date-strip');
+      if(!strip)return;
+      strip.innerHTML='';
+      document.getElementById('g-date').value='';
+      const days=_lang==='en'?G_DAYS_EN:G_DAYS;
+      const mons=_lang==='en'?G_MONS_EN:G_MONS;
+      const today=new Date(); let d=new Date(today); d.setDate(d.getDate()+1);
+      for(let added=0;added<45;){
+        if(d.getDay()!==0){
+          const yyyy=d.getFullYear(),mm=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');
+          const ds=`${yyyy}-${mm}-${dd}`;
+          const btn=document.createElement('div');
+          btn.style.cssText='flex-shrink:0;width:48px;padding:8px 4px;border-radius:9px;background:#18181F;border:1px solid rgba(255,255,255,0.07);cursor:pointer;text-align:center;user-select:none';
+          btn.innerHTML=`<div style="font-size:8px;font-weight:700;color:#44445A;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:3px">${days[d.getDay()]}</div><div style="font-size:16px;font-weight:800;font-family:'Montserrat',sans-serif;color:#F4F4F8;line-height:1">${d.getDate()}</div><div style="font-size:8px;color:#606078;margin-top:3px;text-transform:uppercase">${mons[d.getMonth()]}</div>`;
+          btn.addEventListener('click',()=>{
+            strip.querySelectorAll('div').forEach(b=>{b.style.background='#18181F';b.style.borderColor='rgba(255,255,255,0.07)';});
+            btn.style.background='rgba(0,123,255,0.18)'; btn.style.borderColor='rgba(0,123,255,0.55)';
+            document.getElementById('g-date').value=ds;
+            loadGuestSlots(ds);
+          });
+          strip.appendChild(btn);
+          added++;
+        }
+        d.setDate(d.getDate()+1);
+      }
+    }
+
+    async function loadGuestSlots(date){
+      const wrap=document.getElementById('g-slots');
+      wrap.innerHTML=`<div style="grid-column:span 5;text-align:center;font-size:13px;color:#33334A;padding:10px 0">Cargando…</div>`;
+      document.getElementById('g-time').value='';
+      try {
+        const {taken}=await fetch(`/api/guest/available-slots?date=${date}`).then(r=>r.json());
+        const all=['8:00','9:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'];
+        wrap.innerHTML='';
+        all.forEach(s=>{
+          const el=document.createElement('div');
+          const tk=taken.includes(s);
+          el.style.cssText=`padding:9px 4px;border-radius:8px;background:${tk?'#141418':'#18181F'};border:1px solid ${tk?'rgba(255,255,255,0.03)':'rgba(255,255,255,0.07)'};text-align:center;font-size:12px;font-weight:600;color:${tk?'#2A2A3A':'#888898'};cursor:${tk?'not-allowed':'pointer'};${tk?'text-decoration:line-through':''}`;
+          el.textContent=s;
+          if(!tk) el.addEventListener('click',()=>{
+            wrap.querySelectorAll('div').forEach(x=>{x.style.background='#18181F';x.style.borderColor='rgba(255,255,255,0.07)';x.style.color='#888898';});
+            el.style.background='rgba(0,123,255,0.18)'; el.style.borderColor='rgba(0,123,255,0.55)'; el.style.color='#007bff';
+            document.getElementById('g-time').value=s;
+          });
+          wrap.appendChild(el);
+        });
+      } catch { wrap.innerHTML=`<div style="grid-column:span 5;text-align:center;font-size:13px;color:#007bff;padding:10px 0">Error</div>`; }
+    }
+
+    async function submitGuest(){
+      const name=document.getElementById('g-name').value.trim();
+      const phone=document.getElementById('g-phone').value.trim();
+      const vehicle=document.getElementById('g-vehicle').value.trim();
+      const oil_type=document.getElementById('g-oil').value;
+      const date=document.getElementById('g-date').value;
+      const time=document.getElementById('g-time').value;
+      const street=document.getElementById('g-street').value.trim();
+      const number=document.getElementById('g-number').value.trim();
+      const city=document.getElementById('g-city').value.trim();
+      const state=document.getElementById('g-state').value.trim();
+      const zip=document.getElementById('g-zip').value.trim();
+      const errBox=document.getElementById('guest-error');
+      errBox.style.display='none'; errBox.classList.remove('show');
+      if(!name||!phone||!vehicle||!date||!time||!street||!city||!state||!zip){
+        errBox.textContent=_lang==='en'?'Please fill in all required fields.':'Completa todos los campos requeridos.';
+        errBox.classList.add('show'); return;
+      }
+      const locationParts=[street]; if(number)locationParts.push('#'+number); locationParts.push(city,state,zip);
+      const location=locationParts.join(', ');
+      const btn=document.getElementById('g-submit');
+      btn.disabled=true; btn.textContent=_lang==='en'?'Booking…':'Agendando…';
+      try {
+        const r=await fetch('/api/guest/appointments',{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({name,phone,vehicle,oil_type,date,time,location})});
+        const d=await r.json();
+        if(!r.ok){errBox.textContent=d.error||'Error';errBox.classList.add('show');return;}
+        const dt=new Date(date+'T12:00:00').toLocaleDateString(_lang==='en'?'en-US':'es-MX',{weekday:'long',day:'numeric',month:'long'});
+        document.getElementById('guest-success-msg').textContent=`${dt} · ${time} hrs. ${_lang==='en'?'SMS sent to':'SMS enviado al'} ${phone}`;
+        document.getElementById('guest-form-wrap').style.display='none';
+        document.getElementById('guest-success').style.display='block';
+      } catch {errBox.textContent=_lang==='en'?'Connection error.':'Error de conexión.';errBox.classList.add('show');}
+      finally{btn.disabled=false;btn.textContent=t('guestSubmit');}
+    }
+
+    function resetGuestForm(){
+      document.getElementById('guest-success').style.display='none';
+      document.getElementById('guest-form-wrap').style.display='block';
+      ['g-name','g-phone','g-vehicle','g-street','g-number','g-city','g-state','g-zip'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+      document.getElementById('g-date').value='';
+      document.getElementById('g-time').value='';
+      buildGuestDateStrip();
+      document.getElementById('g-slots').innerHTML=`<div style="grid-column:span 5;text-align:center;font-size:13px;color:#33334A;padding:10px 0">${t('slot_select')}</div>`;
+    }
+
+    // Build date strip when guest tab is shown
+    const _origShowTab = showTab;
+    showTab = function(tab){
+      _origShowTab(tab);
+      if(tab==='guest') buildGuestDateStrip();
+    };
+
+    if(tab==='guest') { _origShowTab('guest'); buildGuestDateStrip(); }
   </script>
 </body>
 </html>

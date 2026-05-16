@@ -115,6 +115,7 @@ const dbReady = (async () => {
   ]) { try { await dbExec(sql); } catch {} }
   try { await dbExec("UPDATE users SET email_verified=1 WHERE verification_token IS NULL AND email_verified=0"); } catch {}
   await buildSendGrid();
+  await buildTwilio();
 })();
 
 app.use(async (_req, _res, next) => { try { await dbReady; next(); } catch (e) { next(e); } });
@@ -212,6 +213,47 @@ async function sendEmail(to, type, vars) {
     if (error) { console.error('Resend error:', error.message); return false; }
     return true;
   } catch(e) { console.error('Resend error:', e.message); return false; }
+}
+
+// ─── Twilio SMS ──────────────────────────────────────────────────────────────
+let twilioClient = null;
+
+async function buildTwilio() {
+  const sid = await getSetting('twilio_sid');
+  const tok = await getSetting('twilio_token');
+  if (sid && tok) {
+    try { twilioClient = require('twilio')(sid.trim(), tok.trim()); return true; }
+    catch(e) { twilioClient = null; }
+  } else { twilioClient = null; }
+  return false;
+}
+
+function fmtPhone(raw) {
+  let p = String(raw||'').replace(/\D/g,'');
+  if (p.length === 10) p = '1' + p;
+  return p.startsWith('+') ? p : '+' + p;
+}
+
+const SMS_DEFAULTS = {
+  sms_booking:  'Hola {name}, tu cita en GLIDE está confirmada para el {date} a las {time}. ¡Hasta pronto!',
+  sms_arriving: 'Hola {name}, tu técnico de GLIDE va en camino. ¡Llegará en breve!',
+  sms_payment:  'Hola {name}, tu técnico llegó. Paga tu servicio aquí: {link}',
+  sms_complete: '¡Listo, {name}! Tu cambio de aceite fue completado. ¡Gracias por elegir GLIDE!',
+  sms_reminder: 'Hola {name}, mañana tienes tu cita en GLIDE a las {time}. ¡Te esperamos!',
+};
+
+async function sendSMS(to, tplKey, vars) {
+  if (!twilioClient || !to) return false;
+  const fromNum = await getSetting('twilio_from');
+  if (!fromNum) return false;
+  let body = await getSetting(tplKey) || SMS_DEFAULTS[tplKey] || '';
+  if (!body) return false;
+  for (const [k, v] of Object.entries(vars))
+    body = body.replace(new RegExp(`\\{${k}\\}`, 'g'), v ?? '');
+  try {
+    await twilioClient.messages.create({ body, from: fromNum, to: fmtPhone(to) });
+    return true;
+  } catch(e) { console.error('SMS error:', e.message); return false; }
 }
 
 async function sendConfirmation(appt) {
@@ -443,6 +485,10 @@ app.post('/api/appointments', requireCustomer, async (req, res) => {
   );
   const appt = await dbGet('SELECT a.*, v.color as vehicle_color FROM appointments a LEFT JOIN vehicles v ON a.vehicle_id=v.id WHERE a.id=?', [r.lastInsertRowid]);
   sendConfirmation(appt);
+  if (phone) {
+    const ds = new Date(date+'T00:00:00').toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});
+    sendSMS(phone,'sms_booking',{name:(name||'').split(' ')[0],date:ds,time}).catch(()=>{});
+  }
   res.json({ success: true, id: r.lastInsertRowid });
 });
 
@@ -688,6 +734,7 @@ app.put('/api/tech/appointments/:id/arrive', requireTech, async (req, res) => {
     );
     resendClient.emails.send({ from: `${fromName} <${fromEmail}>`, to: appt.email, subject: '💳 Tu técnico llegó — Selecciona tu forma de pago', html }).catch(()=>{});
   }
+  if (appt.phone) sendSMS(appt.phone,'sms_payment',{name:(appt.name||'').split(' ')[0],link:paymentUrl}).catch(()=>{});
   res.json({ success: true, paymentUrl });
 });
 
@@ -722,6 +769,7 @@ app.put('/api/tech/appointments/:id/complete', requireTech, async (req, res) => 
     );
     resendClient.emails.send({ from: `${fromName} <${fromEmail}>`, to: next.email, subject: `🚗 ${techName} va en camino a tu domicilio`, html }).catch(() => {});
   }
+  if (appt.phone) sendSMS(appt.phone,'sms_complete',{name:(appt.name||'').split(' ')[0]}).catch(()=>{});
   res.json({ success: true });
 });
 
@@ -886,6 +934,82 @@ app.put('/api/admin/settings/paypal', requireAdmin, async (req, res) => {
   if (client_secret?.trim()) await setSetting('paypal_client_secret', client_secret.trim());
   await setSetting('paypal_mode', mode === 'live' ? 'live' : 'sandbox');
   res.json({ success: true });
+});
+
+// ─── Guest booking (sin cuenta) ──────────────────────────────────────────────
+app.get('/api/guest/available-slots', async (req, res) => {
+  const { date } = req.query;
+  if (!date) return res.status(400).json({ error: 'Date required' });
+  const taken = (await dbAll("SELECT time FROM appointments WHERE date=? AND status='pending'", [date])).map(r => r.time);
+  res.json({ available: TIME_SLOTS.filter(s => !taken.includes(s)), taken });
+});
+
+app.post('/api/guest/appointments', async (req, res) => {
+  const { name, phone, vehicle, oil_type, date, time, notes, location } = req.body;
+  if (!name || !phone || !vehicle || !date || !time)
+    return res.status(400).json({ error: 'Faltan campos requeridos' });
+  const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+  if (date < tomorrow.toISOString().split('T')[0])
+    return res.status(400).json({ error: 'Las citas deben agendarse con al menos 1 día de anticipación' });
+  const exists = await dbGet("SELECT id FROM appointments WHERE date=? AND time=? AND status='pending'", [date, time]);
+  if (exists) return res.status(409).json({ error: 'Ese horario ya está reservado' });
+  const r = await dbRun(
+    `INSERT INTO appointments (user_id,name,email,phone,vehicle,oil_type,date,time,notes,location,is_recurring,recurrence_weeks)
+     VALUES (NULL,?,?,?,?,?,?,?,?,?,0,12)`,
+    [name, '', phone, vehicle, oil_type||'Convencional', date, time, notes||'', location||'']
+  );
+  const ds = new Date(date+'T00:00:00').toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});
+  sendSMS(phone,'sms_booking',{name:name.split(' ')[0],date:ds,time}).catch(()=>{});
+  res.json({ success: true, id: r.lastInsertRowid });
+});
+
+// ─── Cron: recordatorios 24h antes ───────────────────────────────────────────
+app.get('/api/cron/reminders', async (req, res) => {
+  const secret = req.headers['authorization']?.replace('Bearer ','') || req.query.secret || '';
+  if (secret !== (process.env.CRON_SECRET||'glide-cron-2025')) return res.status(401).json({error:'Unauthorized'});
+  const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
+  const tStr = tomorrow.toISOString().split('T')[0];
+  const appts = await dbAll("SELECT * FROM appointments WHERE date=? AND status='pending'", [tStr]);
+  let sent = 0;
+  for (const a of appts) {
+    if (a.phone) { const ok = await sendSMS(a.phone,'sms_reminder',{name:(a.name||'').split(' ')[0],time:a.time}); if(ok) sent++; }
+  }
+  res.json({ sent, total: appts.length });
+});
+
+// ─── Admin: SMS settings ──────────────────────────────────────────────────────
+app.get('/api/admin/settings/sms', requireAdmin, async (_req, res) => {
+  res.json({
+    sid:          await getSetting('twilio_sid'),
+    from:         await getSetting('twilio_from'),
+    sms_booking:  await getSetting('sms_booking')  || SMS_DEFAULTS.sms_booking,
+    sms_arriving: await getSetting('sms_arriving') || SMS_DEFAULTS.sms_arriving,
+    sms_payment:  await getSetting('sms_payment')  || SMS_DEFAULTS.sms_payment,
+    sms_complete: await getSetting('sms_complete') || SMS_DEFAULTS.sms_complete,
+    sms_reminder: await getSetting('sms_reminder') || SMS_DEFAULTS.sms_reminder,
+  });
+});
+
+app.put('/api/admin/settings/sms', requireAdmin, async (req, res) => {
+  const { sid, token, from, sms_booking, sms_arriving, sms_payment, sms_complete, sms_reminder } = req.body;
+  if (sid?.trim())   await setSetting('twilio_sid',   sid.trim());
+  if (token?.trim()) await setSetting('twilio_token', token.trim());
+  if (from?.trim())  await setSetting('twilio_from',  from.trim());
+  if (sms_booking)   await setSetting('sms_booking',  sms_booking);
+  if (sms_arriving)  await setSetting('sms_arriving', sms_arriving);
+  if (sms_payment)   await setSetting('sms_payment',  sms_payment);
+  if (sms_complete)  await setSetting('sms_complete', sms_complete);
+  if (sms_reminder)  await setSetting('sms_reminder', sms_reminder);
+  await buildTwilio();
+  res.json({ success: true });
+});
+
+app.post('/api/admin/sms/test', requireAdmin, async (req, res) => {
+  const { phone } = req.body;
+  if (!phone) return res.status(400).json({ error: 'Phone required' });
+  await buildTwilio();
+  const ok = await sendSMS(phone, 'sms_booking', { name: 'Test', date: 'hoy', time: '10:00' });
+  res.json({ success: ok, error: ok ? null : 'No se pudo enviar. Verifica las credenciales de Twilio.' });
 });
 
 // ─── Start ────────────────────────────────────────────────────────────────────
