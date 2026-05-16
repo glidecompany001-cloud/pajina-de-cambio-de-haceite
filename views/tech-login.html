@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>(function(){if(localStorage.getItem('glide-theme')==='light')document.documentElement.classList.add('light')})()</script>
   <style>
     *,*::before,*::after{box-sizing:border-box}
     body{font-family:'Montserrat',sans-serif;background:#09090B;color:#F4F4F8;min-height:100vh}
@@ -28,6 +29,22 @@
     .form-group{margin-bottom:16px}
     .logo-ring{display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:16px;margin-bottom:16px;background:linear-gradient(135deg,rgba(13,148,136,0.18),rgba(13,148,136,0.07));border:1px solid rgba(13,148,136,0.25);box-shadow:0 0 24px rgba(13,148,136,0.12)}
     .tech-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:3px 10px;border-radius:20px;background:rgba(13,148,136,0.1);border:1px solid rgba(13,148,136,0.25);color:#0D9488;margin-top:8px}
+    /* ── Theme toggle ─────────────────────────────────── */
+    .theme-btn{position:fixed;top:18px;right:18px;z-index:60;width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1);padding:0}
+    .theme-btn:hover{background:rgba(255,255,255,0.1);transform:scale(1.1)}
+    .theme-btn:active{transform:scale(0.92)}
+    /* ── Light mode ───────────────────────────────────── */
+    html.light body{background:#EEF1FF;color:#0A0A1A}
+    html.light .grain{opacity:0.012}
+    html.light .orb-1,html.light .orb-2{opacity:0.3}
+    html.light .card{background:#fff;border-color:rgba(0,0,0,0.08);box-shadow:0 0 0 1px rgba(0,0,0,0.02) inset,0 8px 48px rgba(0,0,0,0.1),0 2px 8px rgba(0,0,0,0.05)}
+    html.light .theme-btn{background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.1)}
+    html.light .theme-btn:hover{background:rgba(0,0,0,0.09)}
+    html.light .field{background:#F0F3FF;border-color:rgba(0,0,0,0.1);color:#0A0A1A}
+    html.light .field::placeholder{color:#B0B0C8}
+    html.light .field-label{color:#7070A0}
+    html.light .error-box{background:rgba(239,68,68,0.05);border-color:rgba(239,68,68,0.2)}
+    html.light .card [style*="color:#ffffff"]{color:#0A0A1A!important}
   </style>
 </head>
 <body>
@@ -35,11 +52,13 @@
   <div class="orb-1"></div>
   <div class="orb-2"></div>
 
+  <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" aria-label="Cambiar tema">🌙</button>
+
   <div class="min-h-screen flex items-center justify-center px-4 py-12 relative z-10">
     <div class="card w-full max-w-[380px] p-10">
 
       <div class="text-center mb-8">
-        <img src="/brand/logo.svg" alt="GLIDE" style="height:32px;width:auto;margin:0 auto 8px;display:block">
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px"><img src="/brand/icon.svg" alt="GLIDE" style="height:32px;width:auto"><span style="font-family:'Montserrat',sans-serif;font-size:22px;font-weight:800;color:#ffffff;letter-spacing:-0.03em">glide</span></div>
         <h1 style="font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;letter-spacing:-0.03em;color:#F4F4F8">Portal Técnicos</h1>
         <p style="font-size:13px;color:#44445A;margin-top:10px">Ingresa con tus credenciales de técnico</p>
       </div>
@@ -75,6 +94,8 @@
       box.textContent = errors[err] || 'Ocurrió un error. Intenta de nuevo.';
       box.classList.add('show');
     }
+    function toggleTheme(){var l=document.documentElement.classList.toggle('light');localStorage.setItem('glide-theme',l?'light':'dark');var b=document.getElementById('theme-btn');if(b)b.textContent=l?'☀️':'🌙'}
+    (function(){var b=document.getElementById('theme-btn');if(b&&document.documentElement.classList.contains('light'))b.textContent='☀️'})();
   </script>
 </body>
 </html>

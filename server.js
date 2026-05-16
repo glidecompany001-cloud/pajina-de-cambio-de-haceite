@@ -783,6 +783,21 @@ app.get('/api/settings/paypal-client', async (_req, res) => {
   res.json({ client_id: clientId || '', mode: await getSetting('paypal_mode') || 'sandbox', enabled: !!clientId });
 });
 
+// ─── Services toggle (public read, admin write) ───────────────────────────────
+app.get('/api/settings/services', async (_req, res) => {
+  const brakes = await getSetting('svc_brakes_enabled');
+  const tires  = await getSetting('svc_tires_enabled');
+  const glass  = await getSetting('svc_glass_enabled');
+  res.json({ brakes: brakes === '1', tires: tires === '1', glass: glass === '1' });
+});
+app.put('/api/admin/settings/services', requireAdmin, async (req, res) => {
+  const { brakes, tires, glass } = req.body;
+  await setSetting('svc_brakes_enabled', brakes ? '1' : '0');
+  await setSetting('svc_tires_enabled',  tires  ? '1' : '0');
+  await setSetting('svc_glass_enabled',  glass  ? '1' : '0');
+  res.json({ ok: true });
+});
+
 // ─── Token-based payment page (technician arrives → customer pays) ─────────────
 app.get('/pay/:token', async (req, res) => {
   const appt = await dbGet('SELECT id FROM appointments WHERE payment_token=?', [req.params.token]);

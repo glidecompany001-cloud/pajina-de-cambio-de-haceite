@@ -7,6 +7,7 @@
   <title>GLIDE</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script>(function(){if(localStorage.getItem('glide-theme')==='light')document.documentElement.classList.add('light')})()</script>
   <style>
     *,*::before,*::after{box-sizing:border-box}
     body{font-family:'Montserrat',sans-serif;background:#09090B;color:#F4F4F8;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
@@ -39,14 +40,39 @@
     .success-sub{font-size:14px;color:#44445A;line-height:1.6}
     #loading{text-align:center;padding:40px 0;color:#33334A;font-size:14px}
     #error-wrap{text-align:center;padding:40px 0;color:#007bff;font-size:14px}
+    /* ── Theme toggle ─────────────────────────────────── */
+    .theme-btn{position:fixed;top:14px;right:14px;z-index:100;width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1);padding:0}
+    .theme-btn:hover{background:rgba(255,255,255,0.1);transform:scale(1.1)}
+    .theme-btn:active{transform:scale(0.92)}
+    /* ── Light mode ───────────────────────────────────── */
+    html.light body{background:#EEF1FF;color:#0A0A1A}
+    html.light .grain{opacity:0.012}
+    html.light .orb{opacity:0.3}
+    html.light .card{background:#fff;border-color:rgba(0,0,0,0.08);box-shadow:0 32px 80px rgba(0,0,0,0.1)}
+    html.light .theme-btn{background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.1)}
+    html.light .theme-btn:hover{background:rgba(0,0,0,0.09)}
+    html.light .title{color:#0A0A1A}
+    html.light .subtitle{color:#7070A0}
+    html.light .info-box{background:#F0F3FF;border-color:rgba(0,0,0,0.06)}
+    html.light .info-row:not(:last-child){border-bottom-color:rgba(0,0,0,0.05)}
+    html.light .info-label{color:#7070A0}
+    html.light .info-value{color:#2A2A40}
+    html.light .price-row .info-value{color:#0A0A1A}
+    html.light .section-title{color:#9090B0}
+    html.light .btn-cash{background:#F0F3FF;border-color:rgba(0,0,0,0.1);color:#2A2A40}
+    html.light .divider{color:#B0B0C8}
+    html.light #loading{color:#9090B0}
+    html.light .success-sub{color:#7070A0}
+    html.light .card [style*="color:#ffffff"]{color:#0A0A1A!important}
   </style>
 </head>
 <body>
   <div class="grain"></div>
   <div class="orb"></div>
+  <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" aria-label="Cambiar tema">🌙</button>
   <div class="card">
     <div class="logo">
-      <img src="/brand/logo.svg" alt="GLIDE" style="height:24px;width:auto">
+      <img src="/brand/icon.svg" alt="GLIDE" style="height:26px;width:auto"><span style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:800;color:#ffffff;letter-spacing:-0.03em">glide</span>
     </div>
     <div id="loading">Cargando…</div>
     <div id="error-wrap" style="display:none"></div>
@@ -165,6 +191,8 @@
     }
 
     init();
+    function toggleTheme(){var l=document.documentElement.classList.toggle('light');localStorage.setItem('glide-theme',l?'light':'dark');var b=document.getElementById('theme-btn');if(b)b.textContent=l?'☀️':'🌙'}
+    (function(){var b=document.getElementById('theme-btn');if(b&&document.documentElement.classList.contains('light'))b.textContent='☀️'})();
   </script>
 </body>
 </html>

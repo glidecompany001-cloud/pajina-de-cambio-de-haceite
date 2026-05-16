@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>(function(){if(localStorage.getItem('glide-theme')==='light')document.documentElement.classList.add('light')})()</script>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     body { font-family:'Montserrat',sans-serif; background:#09090B; color:#F4F4F8; min-height:100vh; }
@@ -193,6 +194,59 @@
     .btn-modal-skip:hover { background:rgba(255,255,255,0.08);color:#C0C0D0;transform:translateY(-1px); }
     .btn-modal-skip:active { transform:translateY(0); }
     .btn-modal-skip:focus-visible { outline:2px solid rgba(255,255,255,0.15);outline-offset:2px;border-radius:10px; }
+    /* ── Theme toggle ─────────────────────────────────── */
+    .theme-btn{width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1);flex-shrink:0;padding:0}
+    .theme-btn:hover{background:rgba(255,255,255,0.1);transform:scale(1.12)}
+    .theme-btn:active{transform:scale(0.9)}
+    /* ── Light mode ───────────────────────────────────── */
+    html.light body{background:#EEF1FF;color:#0A0A1A}
+    html.light .grain{opacity:0.012}
+    html.light .orb-1{opacity:0.3}
+    html.light .topbar{background:#fff;border-bottom-color:rgba(0,0,0,0.08)}
+    html.light .topbar-brand .name{color:#0A0A1A}
+    html.light .theme-btn{background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.1)}
+    html.light .theme-btn:hover{background:rgba(0,0,0,0.09)}
+    html.light .btn-link{background:rgba(0,0,0,0.04)!important;border-color:rgba(0,0,0,0.08)!important;color:#7070A0!important}
+    html.light .btn-link:hover{background:rgba(0,0,0,0.08)!important;color:#2A2A40!important}
+    html.light .stat-card{background:#fff;border-color:rgba(0,0,0,0.08)}
+    html.light .stat-card:hover{border-color:rgba(0,0,0,0.14)}
+    html.light .stat-lbl{color:#9090B0}
+    html.light .tab-bar{border-bottom-color:rgba(0,0,0,0.08)}
+    html.light .tab-btn{color:#9090B0}
+    html.light .tab-btn.active{color:#0A0A1A;border-bottom-color:#007bff}
+    html.light .panel-wrap{background:#fff;border-color:rgba(0,0,0,0.08);box-shadow:0 4px 24px rgba(0,0,0,0.06)}
+    html.light .appt-card{background:#F4F6FF;border-color:rgba(0,0,0,0.08)}
+    html.light .appt-card:hover{border-color:rgba(0,0,0,0.14);box-shadow:0 4px 16px rgba(0,0,0,0.08)}
+    html.light .appt-card.urgent{background:rgba(0,123,255,0.04)}
+    html.light .appt-card.warning{background:rgba(217,119,6,0.04)}
+    html.light .time-pill{background:#EAECFF;border-color:rgba(0,0,0,0.08);color:#0A0A1A}
+    html.light .a-name{color:#0A0A1A}
+    html.light .a-detail{color:#7070A0}
+    html.light .date-str{color:#2A2A40}
+    html.light .count-lbl{color:#9090B0}
+    html.light .date-head{border-bottom-color:rgba(0,0,0,0.06)}
+    html.light .form-section-title{color:#5A5A80;border-bottom-color:rgba(0,0,0,0.06)}
+    html.light .nf-field{background:#F0F3FF;border-color:rgba(0,0,0,0.1);color:#0A0A1A}
+    html.light .nf-field::placeholder{color:#B0B0C8}
+    html.light .nf-label{color:#7070A0}
+    html.light select.nf-field option{background:#fff;color:#0A0A1A}
+    html.light .modal-backdrop{background:rgba(0,0,0,0.35)}
+    html.light .modal{background:#fff;border-color:rgba(0,0,0,0.08);box-shadow:0 24px 80px rgba(0,0,0,0.12)}
+    html.light .modal-close{background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.08);color:#7070A0}
+    html.light .modal-close:hover{background:rgba(0,0,0,0.1);color:#0A0A1A}
+    html.light .modal-title{color:#0A0A1A}
+    html.light .modal-sub,html.light .modal-section{color:#7070A0}
+    html.light .slider-lbl{color:#7070A0}
+    html.light .slider-val{color:#0A0A1A}
+    .num-field{width:100%;padding:8px 10px;background:#18181F;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#F4F4F8;font-size:15px;font-weight:700;outline:none;text-align:center;box-sizing:border-box}
+    .num-field::placeholder{color:#44445A}
+    html.light .num-field{background:#F0F3FF;border-color:rgba(0,0,0,0.12);color:#0A0A1A}
+    html.light .num-field::placeholder{color:#B0B0C8}
+    html.light .btn-modal-skip{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.08);color:#7070A0}
+    html.light #panel-servicios [style*="background:#18181F"]{background:#fff!important;border-color:rgba(0,0,0,0.08)!important}
+    html.light #panel-servicios [style*="color:#F4F4F8"]{color:#0A0A1A!important}
+    html.light #panel-servicios [style*="color:#44445A"]{color:#9090B0!important}
+    html.light #panel-servicios p{color:#9090B0}
   </style>
 </head>
 <body>
@@ -207,6 +261,7 @@
     </div>
     <div class="topbar-right">
       <a href="/" target="_blank" class="btn-link">Ver página →</a>
+      <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" aria-label="Cambiar tema">🌙</button>
       <a href="/logout" class="btn-link" style="color:#007bff;border-color:rgba(0,123,255,0.2);background:rgba(0,123,255,0.06)">Salir</a>
     </div>
   </header>
@@ -231,6 +286,7 @@
       <button class="tab-btn"        id="tb-techs"    onclick="switchTab('techs')">Técnicos</button>
       <button class="tab-btn"        id="tb-config"   onclick="switchTab('config')">⚙️ Configuración</button>
       <button class="tab-btn"        id="tb-pagos"    onclick="switchTab('pagos')">💳 Pagos</button>
+      <button class="tab-btn"        id="tb-servicios" onclick="switchTab('servicios')">🔧 Servicios</button>
     </div>
     <div class="panel-wrap">
 
@@ -554,6 +610,64 @@
 
       </div>
 
+      <!-- ── Servicios ── -->
+      <div class="panel" id="panel-servicios">
+        <div class="form-section-title" style="margin-top:0">🔧 Activar / desactivar servicios</div>
+        <p style="font-size:13px;color:#44445A;margin-bottom:24px;line-height:1.6">
+          El cambio de aceite siempre está activo. Activa los demás servicios cuando estés listo para ofrecerlos.
+        </p>
+        <div id="svc-status" style="margin-bottom:16px"></div>
+
+        <div style="display:flex;flex-direction:column;gap:14px;max-width:480px">
+          <!-- Frenos -->
+          <div style="display:flex;align-items:center;justify-content:space-between;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px 20px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="font-size:24px">🛑</span>
+              <div>
+                <div style="font-size:14px;font-weight:700;color:#F4F4F8">Cambio de frenos</div>
+                <div style="font-size:12px;color:#44445A;margin-top:2px">Pastillas y discos</div>
+              </div>
+            </div>
+            <label style="position:relative;display:inline-block;width:46px;height:26px;cursor:pointer">
+              <input type="checkbox" id="svc-toggle-brakes" style="opacity:0;width:0;height:0" onchange="saveSvcSettings()">
+              <span id="svc-slider-brakes" style="position:absolute;inset:0;border-radius:13px;background:#2A2A3A;transition:background 0.2s ease;border:1px solid rgba(255,255,255,0.08)"></span>
+              <span id="svc-knob-brakes" style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#606078;transition:transform 0.2s ease,background 0.2s ease"></span>
+            </label>
+          </div>
+          <!-- Llantas -->
+          <div style="display:flex;align-items:center;justify-content:space-between;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px 20px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="font-size:24px">🔧</span>
+              <div>
+                <div style="font-size:14px;font-weight:700;color:#F4F4F8">Cambio de llantas</div>
+                <div style="font-size:12px;color:#44445A;margin-top:2px">Montaje y balanceo</div>
+              </div>
+            </div>
+            <label style="position:relative;display:inline-block;width:46px;height:26px;cursor:pointer">
+              <input type="checkbox" id="svc-toggle-tires" style="opacity:0;width:0;height:0" onchange="saveSvcSettings()">
+              <span id="svc-slider-tires" style="position:absolute;inset:0;border-radius:13px;background:#2A2A3A;transition:background 0.2s ease;border:1px solid rgba(255,255,255,0.08)"></span>
+              <span id="svc-knob-tires" style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#606078;transition:transform 0.2s ease,background 0.2s ease"></span>
+            </label>
+          </div>
+          <!-- Cristales -->
+          <div style="display:flex;align-items:center;justify-content:space-between;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px 20px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="font-size:24px">🪟</span>
+              <div>
+                <div style="font-size:14px;font-weight:700;color:#F4F4F8">Cambio de cristales</div>
+                <div style="font-size:12px;color:#44445A;margin-top:2px">Parabrisas y ventanas</div>
+              </div>
+            </div>
+            <label style="position:relative;display:inline-block;width:46px;height:26px;cursor:pointer">
+              <input type="checkbox" id="svc-toggle-glass" style="opacity:0;width:0;height:0" onchange="saveSvcSettings()">
+              <span id="svc-slider-glass" style="position:absolute;inset:0;border-radius:13px;background:#2A2A3A;transition:background 0.2s ease;border:1px solid rgba(255,255,255,0.08)"></span>
+              <span id="svc-knob-glass" style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#606078;transition:transform 0.2s ease,background 0.2s ease"></span>
+            </label>
+          </div>
+        </div>
+        <p style="font-size:12px;color:#44445A;margin-top:20px">Los cambios se aplican de inmediato en la página de reservas.</p>
+      </div>
+
     </div>
   </div>
 
@@ -576,16 +690,16 @@
 
       <div class="modal-section">Desgaste de neumáticos <span style="font-size:11px;color:#44445A;font-weight:400">(0 = agotado · 100 = nuevo)</span></div>
       <div class="slider-row">
-        <div class="slider-item"><div class="slider-header"><span class="slider-lbl">Conductor Delantero</span></div><div style="display:flex;align-items:center;gap:6px"><input type="number" id="sl-fl" min="0" max="100" placeholder="—" style="width:100%;padding:8px 10px;background:#18181F;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#F4F4F8;font-size:15px;font-weight:700;outline:none;text-align:center"><span style="font-size:12px;color:#44445A;flex-shrink:0">%</span></div></div>
-        <div class="slider-item"><div class="slider-header"><span class="slider-lbl">Pasajero Delantero</span></div><div style="display:flex;align-items:center;gap:6px"><input type="number" id="sl-fr" min="0" max="100" placeholder="—" style="width:100%;padding:8px 10px;background:#18181F;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#F4F4F8;font-size:15px;font-weight:700;outline:none;text-align:center"><span style="font-size:12px;color:#44445A;flex-shrink:0">%</span></div></div>
-        <div class="slider-item"><div class="slider-header"><span class="slider-lbl">Conductor Trasero</span></div><div style="display:flex;align-items:center;gap:6px"><input type="number" id="sl-rl" min="0" max="100" placeholder="—" style="width:100%;padding:8px 10px;background:#18181F;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#F4F4F8;font-size:15px;font-weight:700;outline:none;text-align:center"><span style="font-size:12px;color:#44445A;flex-shrink:0">%</span></div></div>
-        <div class="slider-item"><div class="slider-header"><span class="slider-lbl">Pasajero Trasero</span></div><div style="display:flex;align-items:center;gap:6px"><input type="number" id="sl-rr" min="0" max="100" placeholder="—" style="width:100%;padding:8px 10px;background:#18181F;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#F4F4F8;font-size:15px;font-weight:700;outline:none;text-align:center"><span style="font-size:12px;color:#44445A;flex-shrink:0">%</span></div></div>
+        <div class="slider-item"><div class="slider-header"><span class="slider-lbl">Conductor Delantero</span></div><div style="display:flex;align-items:center;gap:6px"><input type="number" id="sl-fl" min="0" max="100" placeholder="—" class="num-field"><span style="font-size:12px;color:#44445A;flex-shrink:0">%</span></div></div>
+        <div class="slider-item"><div class="slider-header"><span class="slider-lbl">Pasajero Delantero</span></div><div style="display:flex;align-items:center;gap:6px"><input type="number" id="sl-fr" min="0" max="100" placeholder="—" class="num-field"><span style="font-size:12px;color:#44445A;flex-shrink:0">%</span></div></div>
+        <div class="slider-item"><div class="slider-header"><span class="slider-lbl">Conductor Trasero</span></div><div style="display:flex;align-items:center;gap:6px"><input type="number" id="sl-rl" min="0" max="100" placeholder="—" class="num-field"><span style="font-size:12px;color:#44445A;flex-shrink:0">%</span></div></div>
+        <div class="slider-item"><div class="slider-header"><span class="slider-lbl">Pasajero Trasero</span></div><div style="display:flex;align-items:center;gap:6px"><input type="number" id="sl-rr" min="0" max="100" placeholder="—" class="num-field"><span style="font-size:12px;color:#44445A;flex-shrink:0">%</span></div></div>
       </div>
 
       <div class="modal-section">Pastillas de freno <span style="font-size:11px;color:#44445A;font-weight:400">(0 = agotado · 100 = nuevo)</span></div>
       <div class="slider-row">
-        <div class="slider-item"><div class="slider-header"><span class="slider-lbl">Frenos delanteros</span></div><div style="display:flex;align-items:center;gap:6px"><input type="number" id="sl-bf" min="0" max="100" placeholder="—" style="width:100%;padding:8px 10px;background:#18181F;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#F4F4F8;font-size:15px;font-weight:700;outline:none;text-align:center"><span style="font-size:12px;color:#44445A;flex-shrink:0">%</span></div></div>
-        <div class="slider-item"><div class="slider-header"><span class="slider-lbl">Frenos traseros</span></div><div style="display:flex;align-items:center;gap:6px"><input type="number" id="sl-br" min="0" max="100" placeholder="—" style="width:100%;padding:8px 10px;background:#18181F;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#F4F4F8;font-size:15px;font-weight:700;outline:none;text-align:center"><span style="font-size:12px;color:#44445A;flex-shrink:0">%</span></div></div>
+        <div class="slider-item"><div class="slider-header"><span class="slider-lbl">Frenos delanteros</span></div><div style="display:flex;align-items:center;gap:6px"><input type="number" id="sl-bf" min="0" max="100" placeholder="—" class="num-field"><span style="font-size:12px;color:#44445A;flex-shrink:0">%</span></div></div>
+        <div class="slider-item"><div class="slider-header"><span class="slider-lbl">Frenos traseros</span></div><div style="display:flex;align-items:center;gap:6px"><input type="number" id="sl-br" min="0" max="100" placeholder="—" class="num-field"><span style="font-size:12px;color:#44445A;flex-shrink:0">%</span></div></div>
       </div>
 
       <div class="modal-actions">
@@ -633,18 +747,76 @@
     }
     function urgencyClass(days) { return days<=1?'urgent':days<=3?'warning':''; }
 
-    const ALL_TABS = ['upcoming','all','new','techs','config','pagos'];
+    const ALL_TABS = ['upcoming','all','new','techs','config','pagos','servicios'];
 
     function switchTab(t) {
       ALL_TABS.forEach(tab => {
         document.getElementById('tb-'+tab).classList.toggle('active', tab===t);
         document.getElementById('panel-'+tab).classList.toggle('active', tab===t);
       });
-      if(t==='all')    loadAll();
-      if(t==='new')    initNewForm();
-      if(t==='techs')  loadTechs();
-      if(t==='config') loadSendGridConfig();
-      if(t==='pagos')  loadPayPalConfig();
+      if(t==='all')       loadAll();
+      if(t==='new')       initNewForm();
+      if(t==='techs')     loadTechs();
+      if(t==='config')    loadSendGridConfig();
+      if(t==='pagos')     loadPayPalConfig();
+      if(t==='servicios') loadSvcSettings();
+    }
+
+    // ── Services settings ──────────────────────────────
+    function toggleTheme(){
+      var l=document.documentElement.classList.toggle('light');
+      localStorage.setItem('glide-theme',l?'light':'dark');
+      var b=document.getElementById('theme-btn');
+      if(b)b.textContent=l?'☀️':'🌙';
+      ['brakes','tires','glass'].forEach(k=>{
+        const chk=document.getElementById('svc-toggle-'+k);
+        if(chk)updateSvcToggle(k,chk.checked);
+      });
+    }
+
+    function updateSvcToggle(key, enabled) {
+      const slider = document.getElementById('svc-slider-'+key);
+      const knob   = document.getElementById('svc-knob-'+key);
+      const chk    = document.getElementById('svc-toggle-'+key);
+      if(!slider) return;
+      const light = document.documentElement.classList.contains('light');
+      chk.checked = enabled;
+      slider.style.background  = enabled ? '#007bff' : (light ? '#D0D4F0' : '#2A2A3A');
+      slider.style.borderColor = light ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.08)';
+      knob.style.background    = enabled ? '#fff' : (light ? '#9090B0' : '#606078');
+      knob.style.transform     = enabled ? 'translateX(20px)' : 'translateX(0)';
+    }
+
+    async function loadSvcSettings() {
+      try {
+        const r = await fetch('/api/settings/services');
+        const s = await r.json();
+        updateSvcToggle('brakes', s.brakes);
+        updateSvcToggle('tires',  s.tires);
+        updateSvcToggle('glass',  s.glass);
+      } catch(e) { console.error(e); }
+    }
+
+    async function saveSvcSettings() {
+      const brakes = document.getElementById('svc-toggle-brakes').checked;
+      const tires  = document.getElementById('svc-toggle-tires').checked;
+      const glass  = document.getElementById('svc-toggle-glass').checked;
+      updateSvcToggle('brakes', brakes);
+      updateSvcToggle('tires',  tires);
+      updateSvcToggle('glass',  glass);
+      const status = document.getElementById('svc-status');
+      try {
+        const r = await fetch('/api/admin/settings/services', {
+          method:'PUT', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ brakes, tires, glass })
+        });
+        if(r.ok) {
+          status.innerHTML = '<div style="background:rgba(56,161,105,0.1);border:1px solid rgba(56,161,105,0.25);border-radius:8px;padding:10px 14px;font-size:13px;color:#38A169">✓ Cambios guardados</div>';
+          setTimeout(()=>{ status.innerHTML=''; }, 3000);
+        }
+      } catch(e) {
+        status.innerHTML = '<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:10px 14px;font-size:13px;color:#FC8181">Error al guardar</div>';
+      }
     }
 
     function toggleApiKey() {
@@ -1235,6 +1407,7 @@
       loadStats();
       loadUpcoming();
       setInterval(()=>{ loadStats(); loadUpcoming(); }, 5*60*1000);
+      (function(){var b=document.getElementById('theme-btn');if(b&&document.documentElement.classList.contains('light'))b.textContent='☀️'})();
     })();
   </script>
 </body>

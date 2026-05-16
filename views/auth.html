@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>(function(){if(localStorage.getItem('glide-theme')==='light')document.documentElement.classList.add('light')})()</script>
   <style>
     *,*::before,*::after{box-sizing:border-box}
     body{font-family:'Montserrat',sans-serif;background:#09090B;color:#F4F4F8;min-height:100vh}
@@ -44,6 +45,30 @@
     .addr-hint{font-size:11px;color:#44445A;margin-top:5px}
     .lang-toggle{position:fixed;top:18px;right:18px;z-index:50;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 12px;color:#8888A0;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.08em;cursor:pointer;transition:background 0.15s ease,color 0.15s ease}
     .lang-toggle:hover{background:rgba(255,255,255,0.1);color:#F4F4F8}
+    /* ── Theme toggle ─────────────────────────────────── */
+    .theme-btn{position:fixed;top:18px;right:68px;z-index:60;width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1);padding:0}
+    .theme-btn:hover{background:rgba(255,255,255,0.1);transform:scale(1.1)}
+    .theme-btn:active{transform:scale(0.92)}
+    /* ── Light mode ───────────────────────────────────── */
+    html.light body{background:#EEF1FF;color:#0A0A1A}
+    html.light .grain{opacity:0.012}
+    html.light .orb-1,html.light .orb-2{opacity:0.3}
+    html.light .card{background:#fff;border-color:rgba(0,0,0,0.08);box-shadow:0 0 0 1px rgba(0,0,0,0.02) inset,0 8px 48px rgba(0,0,0,0.1),0 2px 8px rgba(0,0,0,0.05)}
+    html.light .theme-btn{background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.1)}
+    html.light .theme-btn:hover{background:rgba(0,0,0,0.09)}
+    html.light .lang-toggle{background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.1);color:#7070A0}
+    html.light .lang-toggle:hover{background:rgba(0,0,0,0.09);color:#2A2A40}
+    html.light .field{background:#F0F3FF;border-color:rgba(0,0,0,0.1);color:#0A0A1A}
+    html.light .field::placeholder{color:#B0B0C8}
+    html.light .field-label{color:#7070A0}
+    html.light .tab-btn{color:#9090B0}
+    html.light .tab-btn.active{color:#0A0A1A;border-bottom-color:#007bff}
+    html.light .btn-ghost{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.08);color:#7070A0}
+    html.light .btn-ghost:hover{background:rgba(0,0,0,0.07);color:#2A2A40}
+    html.light .error-box{background:rgba(239,68,68,0.05);border-color:rgba(239,68,68,0.2)}
+    html.light .addr-hint{color:#9090B0}
+    html.light .divider-line{border-top-color:rgba(0,0,0,0.06)}
+    html.light .card [style*="color:#ffffff"]{color:#0A0A1A!important}
   </style>
 </head>
 <body>
@@ -52,12 +77,13 @@
   <div class="orb-2"></div>
 
   <button class="lang-toggle" onclick="toggleLang()" id="lang-btn">EN</button>
+  <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" aria-label="Cambiar tema">🌙</button>
 
   <div class="min-h-screen flex items-center justify-center px-4 py-12 relative z-10">
     <div class="card w-full max-w-[420px] p-10">
 
       <div class="text-center mb-8">
-        <img src="/brand/logo.svg" alt="GLIDE" style="height:36px;width:auto;margin:0 auto 8px;display:block">
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px"><img src="/brand/icon.svg" alt="GLIDE" style="height:34px;width:auto"><span style="font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;color:#ffffff;letter-spacing:-0.03em">glide</span></div>
         <p style="font-size:14px;color:#44445A;margin-top:6px" data-i18n="subtitle">Accede para reservar tu próxima cita</p>
       </div>
 
@@ -361,6 +387,8 @@
       sb.style.display = 'block';
       sb.innerHTML = t('linkGenerated') + '<br><a href="' + decodeURIComponent(resetUrl) + '" style="color:#60a5fa;word-break:break-all;font-size:12px">' + decodeURIComponent(resetUrl) + '</a>';
     }
+    function toggleTheme(){var l=document.documentElement.classList.toggle('light');localStorage.setItem('glide-theme',l?'light':'dark');var b=document.getElementById('theme-btn');if(b)b.textContent=l?'☀️':'🌙'}
+    (function(){var b=document.getElementById('theme-btn');if(b&&document.documentElement.classList.contains('light'))b.textContent='☀️'})();
   </script>
 </body>
 </html>

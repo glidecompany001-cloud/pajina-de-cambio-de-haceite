@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>(function(){if(localStorage.getItem('glide-theme')==='light')document.documentElement.classList.add('light')})()</script>
   <style>
     *,*::before,*::after{box-sizing:border-box}
     body{font-family:'Montserrat',sans-serif;background:#09090B;color:#F4F4F8;min-height:100vh}
@@ -208,6 +209,102 @@
     .service-card-name{font-size:12px;font-weight:700;color:#C8C8D8;line-height:1.3}
     .service-card.active .service-card-name{color:#FF8090}
     .service-soon-badge{position:absolute;top:6px;right:6px;font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#44445A}
+    /* ── Date strip ──────────────────────────────────── */
+    .date-strip{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 6px;scrollbar-width:none;-ms-overflow-style:none}
+    .date-strip::-webkit-scrollbar{display:none}
+    .date-btn{flex-shrink:0;width:52px;padding:9px 4px;border-radius:10px;background:#18181F;border:1px solid rgba(255,255,255,0.07);cursor:pointer;text-align:center;transition:border-color 0.15s ease,background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1);user-select:none}
+    .date-btn:hover{border-color:rgba(0,123,255,0.35);background:rgba(0,123,255,0.07);transform:translateY(-2px)}
+    .date-btn:active{transform:translateY(0)}
+    .date-btn.ds-sel{border-color:rgba(0,123,255,0.55);background:rgba(0,123,255,0.18)}
+    .date-btn-day{font-size:9px;font-weight:700;color:#44445A;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:3px}
+    .date-btn-num{font-size:18px;font-weight:800;font-family:'Montserrat',sans-serif;color:#F4F4F8;line-height:1}
+    .date-btn-mon{font-size:9px;color:#606078;margin-top:3px;text-transform:uppercase;letter-spacing:0.04em}
+    .date-btn.ds-sel .date-btn-day,.date-btn.ds-sel .date-btn-num,.date-btn.ds-sel .date-btn-mon{color:#007bff}
+    html.light .date-btn{background:#F0F3FF;border-color:rgba(0,0,0,0.08)}
+    html.light .date-btn:hover{border-color:rgba(0,123,255,0.35);background:rgba(0,123,255,0.06)}
+    html.light .date-btn-day{color:#9090B0}
+    html.light .date-btn-num{color:#0A0A1A}
+    html.light .date-btn-mon{color:#9090B0}
+    html.light .date-btn.ds-sel{border-color:rgba(0,123,255,0.55);background:rgba(0,123,255,0.12)}
+    html.light .date-btn.ds-sel .date-btn-day,html.light .date-btn.ds-sel .date-btn-num,html.light .date-btn.ds-sel .date-btn-mon{color:#007bff}
+    /* ── Theme toggle ─────────────────────────────────── */
+    .theme-btn{width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1);flex-shrink:0;padding:0}
+    .theme-btn:hover{background:rgba(255,255,255,0.1);transform:scale(1.12)}
+    .theme-btn:active{transform:scale(0.9)}
+    /* ── Light mode ───────────────────────────────────── */
+    html.light body{background:#EEF1FF;color:#0A0A1A}
+    html.light .grain{opacity:0.012}
+    html.light .orb-1,html.light .orb-2{opacity:0.3}
+    html.light .topbar{background:#fff;border-bottom-color:rgba(0,0,0,0.08)}
+    html.light .topbar-brand span{color:#0A0A1A!important}
+    html.light .theme-btn{background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.1)}
+    html.light .theme-btn:hover{background:rgba(0,0,0,0.09)}
+    html.light .user-name{color:#7070A0}
+    html.light .btn-logout,html.light .btn-lang{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.08);color:#7070A0}
+    html.light .btn-logout:hover{background:rgba(0,0,0,0.08);color:#2A2A40}
+    html.light .avatar{background:linear-gradient(135deg,rgba(0,123,255,0.15),rgba(0,123,255,0.06));border-color:rgba(0,123,255,0.2)}
+    html.light .hero-greeting,html.light .page-title{color:#0A0A1A}
+    html.light .hero-sub,html.light .page-sub,html.light .section-label,html.light .field-label{color:#7070A0}
+    html.light .vehicle-card,html.light .section-card,html.light .add-v-wrap,html.light .detail-vehicle-card{background:#fff;border-color:rgba(0,0,0,0.08)}
+    html.light .vehicle-card:hover{border-color:rgba(0,123,255,0.35)}
+    html.light .v-name,html.light .section-card-title,html.light .detail-v-name,html.light .add-v-title{color:#0A0A1A}
+    html.light .v-loc,html.light .v-color-chip,html.light .pending-sub,html.light .he-tech{color:#7070A0}
+    html.light .v-color-chip{border-color:rgba(0,0,0,0.1)}
+    html.light .v-arrow{color:#C0C0D8}
+    html.light .vehicle-card:hover .v-arrow{color:#007bff}
+    html.light .btn-add-v{border-color:rgba(0,0,0,0.12);color:#9090B0;background:rgba(0,0,0,0.02)}
+    html.light .btn-back{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.08);color:#2A2A40}
+    html.light .time-pill{background:#F0F3FF;border-color:rgba(0,0,0,0.08);color:#0A0A1A}
+    html.light .pending-row{background:#fff;border-color:rgba(0,0,0,0.08)}
+    html.light .pending-date{color:#0A0A1A}
+    html.light .history-entry{background:#fff;border-color:rgba(0,0,0,0.08)}
+    html.light .he-date,html.light .he-km{color:#0A0A1A}
+    html.light .health-block{background:rgba(0,0,0,0.04)}
+    html.light .wear-bar-wrap{background:rgba(0,0,0,0.08)}
+    html.light .brake-indicator{background:#F0F3FF;border-color:rgba(0,0,0,0.08)}
+    html.light .t-gauge-lbl{color:#9090B0}
+    html.light .brake-ind-lbl{color:#9090B0}
+    html.light .brake-ind-bar-wrap{background:rgba(0,0,0,0.07)}
+    html.light .field{background:#F0F3FF;border-color:rgba(0,0,0,0.1);color:#0A0A1A}
+    html.light .field::placeholder{color:#B0B0C8}
+    html.light select.field option{background:#fff;color:#0A0A1A}
+    html.light .slot{background:#F0F3FF;border-color:rgba(0,0,0,0.08);color:#7070A0}
+    html.light .slot.taken{background:#E8EBFF;color:#C0C0D8;border-color:rgba(0,0,0,0.04)}
+    html.light .service-card{background:#F0F3FF;border-color:rgba(0,0,0,0.08)}
+    html.light .service-card.active{border-color:rgba(0,123,255,0.5);background:rgba(0,123,255,0.07)}
+    html.light .service-card-name{color:#2A2A40}
+    html.light .lang-btn{background:#F0F3FF;border-color:rgba(0,0,0,0.08)}
+    html.light .lang-name{color:#0A0A1A}
+    html.light .lang-native{color:#7070A0}
+    html.light .modal{background:#fff;border-color:rgba(0,0,0,0.08);box-shadow:0 24px 80px rgba(0,0,0,0.12)}
+    html.light .modal-bd{background:rgba(0,0,0,0.35)}
+    html.light .modal-close{background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.08);color:#7070A0}
+    html.light .modal-close:hover{background:rgba(0,0,0,0.1);color:#0A0A1A}
+    html.light .modal-title{color:#0A0A1A}
+    html.light .modal-sub,html.light .modal-section,html.light .slider-lbl{color:#7070A0}
+    html.light .slider-val{color:#0A0A1A}
+    html.light .mileage-field{background:#F0F3FF;border-color:rgba(0,0,0,0.1);color:#0A0A1A}
+    html.light .mileage-field::placeholder{color:#B0B0C8}
+    html.light input[type="number"]{background:#F0F3FF!important;border-color:rgba(0,0,0,0.1)!important;color:#0A0A1A!important}
+    html.light .appt-summary-box{background:#F0F3FF;border-color:rgba(0,0,0,0.06);color:#7070A0}
+    html.light .appt-summary-box strong{color:#0A0A1A}
+    html.light .btn-skip{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.08);color:#7070A0}
+    html.light .empty{color:#B0B0D0}
+    html.light .hb-label{color:#9090B0}
+    html.light .wear-lbl{color:#9090B0}
+    html.light .wear-pct{color:#2A2A40}
+    html.light .he-km{color:#0A0A1A}
+    html.light [style*="color:#F4F4F8"]{color:#0A0A1A!important}
+    html.light [style*="color:#C8C8D8"]{color:#2A2A40!important}
+    html.light [style*="color:#8888A0"]{color:#7070A0!important}
+    html.light [style*="color:#66667A"]{color:#7070A0!important}
+    html.light [style*="color:#44445A"]:not(.u-today):not(.u-tomorrow):not(.u-week):not(.b-oil):not(.v-oil-badge):not(.pay-pending):not(.pay-done){color:#7070A0!important}
+    html.light #pm-modal>div{background:#fff!important;border-color:rgba(0,0,0,0.08)!important;box-shadow:0 32px 80px rgba(0,0,0,0.1)!important}
+    html.light #pm-vehicle,html.light #pm-service{color:#2A2A40!important}
+    html.light #pm-price{color:#0A0A1A!important}
+    html.light #pm-btn-cash{background:#F0F3FF!important;border-color:rgba(0,0,0,0.1)!important;color:#2A2A40!important}
+    html.light #pm-success-msg{color:#7070A0!important}
+    html.light #verify-banner{background:linear-gradient(135deg,rgba(0,123,255,0.08),rgba(0,123,255,0.04))}
   </style>
 </head>
 <body>
@@ -246,29 +343,30 @@
       <div id="bm-form-wrap">
         <div class="field-label" style="margin-bottom:10px" data-i18n="bm_service">Tipo de servicio</div>
         <div class="service-grid">
-          <div class="service-card active">
+          <div class="service-card active" id="svc-oil">
             <div class="service-card-icon">🛢️</div>
             <div class="service-card-name" data-i18n="svc_oil">Cambio de aceite</div>
           </div>
-          <div class="service-card soon">
-            <span class="service-soon-badge">Coming soon</span>
+          <div class="service-card soon" id="svc-brakes">
+            <span class="service-soon-badge" id="svc-brakes-badge">Próximamente</span>
             <div class="service-card-icon">🛑</div>
             <div class="service-card-name" data-i18n="svc_brakes">Cambio de frenos</div>
           </div>
-          <div class="service-card soon">
-            <span class="service-soon-badge">Coming soon</span>
+          <div class="service-card soon" id="svc-tires">
+            <span class="service-soon-badge" id="svc-tires-badge">Próximamente</span>
             <div class="service-card-icon">🔧</div>
             <div class="service-card-name" data-i18n="svc_tires">Cambio de llantas</div>
           </div>
-          <div class="service-card soon">
-            <span class="service-soon-badge">Coming soon</span>
+          <div class="service-card soon" id="svc-glass">
+            <span class="service-soon-badge" id="svc-glass-badge">Próximamente</span>
             <div class="service-card-icon">🪟</div>
             <div class="service-card-name" data-i18n="svc_glass">Cambio de cristales</div>
           </div>
         </div>
         <div class="form-group">
-          <label class="field-label"><span data-i18n="bm_date">Fecha *</span> <span style="color:#44445A;font-size:10px;font-weight:400;text-transform:none;letter-spacing:0" data-i18n="bm_date_hint">(mínimo mañana)</span></label>
-          <input class="field" type="date" id="bm-date">
+          <label class="field-label" data-i18n="bm_date">Fecha *</label>
+          <div class="date-strip" id="bm-date-strip"></div>
+          <input type="hidden" id="bm-date">
         </div>
         <div class="form-group">
           <label class="field-label" data-i18n="bm_time">Horario *</label>
@@ -306,12 +404,13 @@
 
   <header class="topbar">
     <div class="topbar-brand" onclick="showList()" role="button" tabindex="0" onkeydown="if(event.key==='Enter')showList()">
-      <img src="/brand/logo.svg" alt="GLIDE" style="height:26px;width:auto">
+      <img src="/brand/icon.svg" alt="GLIDE" style="height:28px;width:auto"><span style="font-family:'Montserrat',sans-serif;font-size:17px;font-weight:800;color:#ffffff;letter-spacing:-0.03em">glide</span>
     </div>
     <div class="user-area">
       <span class="user-name" id="user-name">—</span>
       <div class="avatar" id="user-avatar">?</div>
       <button class="btn-lang" id="lang-toggle" onclick="toggleLang()">EN</button>
+      <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" aria-label="Cambiar tema">🌙</button>
       <a href="/auth/logout" class="btn-logout" data-i18n="logout">Salir</a>
     </div>
   </header>
@@ -473,6 +572,7 @@
   </div>
 
   <script>
+    function toggleTheme(){var l=document.documentElement.classList.toggle('light');localStorage.setItem('glide-theme',l?'light':'dark');var b=document.getElementById('theme-btn');if(b)b.textContent=l?'☀️':'🌙'}
     // ── Translations ───────────────────────────────────
     const STRINGS = {
       es: {
@@ -609,7 +709,7 @@
     }
 
     // ── App state ──────────────────────────────────────
-    let _me = {}, _vehicles = [], _activeVehicle = null;
+    let _me = {}, _vehicles = [], _activeVehicle = null, _currentHistory = [];
 
     function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
     function wearColor(p){ return p==null?'#2A2A3A':p>=60?'#38A169':p>=30?'#D97706':'#007bff' }
@@ -921,12 +1021,38 @@
           return;
         }
         // Show current status from most recent entry
+        _currentHistory = items;
         const latest = items[0];
         const hasLatestHealth = [latest.tire_fl,latest.tire_fr,latest.tire_rl,latest.tire_rr,latest.brake_front,latest.brake_rear].some(v=>v!=null);
         if (hasLatestHealth){
           statusSec.style.display = 'block';
+          const score = calcHealthScore(latest);
+          const grade = healthGrade(score);
+          const sc = wearColor(score);
+          const r=24, circ=2*Math.PI*r, fill=(score/100)*circ;
+          const light=document.documentElement.classList.contains('light');
+          const trackFill=light?'rgba(0,0,0,0.07)':'rgba(0,0,0,0.2)';
+          const scoreLabel = score>=60?(_lang==='en'?'Excellent condition':'Excelente estado'):score>=30?(_lang==='en'?'Moderate condition':'Estado moderado'):(_lang==='en'?'Needs attention':'Requiere atención');
           document.getElementById('detail-status-content').innerHTML =
-            `<div style="font-size:11px;color:#44445A;margin-bottom:12px">${t('last_svc')} ${fmtShort(latest.date)}</div>`+
+            `<div style="display:flex;align-items:center;gap:16px;padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid rgba(${light?'0,0,0':'255,255,255'},0.06)">
+              <svg viewBox="0 0 60 60" width="72" height="72" style="flex-shrink:0">
+                <circle cx="30" cy="30" r="${r}" fill="${trackFill}" stroke="none" stroke-width="6"/>
+                <circle cx="30" cy="30" r="${r}" fill="none" stroke="${sc}" stroke-width="6"
+                  stroke-dasharray="${fill.toFixed(1)} ${circ.toFixed(1)}" stroke-linecap="round"
+                  transform="rotate(-90 30 30)"/>
+                <text x="30" y="27" text-anchor="middle" font-family="'Montserrat',sans-serif" font-size="9" font-weight="700" fill="${light?'#9090B0':'#44445A'}">${_lang==='en'?'HEALTH':'SALUD'}</text>
+                <text x="30" y="38" text-anchor="middle" font-family="'Montserrat',sans-serif" font-size="12" font-weight="800" fill="${sc}">${score}%</text>
+              </svg>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${light?'#9090B0':'#44445A'};margin-bottom:4px">${_lang==='en'?'Vehicle Health':'Salud del vehículo'}</div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                  <span style="font-family:'Montserrat',sans-serif;font-size:30px;font-weight:900;letter-spacing:-0.03em;color:${sc};line-height:1">${score}<span style="font-size:16px;font-weight:500;color:${light?'#9090B0':'#44445A'}">%</span></span>
+                  <span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;font-size:14px;font-weight:800;background:${sc}22;color:${sc};border:1px solid ${sc}44">${grade}</span>
+                </div>
+                <div style="font-size:12px;color:${light?'#9090B0':'#44445A'}">${scoreLabel}</div>
+                <div style="font-size:11px;color:${light?'#B0B0C8':'#33334A'};margin-top:3px">📅 ${t('last_svc')} ${fmtShort(latest.date)}</div>
+              </div>
+            </div>`+
             renderCarSchematic(latest);
         } else {
           statusSec.style.display = 'none';
@@ -934,6 +1060,13 @@
         wrap.innerHTML = items.map(a => renderHistoryEntry(a)).join('');
       } catch { wrap.innerHTML='<div class="empty-state" style="color:#007bff">Error al cargar historial</div>'; }
     }
+
+    // ── Health score ───────────────────────────────────
+    function calcHealthScore(e){
+      const vals=[e.tire_fl,e.tire_fr,e.tire_rl,e.tire_rr,e.brake_front,e.brake_rear].filter(v=>v!=null);
+      return vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):null;
+    }
+    function healthGrade(s){ return s>=80?'A':s>=65?'B':s>=50?'C':s>=35?'D':'F'; }
 
     // ── Car schematic ──────────────────────────────────
     function renderCarSchematic(data){
@@ -944,8 +1077,11 @@
         const fill = pct!=null ? (pct/100)*circ : 0;
         const c = wearColor(pct);
         const label = pct!=null ? pct+'%' : '—';
+        const light = document.documentElement.classList.contains('light');
+        const trackFill = light ? 'rgba(0,0,0,0.07)' : 'rgba(0,0,0,0.25)';
+        const trackStroke = light ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.04)';
         return `<svg viewBox="0 0 60 60" width="58" height="58" style="display:block">
-          <circle cx="30" cy="30" r="${r}" fill="rgba(0,0,0,0.25)" stroke="rgba(255,255,255,0.04)" stroke-width="5"/>
+          <circle cx="30" cy="30" r="${r}" fill="${trackFill}" stroke="${trackStroke}" stroke-width="5"/>
           <circle cx="30" cy="30" r="${r}" fill="none" stroke="${c}" stroke-width="5"
             stroke-dasharray="${fill.toFixed(1)} ${circ.toFixed(1)}" stroke-linecap="round"
             transform="rotate(-90 30 30)"/>
@@ -974,15 +1110,15 @@
 
         <!-- row 2: empty / car body / empty -->
         <div></div>
-        <div style="display:flex;justify-content:center;padding:2px 0">
+        ${(()=>{const light=document.documentElement.classList.contains('light');return`<div style="display:flex;justify-content:center;padding:2px 0">
           <svg viewBox="0 0 72 110" width="72" height="110">
-            <rect x="4" y="5" width="64" height="100" rx="22" fill="#1A1A24" stroke="rgba(255,255,255,0.09)" stroke-width="1.5"/>
-            <rect x="9" y="11" width="54" height="34" rx="10" fill="rgba(74,126,200,0.11)" stroke="rgba(74,126,200,0.16)" stroke-width="1"/>
-            <rect x="9" y="65" width="54" height="26" rx="8" fill="rgba(74,126,200,0.07)" stroke="rgba(74,126,200,0.11)" stroke-width="1"/>
-            <line x1="6" y1="54" x2="66" y2="54" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
-            <rect x="29" y="48" width="14" height="12" rx="3" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+            <rect x="4" y="5" width="64" height="100" rx="22" fill="${light?'#E8ECFF':'#1A1A24'}" stroke="${light?'rgba(0,0,0,0.1)':'rgba(255,255,255,0.09)'}" stroke-width="1.5"/>
+            <rect x="9" y="11" width="54" height="34" rx="10" fill="${light?'rgba(0,100,255,0.07)':'rgba(74,126,200,0.11)'}" stroke="${light?'rgba(0,100,255,0.15)':'rgba(74,126,200,0.16)'}" stroke-width="1"/>
+            <rect x="9" y="65" width="54" height="26" rx="8" fill="${light?'rgba(0,100,255,0.05)':'rgba(74,126,200,0.07)'}" stroke="${light?'rgba(0,100,255,0.1)':'rgba(74,126,200,0.11)'}" stroke-width="1"/>
+            <line x1="6" y1="54" x2="66" y2="54" stroke="${light?'rgba(0,0,0,0.06)':'rgba(255,255,255,0.04)'}" stroke-width="1"/>
+            <rect x="29" y="48" width="14" height="12" rx="3" fill="${light?'rgba(0,0,0,0.03)':'rgba(255,255,255,0.03)'}" stroke="${light?'rgba(0,0,0,0.06)':'rgba(255,255,255,0.05)'}" stroke-width="1"/>
           </svg>
-        </div>
+        </div>`})()}
         <div></div>
 
         <!-- row 3: RL / rear brake / RR -->
@@ -1019,9 +1155,7 @@
           ${v.location ? `<span class="v-loc">📍 ${esc(v.location)}</span>` : ''}
         </div>
         <div style="font-size:12px;color:#44445A;margin-top:6px">👤 ${esc(_me.name)} · 📞 ${esc(_me.phone||'—')}</div>`;
-      const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
-      document.getElementById('bm-date').min = tomorrow.toISOString().split('T')[0];
-      document.getElementById('bm-date').value = '';
+      populateDateStrip();
       document.getElementById('bm-slots').innerHTML = `<div class="slot-ph">${t('slot_select')}</div>`;
       document.getElementById('bm-time').value = '';
       document.getElementById('bm-notes').value = '';
@@ -1043,11 +1177,34 @@
       if (_activeVehicle) loadPending(_activeVehicle.id);
     }
 
-    document.getElementById('bm-date').addEventListener('input', function(){
-      const d = new Date(this.value+'T12:00:00');
-      if (d.getDay()===0){ this.value=''; alert(t('no_sunday')); return; }
-      loadBmSlots(this.value);
-    });
+    function populateDateStrip(){
+      const strip=document.getElementById('bm-date-strip');
+      if(!strip)return;
+      strip.innerHTML='';
+      document.getElementById('bm-date').value='';
+      const DAY=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+      const MON=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+      const today=new Date();
+      let d=new Date(today); d.setDate(d.getDate()+1);
+      for(let added=0;added<60;){
+        if(d.getDay()!==0){
+          const yyyy=d.getFullYear(),mm=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');
+          const dateStr=`${yyyy}-${mm}-${dd}`;
+          const btn=document.createElement('div');
+          btn.className='date-btn';
+          btn.innerHTML=`<div class="date-btn-day">${DAY[d.getDay()]}</div><div class="date-btn-num">${d.getDate()}</div><div class="date-btn-mon">${MON[d.getMonth()]}</div>`;
+          btn.addEventListener('click',()=>{
+            document.querySelectorAll('.date-btn').forEach(b=>b.classList.remove('ds-sel'));
+            btn.classList.add('ds-sel');
+            document.getElementById('bm-date').value=dateStr;
+            loadBmSlots(dateStr);
+          });
+          strip.appendChild(btn);
+          added++;
+        }
+        d.setDate(d.getDate()+1);
+      }
+    }
 
     async function loadBmSlots(date){
       const wrap = document.getElementById('bm-slots');
@@ -1236,9 +1393,27 @@
         : '¡Pago completado! El técnico completará el servicio ahora.';
     }
 
+    // Load enabled services
+    fetch('/api/settings/services').then(r=>r.json()).then(s=>{
+      ['brakes','tires','glass'].forEach(k=>{
+        const card = document.getElementById('svc-'+k);
+        const badge = document.getElementById('svc-'+k+'-badge');
+        if(!card) return;
+        if(s[k]){
+          card.classList.remove('soon');
+          if(badge) badge.remove();
+          card.onclick = () => {
+            document.querySelectorAll('.service-card').forEach(c=>c.classList.remove('active'));
+            card.classList.add('active');
+          };
+        }
+      });
+    }).catch(()=>{});
+
     init();
     setInterval(pollPaymentPending, 10000);
     pollPaymentPending();
+    (function(){var b=document.getElementById('theme-btn');if(b&&document.documentElement.classList.contains('light'))b.textContent='☀️'})();
   </script>
 
   <!-- Payment pending modal -->
