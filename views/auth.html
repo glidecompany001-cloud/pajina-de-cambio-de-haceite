@@ -399,10 +399,11 @@
 
     // ── tab logic ─────────────────────────────────────────────────────────────
     function showTab(tab) {
-      ['login','register'].forEach(n => {
+      ['login','register','guest'].forEach(n => {
         document.getElementById('tab-'+n).classList.toggle('active', tab===n);
         document.getElementById('tab-'+n+'-btn').classList.toggle('active', tab===n);
       });
+      if (tab === 'guest') buildGuestDateStrip();
     }
 
     function toggleForgot() {
