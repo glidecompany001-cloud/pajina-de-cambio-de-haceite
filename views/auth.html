@@ -2,35 +2,36 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="/brand/favicon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Acceso – Cambio de Aceite</title>
+  <title>GLIDE</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box}
-    body{font-family:'DM Sans',sans-serif;background:#09090B;color:#F4F4F8;min-height:100vh}
+    body{font-family:'Montserrat',sans-serif;background:#09090B;color:#F4F4F8;min-height:100vh}
     .grain{position:fixed;inset:0;pointer-events:none;z-index:40;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E")}
-    .orb-1{position:fixed;width:640px;height:640px;border-radius:50%;top:-260px;right:-180px;pointer-events:none;background:radial-gradient(circle,rgba(204,41,54,0.13) 0%,transparent 68%)}
-    .orb-2{position:fixed;width:480px;height:480px;border-radius:50%;bottom:-180px;left:-140px;pointer-events:none;background:radial-gradient(circle,rgba(204,41,54,0.07) 0%,transparent 68%)}
+    .orb-1{position:fixed;width:640px;height:640px;border-radius:50%;top:-260px;right:-180px;pointer-events:none;background:radial-gradient(circle,rgba(0,123,255,0.13) 0%,transparent 68%)}
+    .orb-2{position:fixed;width:480px;height:480px;border-radius:50%;bottom:-180px;left:-140px;pointer-events:none;background:radial-gradient(circle,rgba(0,123,255,0.07) 0%,transparent 68%)}
     .card{background:#111118;border:1px solid rgba(255,255,255,0.07);box-shadow:0 0 0 1px rgba(255,255,255,0.03) inset,0 8px 48px rgba(0,0,0,0.7),0 2px 8px rgba(0,0,0,0.5);border-radius:20px}
     .field-label{display:block;font-size:11px;font-weight:600;color:#5A5A78;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:7px}
-    .field{width:100%;padding:11px 14px;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#F4F4F8;font-family:'DM Sans',sans-serif;font-size:15px;outline:none;transition:border-color 0.18s ease,box-shadow 0.18s ease}
+    .field{width:100%;padding:11px 14px;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#F4F4F8;font-family:'Montserrat',sans-serif;font-size:15px;outline:none;transition:border-color 0.18s ease,box-shadow 0.18s ease}
     .field::placeholder{color:#333345}
-    .field:focus{border-color:rgba(204,41,54,0.55);box-shadow:0 0 0 3px rgba(204,41,54,0.09)}
-    .tab-btn{flex:1;padding:10px 4px;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:#44445A;cursor:pointer;border-bottom:2px solid transparent;letter-spacing:0.03em;text-transform:uppercase;transition:color 0.18s ease,border-color 0.18s ease}
+    .field:focus{border-color:rgba(0,123,255,0.55);box-shadow:0 0 0 3px rgba(0,123,255,0.09)}
+    .tab-btn{flex:1;padding:10px 4px;background:none;border:none;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;color:#44445A;cursor:pointer;border-bottom:2px solid transparent;letter-spacing:0.03em;text-transform:uppercase;transition:color 0.18s ease,border-color 0.18s ease}
     .tab-btn:hover{color:#8888A0}
-    .tab-btn.active{color:#F4F4F8;border-bottom-color:#CC2936}
-    .tab-btn:focus-visible{outline:2px solid rgba(204,41,54,0.4);outline-offset:2px;border-radius:2px}
-    .btn-primary{width:100%;padding:13px;background:linear-gradient(135deg,#CC2936 0%,#A31F2B 100%);border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;letter-spacing:0.01em;box-shadow:0 0 24px rgba(204,41,54,0.22),0 2px 8px rgba(0,0,0,0.45);transition:transform 0.22s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.22s ease}
-    .btn-primary:hover{transform:translateY(-2px) scale(1.01);box-shadow:0 0 32px rgba(204,41,54,0.32),0 6px 16px rgba(0,0,0,0.5)}
+    .tab-btn.active{color:#F4F4F8;border-bottom-color:#007bff}
+    .tab-btn:focus-visible{outline:2px solid rgba(0,123,255,0.4);outline-offset:2px;border-radius:2px}
+    .btn-primary{width:100%;padding:13px;background:linear-gradient(135deg,#007bff 0%,#0056b3 100%);border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#fff;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:600;cursor:pointer;letter-spacing:0.01em;box-shadow:0 0 24px rgba(0,123,255,0.22),0 2px 8px rgba(0,0,0,0.45);transition:transform 0.22s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.22s ease}
+    .btn-primary:hover{transform:translateY(-2px) scale(1.01);box-shadow:0 0 32px rgba(0,123,255,0.32),0 6px 16px rgba(0,0,0,0.5)}
     .btn-primary:active{transform:translateY(0) scale(0.99)}
-    .btn-primary:focus-visible{outline:2px solid rgba(204,41,54,0.7);outline-offset:3px;border-radius:10px}
-    .btn-ghost{width:100%;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#606078;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:background 0.15s ease,color 0.15s ease,transform 0.18s cubic-bezier(0.34,1.56,0.64,1)}
+    .btn-primary:focus-visible{outline:2px solid rgba(0,123,255,0.7);outline-offset:3px;border-radius:10px}
+    .btn-ghost{width:100%;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#606078;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:background 0.15s ease,color 0.15s ease,transform 0.18s cubic-bezier(0.34,1.56,0.64,1)}
     .btn-ghost:hover{background:rgba(255,255,255,0.07);color:#C8C8D8;transform:translateY(-1px)}
     .btn-ghost:active{transform:translateY(0)}
     .btn-ghost:focus-visible{outline:2px solid rgba(255,255,255,0.15);outline-offset:2px;border-radius:10px}
-    .error-box{background:rgba(204,41,54,0.08);border:1px solid rgba(204,41,54,0.22);border-radius:8px;padding:10px 14px;color:#FF8590;font-size:13px;margin-bottom:18px;display:none}
+    .error-box{background:rgba(0,123,255,0.08);border:1px solid rgba(0,123,255,0.22);border-radius:8px;padding:10px 14px;color:#FF8590;font-size:13px;margin-bottom:18px;display:none}
     .error-box.show{display:block}
     .success-box{background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.22);border-radius:8px;padding:10px 14px;color:#86efac;font-size:13px;margin-bottom:14px}
     .tab-panel{display:none}
@@ -38,10 +39,10 @@
     .form-group{margin-bottom:16px}
     .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     @media(max-width:480px){.form-row{grid-template-columns:1fr}}
-    .logo-ring{display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:16px;margin-bottom:16px;background:linear-gradient(135deg,rgba(204,41,54,0.18),rgba(204,41,54,0.07));border:1px solid rgba(204,41,54,0.18);box-shadow:0 0 24px rgba(204,41,54,0.1)}
+    .logo-ring{display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:16px;margin-bottom:16px;background:linear-gradient(135deg,rgba(0,123,255,0.18),rgba(0,123,255,0.07));border:1px solid rgba(0,123,255,0.18);box-shadow:0 0 24px rgba(0,123,255,0.1)}
     .divider-line{border:none;border-top:1px solid rgba(255,255,255,0.05);margin:20px 0 16px}
     .addr-hint{font-size:11px;color:#44445A;margin-top:5px}
-    .lang-toggle{position:fixed;top:18px;right:18px;z-index:50;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 12px;color:#8888A0;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.08em;cursor:pointer;transition:background 0.15s ease,color 0.15s ease}
+    .lang-toggle{position:fixed;top:18px;right:18px;z-index:50;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 12px;color:#8888A0;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.08em;cursor:pointer;transition:background 0.15s ease,color 0.15s ease}
     .lang-toggle:hover{background:rgba(255,255,255,0.1);color:#F4F4F8}
   </style>
 </head>
@@ -56,8 +57,7 @@
     <div class="card w-full max-w-[420px] p-10">
 
       <div class="text-center mb-8">
-        <div class="logo-ring"><span style="font-size:26px">🛢️</span></div>
-        <h1 style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;letter-spacing:-0.03em;color:#F4F4F8" data-i18n="brand">Cambio de Aceite</h1>
+        <img src="/brand/logo.svg" alt="GLIDE" style="height:36px;width:auto;margin:0 auto 8px;display:block">
         <p style="font-size:14px;color:#44445A;margin-top:6px" data-i18n="subtitle">Accede para reservar tu próxima cita</p>
       </div>
 

@@ -2,33 +2,34 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="/brand/favicon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin – Cambio de Aceite</title>
+  <title>GLIDE</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script>
     tailwind.config = { theme: { extend: { fontFamily: { display:['Syne','sans-serif'], sans:['DM Sans','sans-serif'] } } } }
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    body { font-family:'DM Sans',sans-serif; background:#09090B; color:#F4F4F8; min-height:100vh; }
+    body { font-family:'Montserrat',sans-serif; background:#09090B; color:#F4F4F8; min-height:100vh; }
     .grain { position:fixed;inset:0;pointer-events:none;z-index:40;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"); }
-    .orb-1 { position:fixed;width:600px;height:600px;border-radius:50%;top:-240px;left:-180px;pointer-events:none;background:radial-gradient(circle,rgba(204,41,54,0.1) 0%,transparent 68%); }
-    .orb-2 { position:fixed;width:400px;height:400px;border-radius:50%;bottom:-160px;right:-120px;pointer-events:none;background:radial-gradient(circle,rgba(204,41,54,0.06) 0%,transparent 68%); }
+    .orb-1 { position:fixed;width:600px;height:600px;border-radius:50%;top:-240px;left:-180px;pointer-events:none;background:radial-gradient(circle,rgba(0,123,255,0.1) 0%,transparent 68%); }
+    .orb-2 { position:fixed;width:400px;height:400px;border-radius:50%;bottom:-160px;right:-120px;pointer-events:none;background:radial-gradient(circle,rgba(0,123,255,0.06) 0%,transparent 68%); }
     .card { background:#111118;border:1px solid rgba(255,255,255,0.07);box-shadow:0 0 0 1px rgba(255,255,255,0.03) inset,0 8px 48px rgba(0,0,0,0.7),0 2px 8px rgba(0,0,0,0.5);border-radius:20px; }
     .field-label { display:block;font-size:11px;font-weight:600;color:#5A5A78;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:7px; }
-    .field { width:100%;padding:11px 14px;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#F4F4F8;font-family:'DM Sans',sans-serif;font-size:15px;outline:none;transition:border-color 0.18s ease,box-shadow 0.18s ease; }
+    .field { width:100%;padding:11px 14px;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#F4F4F8;font-family:'Montserrat',sans-serif;font-size:15px;outline:none;transition:border-color 0.18s ease,box-shadow 0.18s ease; }
     .field::placeholder { color:#333345; }
-    .field:focus { border-color:rgba(204,41,54,0.55);box-shadow:0 0 0 3px rgba(204,41,54,0.09); }
-    .field:focus-visible { border-color:rgba(204,41,54,0.55);box-shadow:0 0 0 3px rgba(204,41,54,0.09); }
-    .btn-primary { width:100%;padding:13px;background:linear-gradient(135deg,#CC2936 0%,#A31F2B 100%);border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;letter-spacing:0.01em;box-shadow:0 0 24px rgba(204,41,54,0.22),0 2px 8px rgba(0,0,0,0.45);transition:transform 0.22s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.22s ease; }
-    .btn-primary:hover { transform:translateY(-2px) scale(1.01);box-shadow:0 0 32px rgba(204,41,54,0.32),0 6px 16px rgba(0,0,0,0.5); }
-    .btn-primary:active { transform:translateY(0) scale(0.99);box-shadow:0 0 12px rgba(204,41,54,0.14),0 1px 4px rgba(0,0,0,0.5); }
-    .btn-primary:focus-visible { outline:2px solid rgba(204,41,54,0.7);outline-offset:3px;border-radius:10px; }
-    .error-box { background:rgba(204,41,54,0.08);border:1px solid rgba(204,41,54,0.22);border-radius:8px;padding:10px 14px;color:#FF8590;font-size:13px;margin-bottom:18px;display:none; }
+    .field:focus { border-color:rgba(0,123,255,0.55);box-shadow:0 0 0 3px rgba(0,123,255,0.09); }
+    .field:focus-visible { border-color:rgba(0,123,255,0.55);box-shadow:0 0 0 3px rgba(0,123,255,0.09); }
+    .btn-primary { width:100%;padding:13px;background:linear-gradient(135deg,#007bff 0%,#0056b3 100%);border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#fff;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:600;cursor:pointer;letter-spacing:0.01em;box-shadow:0 0 24px rgba(0,123,255,0.22),0 2px 8px rgba(0,0,0,0.45);transition:transform 0.22s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.22s ease; }
+    .btn-primary:hover { transform:translateY(-2px) scale(1.01);box-shadow:0 0 32px rgba(0,123,255,0.32),0 6px 16px rgba(0,0,0,0.5); }
+    .btn-primary:active { transform:translateY(0) scale(0.99);box-shadow:0 0 12px rgba(0,123,255,0.14),0 1px 4px rgba(0,0,0,0.5); }
+    .btn-primary:focus-visible { outline:2px solid rgba(0,123,255,0.7);outline-offset:3px;border-radius:10px; }
+    .error-box { background:rgba(0,123,255,0.08);border:1px solid rgba(0,123,255,0.22);border-radius:8px;padding:10px 14px;color:#FF8590;font-size:13px;margin-bottom:18px;display:none; }
     .error-box.show { display:block; }
-    .admin-badge { display:inline-block;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border-radius:6px;background:rgba(204,41,54,0.12);border:1px solid rgba(204,41,54,0.2);color:#CC2936;margin-bottom:16px; }
+    .admin-badge { display:inline-block;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border-radius:6px;background:rgba(0,123,255,0.12);border:1px solid rgba(0,123,255,0.2);color:#007bff;margin-bottom:16px; }
     .back-link { display:block;text-align:center;margin-top:20px;font-size:13px;color:#44445A;text-decoration:none;transition:color 0.15s ease; }
     .back-link:hover { color:#8888A0; }
     .back-link:focus-visible { outline:2px solid rgba(255,255,255,0.15);outline-offset:2px;border-radius:4px; }
@@ -45,7 +46,7 @@
       <div class="text-center mb-8">
         <span class="admin-badge">Panel Administrativo</span>
         <div style="font-size:44px;margin-bottom:12px;">🔒</div>
-        <h1 style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;letter-spacing:-0.03em;color:#F4F4F8;">Acceso Admin</h1>
+        <h1 style="font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;letter-spacing:-0.03em;color:#F4F4F8;">Acceso Admin</h1>
         <p style="font-size:13px;color:#44445A;margin-top:6px;">Solo para personal autorizado</p>
       </div>
 

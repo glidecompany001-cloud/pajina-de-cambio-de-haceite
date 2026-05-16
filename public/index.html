@@ -3,21 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cambio de Aceite</title>
+  <title>GLIDE</title>
+  <link rel="icon" type="image/png" href="/brand/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box}
-    body{font-family:'DM Sans',sans-serif;background:#09090B;color:#F4F4F8;min-height:100vh}
+    body{font-family:'Montserrat',sans-serif;background:#09090B;color:#F4F4F8;min-height:100vh}
     .grain{position:fixed;inset:0;pointer-events:none;z-index:40;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E")}
-    .orb-1{position:fixed;width:700px;height:700px;border-radius:50%;top:-300px;right:-200px;pointer-events:none;background:radial-gradient(circle,rgba(204,41,54,0.1) 0%,transparent 65%)}
-    .orb-2{position:fixed;width:500px;height:500px;border-radius:50%;bottom:-200px;left:-150px;pointer-events:none;background:radial-gradient(circle,rgba(204,41,54,0.06) 0%,transparent 65%)}
+    .orb-1{position:fixed;width:700px;height:700px;border-radius:50%;top:-300px;right:-200px;pointer-events:none;background:radial-gradient(circle,rgba(0,123,255,0.1) 0%,transparent 65%)}
+    .orb-2{position:fixed;width:500px;height:500px;border-radius:50%;bottom:-200px;left:-150px;pointer-events:none;background:radial-gradient(circle,rgba(0,123,255,0.06) 0%,transparent 65%)}
 
     .topbar{background:#111118;border-bottom:1px solid rgba(255,255,255,0.06);padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30}
     .topbar-brand{display:flex;align-items:center;gap:10px;cursor:pointer}
-    .brand-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:-0.02em}
-    .avatar{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,rgba(204,41,54,0.3),rgba(204,41,54,0.12));border:1px solid rgba(204,41,54,0.28);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#CC2936;flex-shrink:0}
+    .brand-name{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:800;letter-spacing:-0.02em}
+    .avatar{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,rgba(0,123,255,0.3),rgba(0,123,255,0.12));border:1px solid rgba(0,123,255,0.28);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#007bff;flex-shrink:0}
     .user-area{display:flex;align-items:center;gap:10px}
     .user-name{font-size:13px;color:#606078}
     @media(max-width:460px){.user-name{display:none}}
@@ -29,52 +30,52 @@
     .page{max-width:680px;margin:0 auto;padding:28px 16px 80px;position:relative;z-index:10}
 
     /* ── Vehicle list view ─────────────────────────── */
-    .hero-greeting{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;letter-spacing:-0.03em;margin-bottom:4px}
+    .hero-greeting{font-family:'Montserrat',sans-serif;font-size:26px;font-weight:800;letter-spacing:-0.03em;margin-bottom:4px}
     .hero-sub{font-size:14px;color:#44445A;margin-bottom:28px}
     .section-label{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#44445A;margin-bottom:12px}
 
     .vehicle-card{display:flex;align-items:center;gap:14px;background:#111118;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:18px;margin-bottom:12px;cursor:pointer;transition:border-color 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.15s ease;overflow:hidden;position:relative}
     .vehicle-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:transparent;transition:background 0.2s ease}
-    .vehicle-card.has-color::before{background:var(--v-color,#CC2936)}
-    .vehicle-card:hover{border-color:rgba(204,41,54,0.35);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,0.5)}
+    .vehicle-card.has-color::before{background:var(--v-color,#007bff)}
+    .vehicle-card:hover{border-color:rgba(0,123,255,0.35);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,0.5)}
     .vehicle-card:active{transform:translateY(0)}
-    .vehicle-card:focus-visible{outline:2px solid rgba(204,41,54,0.4);outline-offset:2px;border-radius:16px}
-    .v-icon-wrap{width:44px;height:44px;border-radius:12px;background:rgba(204,41,54,0.08);border:1px solid rgba(204,41,54,0.15);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+    .vehicle-card:focus-visible{outline:2px solid rgba(0,123,255,0.4);outline-offset:2px;border-radius:16px}
+    .v-icon-wrap{width:44px;height:44px;border-radius:12px;background:rgba(0,123,255,0.08);border:1px solid rgba(0,123,255,0.15);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
     .v-info{flex:1;min-width:0}
     .v-name{font-size:15px;font-weight:700;color:#F4F4F8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .v-color-chip{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;padding:2px 8px 2px 5px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);color:#C8C8D8;flex-shrink:0}
-    .btn-del-v{padding:7px 13px;border-radius:8px;background:rgba(204,41,54,0.07);border:1px solid rgba(204,41,54,0.18);color:#CC2936;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1)}
-    .btn-del-v:hover{background:rgba(204,41,54,0.14);transform:scale(1.04)}
+    .btn-del-v{padding:7px 13px;border-radius:8px;background:rgba(0,123,255,0.07);border:1px solid rgba(0,123,255,0.18);color:#007bff;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1)}
+    .btn-del-v:hover{background:rgba(0,123,255,0.14);transform:scale(1.04)}
     .btn-del-v:active{transform:scale(0.97)}
-    .btn-del-v:focus-visible{outline:2px solid rgba(204,41,54,0.5);outline-offset:2px;border-radius:8px}
+    .btn-del-v:focus-visible{outline:2px solid rgba(0,123,255,0.5);outline-offset:2px;border-radius:8px}
     .v-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:5px}
     .v-oil-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:rgba(202,138,4,0.1);border:1px solid rgba(202,138,4,0.18);color:#CA8A04}
     .v-loc{font-size:12px;color:#44445A}
     .v-last{font-size:12px;color:#38A169;margin-top:4px}
     .v-arrow{font-size:18px;color:#33334A;flex-shrink:0;transition:color 0.15s ease,transform 0.15s ease}
-    .vehicle-card:hover .v-arrow{color:#CC2936;transform:translateX(3px)}
+    .vehicle-card:hover .v-arrow{color:#007bff;transform:translateX(3px)}
 
-    .btn-add-v{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.1);border-radius:14px;color:#44445A;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.15s ease,border-color 0.15s ease,color 0.15s ease,transform 0.18s cubic-bezier(0.34,1.56,0.64,1);margin-top:4px}
+    .btn-add-v{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.1);border-radius:14px;color:#44445A;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.15s ease,border-color 0.15s ease,color 0.15s ease,transform 0.18s cubic-bezier(0.34,1.56,0.64,1);margin-top:4px}
     .btn-add-v:hover{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.18);color:#8888A0;transform:translateY(-1px)}
     .btn-add-v:active{transform:translateY(0)}
     .btn-add-v:focus-visible{outline:2px solid rgba(255,255,255,0.15);outline-offset:2px;border-radius:14px}
 
     .add-v-wrap{background:#111118;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:20px;margin-bottom:12px}
-    .add-v-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#C8C8D8;margin-bottom:16px}
+    .add-v-title{font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:#C8C8D8;margin-bottom:16px}
 
     /* ── Vehicle detail view ───────────────────────── */
     .detail-topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
-    .btn-back{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:#C0C0D0;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.15s ease,transform 0.15s ease}
+    .btn-back{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:#C0C0D0;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.15s ease,transform 0.15s ease}
     .btn-back:hover{background:rgba(255,255,255,0.08);transform:translateX(-2px)}
     .btn-back:active{transform:translateX(0)}
     .btn-back:focus-visible{outline:2px solid rgba(255,255,255,0.15);outline-offset:2px;border-radius:9px}
 
     .detail-vehicle-card{background:#111118;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:20px;margin-bottom:16px}
-    .detail-v-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.02em;margin-bottom:10px}
+    .detail-v-name{font-family:'Montserrat',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.02em;margin-bottom:10px}
     .detail-v-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 
     .section-card{background:#111118;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:20px;margin-bottom:16px}
-    .section-card-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#C8C8D8;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+    .section-card-title{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;color:#C8C8D8;margin-bottom:14px;display:flex;align-items:center;gap:8px}
 
     .pending-row{display:flex;align-items:center;gap:12px;padding:11px;background:#18181F;border:1px solid rgba(255,255,255,0.06);border-radius:10px;margin-bottom:8px;transition:border-color 0.15s ease}
     .pending-row:hover{border-color:rgba(255,255,255,0.1)}
@@ -82,16 +83,16 @@
     .pending-meta{flex:1;min-width:0}
     .pending-date{font-size:13px;font-weight:600;color:#C8C8D8}
     .pending-sub{font-size:12px;color:#44445A;margin-top:1px}
-    .btn-cancel-appt{padding:5px 10px;border-radius:7px;background:rgba(204,41,54,0.08);border:1px solid rgba(204,41,54,0.15);color:#CC2936;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;transition:background 0.15s ease,transform 0.18s cubic-bezier(0.34,1.56,0.64,1)}
-    .btn-cancel-appt:hover{background:rgba(204,41,54,0.14);transform:scale(1.04)}
+    .btn-cancel-appt{padding:5px 10px;border-radius:7px;background:rgba(0,123,255,0.08);border:1px solid rgba(0,123,255,0.15);color:#007bff;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;transition:background 0.15s ease,transform 0.18s cubic-bezier(0.34,1.56,0.64,1)}
+    .btn-cancel-appt:hover{background:rgba(0,123,255,0.14);transform:scale(1.04)}
     .btn-cancel-appt:active{transform:scale(0.97)}
-    .btn-cancel-appt:focus-visible{outline:2px solid rgba(204,41,54,0.5);outline-offset:2px;border-radius:7px}
+    .btn-cancel-appt:focus-visible{outline:2px solid rgba(0,123,255,0.5);outline-offset:2px;border-radius:7px}
 
     /* History cards */
     .history-entry{background:#18181F;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:16px;margin-bottom:10px;border-left:3px solid transparent}
     .history-entry.good{border-left-color:#38A169}
     .history-entry.warn{border-left-color:#D97706}
-    .history-entry.crit{border-left-color:#CC2936}
+    .history-entry.crit{border-left-color:#007bff}
     .he-date{font-size:13px;font-weight:700;color:#C8C8D8}
     .he-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:6px}
     .he-km{font-size:13px;font-weight:600;color:#F4F4F8}
@@ -108,9 +109,9 @@
 
     /* Common form elements */
     .field-label{display:block;font-size:11px;font-weight:600;color:#5A5A78;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:7px}
-    .field{width:100%;padding:11px 14px;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#F4F4F8;font-family:'DM Sans',sans-serif;font-size:15px;outline:none;transition:border-color 0.18s ease,box-shadow 0.18s ease}
+    .field{width:100%;padding:11px 14px;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#F4F4F8;font-family:'Montserrat',sans-serif;font-size:15px;outline:none;transition:border-color 0.18s ease,box-shadow 0.18s ease}
     .field::placeholder{color:#2A2A3A}
-    .field:focus{border-color:rgba(204,41,54,0.55);box-shadow:0 0 0 3px rgba(204,41,54,0.09)}
+    .field:focus{border-color:rgba(0,123,255,0.55);box-shadow:0 0 0 3px rgba(0,123,255,0.09)}
     select.field{cursor:pointer}
     textarea.field{resize:vertical}
     .form-group{margin-bottom:16px}
@@ -119,20 +120,20 @@
 
     .slots-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px}
     .slot{padding:10px 4px;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:9px;text-align:center;font-size:13px;font-weight:600;color:#888898;cursor:pointer;transition:background 0.15s ease,border-color 0.15s ease,color 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1)}
-    .slot:hover:not(.taken){background:rgba(204,41,54,0.1);border-color:rgba(204,41,54,0.35);color:#F4F4F8;transform:scale(1.05)}
+    .slot:hover:not(.taken){background:rgba(0,123,255,0.1);border-color:rgba(0,123,255,0.35);color:#F4F4F8;transform:scale(1.05)}
     .slot:active:not(.taken){transform:scale(0.97)}
-    .slot:focus-visible{outline:2px solid rgba(204,41,54,0.5);outline-offset:2px;border-radius:9px}
-    .slot.selected{background:rgba(204,41,54,0.18);border-color:rgba(204,41,54,0.55);color:#FF8090;box-shadow:0 0 12px rgba(204,41,54,0.12)}
+    .slot:focus-visible{outline:2px solid rgba(0,123,255,0.5);outline-offset:2px;border-radius:9px}
+    .slot.selected{background:rgba(0,123,255,0.18);border-color:rgba(0,123,255,0.55);color:#FF8090;box-shadow:0 0 12px rgba(0,123,255,0.12)}
     .slot.taken{background:#141418;border-color:rgba(255,255,255,0.03);color:#2A2A3A;cursor:not-allowed;text-decoration:line-through}
     .slot-ph{grid-column:span 5;text-align:center;font-size:13px;color:#33334A;padding:12px 0}
 
-    .btn-primary{width:100%;padding:13px;background:linear-gradient(135deg,#CC2936 0%,#A31F2B 100%);border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;letter-spacing:0.01em;box-shadow:0 0 24px rgba(204,41,54,0.22),0 2px 8px rgba(0,0,0,0.45);transition:transform 0.22s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.22s ease,opacity 0.15s ease}
-    .btn-primary:hover{transform:translateY(-2px) scale(1.01);box-shadow:0 0 32px rgba(204,41,54,0.32),0 6px 16px rgba(0,0,0,0.5)}
+    .btn-primary{width:100%;padding:13px;background:linear-gradient(135deg,#007bff 0%,#0056b3 100%);border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#fff;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:600;cursor:pointer;letter-spacing:0.01em;box-shadow:0 0 24px rgba(0,123,255,0.22),0 2px 8px rgba(0,0,0,0.45);transition:transform 0.22s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.22s ease,opacity 0.15s ease}
+    .btn-primary:hover{transform:translateY(-2px) scale(1.01);box-shadow:0 0 32px rgba(0,123,255,0.32),0 6px 16px rgba(0,0,0,0.5)}
     .btn-primary:active{transform:translateY(0) scale(0.99)}
     .btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none}
-    .btn-primary:focus-visible{outline:2px solid rgba(204,41,54,0.7);outline-offset:3px;border-radius:10px}
+    .btn-primary:focus-visible{outline:2px solid rgba(0,123,255,0.7);outline-offset:3px;border-radius:10px}
 
-    .btn-ghost-sm{padding:8px 16px;border-radius:9px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:#606078;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.15s ease,color 0.15s ease,transform 0.15s ease}
+    .btn-ghost-sm{padding:8px 16px;border-radius:9px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:#606078;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.15s ease,color 0.15s ease,transform 0.15s ease}
     .btn-ghost-sm:hover{background:rgba(255,255,255,0.08);color:#C0C0D0;transform:translateY(-1px)}
     .btn-ghost-sm:active{transform:translateY(0)}
     .btn-ghost-sm:focus-visible{outline:2px solid rgba(255,255,255,0.15);outline-offset:2px;border-radius:9px}
@@ -151,7 +152,7 @@
     .color-swatch:hover{transform:scale(1.15);border-color:rgba(255,255,255,0.3)}
     .color-swatch:active{transform:scale(0.95)}
     .color-swatch.selected{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,0.25),0 0 12px rgba(255,255,255,0.1);transform:scale(1.12)}
-    .color-swatch:focus-visible{outline:2px solid rgba(204,41,54,0.6);outline-offset:2px}
+    .color-swatch:focus-visible{outline:2px solid rgba(0,123,255,0.6);outline-offset:2px}
     .v-color-dot{width:10px;height:10px;border-radius:50%;display:inline-block;border:1px solid rgba(255,255,255,0.15);flex-shrink:0;margin-right:2px}
 
     /* Car schematic */
@@ -175,7 +176,7 @@
     .modal-close{position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);color:#606078;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s ease,color 0.15s ease}
     .modal-close:hover{background:rgba(255,255,255,0.1);color:#F4F4F8}
     .modal-close:focus-visible{outline:2px solid rgba(255,255,255,0.15);outline-offset:2px;border-radius:8px}
-    .modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;letter-spacing:-0.02em;margin-bottom:4px}
+    .modal-title{font-family:'Montserrat',sans-serif;font-size:18px;font-weight:800;letter-spacing:-0.02em;margin-bottom:4px}
     .modal-sub{font-size:13px;color:#44445A;margin-bottom:20px}
 
     .vehicle-summary-box{background:#18181F;border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px 14px;margin-bottom:18px}
@@ -186,11 +187,11 @@
     .lang-overlay{position:fixed;inset:0;background:#09090B;z-index:200;display:flex;align-items:center;justify-content:center;padding:24px}
     .lang-overlay.hidden{display:none}
     .lang-card{background:#111118;border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:40px 32px;width:100%;max-width:360px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.8)}
-    .lang-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.02em;margin:14px 0 6px;color:#F4F4F8}
+    .lang-title{font-family:'Montserrat',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.02em;margin:14px 0 6px;color:#F4F4F8}
     .lang-sub{font-size:13px;color:#44445A;margin-bottom:28px;line-height:1.6}
     .lang-options{display:flex;gap:12px}
-    .lang-btn{flex:1;padding:16px 10px;border-radius:14px;border:1px solid rgba(255,255,255,0.07);background:#18181F;cursor:pointer;transition:border-color 0.15s ease,background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1);font-family:'DM Sans',sans-serif}
-    .lang-btn:hover{border-color:rgba(204,41,54,0.5);background:rgba(204,41,54,0.07);transform:translateY(-3px)}
+    .lang-btn{flex:1;padding:16px 10px;border-radius:14px;border:1px solid rgba(255,255,255,0.07);background:#18181F;cursor:pointer;transition:border-color 0.15s ease,background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1);font-family:'Montserrat',sans-serif}
+    .lang-btn:hover{border-color:rgba(0,123,255,0.5);background:rgba(0,123,255,0.07);transform:translateY(-3px)}
     .lang-btn:active{transform:translateY(0)}
     .lang-flag{font-size:30px;margin-bottom:8px}
     .lang-name{font-size:14px;font-weight:700;color:#F4F4F8}
@@ -201,7 +202,7 @@
     /* Service type selector */
     .service-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
     .service-card{position:relative;padding:12px 10px;border-radius:12px;border:1px solid rgba(255,255,255,0.07);background:#18181F;cursor:pointer;text-align:center;transition:border-color 0.15s ease,background 0.15s ease}
-    .service-card.active{border-color:rgba(204,41,54,0.5);background:rgba(204,41,54,0.07)}
+    .service-card.active{border-color:rgba(0,123,255,0.5);background:rgba(0,123,255,0.07)}
     .service-card.soon{cursor:default;opacity:0.45}
     .service-card-icon{font-size:22px;margin-bottom:4px}
     .service-card-name{font-size:12px;font-weight:700;color:#C8C8D8;line-height:1.3}
@@ -284,7 +285,7 @@
           <div id="bm-price-display" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;margin-bottom:14px">
             <div>
               <div style="font-size:11px;font-weight:600;color:#44445A;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:2px">Total a pagar</div>
-              <div id="bm-price-amount" style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#F4F4F8;letter-spacing:-0.02em">$65</div>
+              <div id="bm-price-amount" style="font-family:'Montserrat',sans-serif;font-size:26px;font-weight:800;color:#F4F4F8;letter-spacing:-0.02em">$65</div>
             </div>
             <div style="text-align:right;font-size:12px;color:#44445A" id="bm-price-detail"></div>
           </div>
@@ -296,17 +297,16 @@
       </div>
       <div id="bm-success" style="display:none;text-align:center;padding:24px 0">
         <div style="font-size:52px">✅</div>
-        <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin:10px 0 6px" data-i18n="bm_confirmed">¡Cita confirmada!</div>
+        <div style="font-family:'Montserrat',sans-serif;font-size:20px;font-weight:800;margin:10px 0 6px" data-i18n="bm_confirmed">¡Cita confirmada!</div>
         <div id="bm-success-msg" style="font-size:14px;color:#66667A;line-height:1.7"></div>
-        <button onclick="closeBookModal()" style="margin-top:16px;padding:10px 24px;background:rgba(204,41,54,0.12);border:1px solid rgba(204,41,54,0.25);border-radius:10px;color:#CC2936;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.15s ease" onmouseover="this.style.background='rgba(204,41,54,0.2)'" onmouseout="this.style.background='rgba(204,41,54,0.12)'" data-i18n="bm_close">Cerrar</button>
+        <button onclick="closeBookModal()" style="margin-top:16px;padding:10px 24px;background:rgba(0,123,255,0.12);border:1px solid rgba(0,123,255,0.25);border-radius:10px;color:#007bff;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.15s ease" onmouseover="this.style.background='rgba(0,123,255,0.2)'" onmouseout="this.style.background='rgba(0,123,255,0.12)'" data-i18n="bm_close">Cerrar</button>
       </div>
     </div>
   </div>
 
   <header class="topbar">
     <div class="topbar-brand" onclick="showList()" role="button" tabindex="0" onkeydown="if(event.key==='Enter')showList()">
-      <span style="font-size:20px">🛢️</span>
-      <span class="brand-name" data-i18n="brand">Cambio de Aceite</span>
+      <img src="/brand/logo.svg" alt="GLIDE" style="height:26px;width:auto">
     </div>
     <div class="user-area">
       <span class="user-name" id="user-name">—</span>
@@ -317,13 +317,13 @@
   </header>
 
   <!-- ── Email verification banner ──────────────────── -->
-  <div id="verify-banner" style="display:none;background:linear-gradient(135deg,rgba(204,41,54,0.12),rgba(204,41,54,0.06));border-bottom:1px solid rgba(204,41,54,0.2);padding:12px 20px;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;position:relative;z-index:20">
+  <div id="verify-banner" style="display:none;background:linear-gradient(135deg,rgba(0,123,255,0.12),rgba(0,123,255,0.06));border-bottom:1px solid rgba(0,123,255,0.2);padding:12px 20px;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;position:relative;z-index:20">
     <span style="font-size:20px">✉️</span>
     <div style="flex:1;min-width:200px">
       <div style="font-size:14px;font-weight:600;color:#F4F4F8" id="verify-banner-title">Confirma tu correo electrónico</div>
       <div style="font-size:12px;color:#606078;margin-top:2px" id="verify-banner-sub">Necesitas confirmar tu correo para poder agendar una cita</div>
     </div>
-    <button id="verify-resend-btn" onclick="resendVerification()" style="padding:8px 16px;background:rgba(204,41,54,0.15);border:1px solid rgba(204,41,54,0.3);border-radius:8px;color:#FF8090;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background 0.15s ease">Reenviar correo</button>
+    <button id="verify-resend-btn" onclick="resendVerification()" style="padding:8px 16px;background:rgba(0,123,255,0.15);border:1px solid rgba(0,123,255,0.3);border-radius:8px;color:#FF8090;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background 0.15s ease">Reenviar correo</button>
   </div>
 
   <div class="page">
@@ -430,19 +430,19 @@
       <button class="btn-add-v" id="add-v-btn" onclick="toggleAddVehicle(true)" data-i18n="btn_add_v">＋ Agregar vehículo</button>
 
       <div style="text-align:center;margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.05)">
-        <button onclick="openDeleteAccount()" style="background:none;border:none;color:#44445A;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;padding:4px 8px;border-radius:6px;transition:color 0.15s ease" onmouseover="this.style.color='#CC2936'" onmouseout="this.style.color='#44445A'" data-i18n="btn_del_account">Eliminar cuenta</button>
+        <button onclick="openDeleteAccount()" style="background:none;border:none;color:#44445A;font-family:'Montserrat',sans-serif;font-size:13px;cursor:pointer;padding:4px 8px;border-radius:6px;transition:color 0.15s ease" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#44445A'" data-i18n="btn_del_account">Eliminar cuenta</button>
       </div>
     </div>
 
     <!-- ── Delete account modal ─────────────────────── -->
     <div id="delete-account-modal" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
-      <div style="background:#111118;border:1px solid rgba(204,41,54,0.3);border-radius:20px;padding:28px;max-width:420px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,0.6)">
+      <div style="background:#111118;border:1px solid rgba(0,123,255,0.3);border-radius:20px;padding:28px;max-width:420px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,0.6)">
         <div style="font-size:36px;text-align:center;margin-bottom:12px">⚠️</div>
-        <h3 id="del-acct-title" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;text-align:center;margin:0 0 10px;color:#F4F4F8">Eliminar cuenta</h3>
+        <h3 id="del-acct-title" style="font-family:'Montserrat',sans-serif;font-size:18px;font-weight:800;text-align:center;margin:0 0 10px;color:#F4F4F8">Eliminar cuenta</h3>
         <p id="del-acct-body" style="font-size:14px;color:#808098;text-align:center;margin:0 0 24px;line-height:1.5">Esta acción eliminará tu cuenta, vehículos y cancelará tus citas pendientes. No se puede deshacer.</p>
         <div style="display:flex;gap:10px">
-          <button onclick="closeDeleteAccount()" style="flex:1;padding:12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:#C0C0D0;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer" data-i18n="btn_cancel">Cancelar</button>
-          <button id="del-acct-confirm-btn" onclick="confirmDeleteAccount()" style="flex:1;padding:12px;border-radius:10px;background:rgba(204,41,54,0.15);border:1px solid rgba(204,41,54,0.35);color:#FF6070;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.15s ease" data-i18n="btn_del_confirm">Sí, eliminar</button>
+          <button onclick="closeDeleteAccount()" style="flex:1;padding:12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:#C0C0D0;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:600;cursor:pointer" data-i18n="btn_cancel">Cancelar</button>
+          <button id="del-acct-confirm-btn" onclick="confirmDeleteAccount()" style="flex:1;padding:12px;border-radius:10px;background:rgba(0,123,255,0.15);border:1px solid rgba(0,123,255,0.35);color:#FF6070;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.15s ease" data-i18n="btn_del_confirm">Sí, eliminar</button>
         </div>
       </div>
     </div>
@@ -612,7 +612,7 @@
     let _me = {}, _vehicles = [], _activeVehicle = null;
 
     function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
-    function wearColor(p){ return p==null?'#2A2A3A':p>=60?'#38A169':p>=30?'#D97706':'#CC2936' }
+    function wearColor(p){ return p==null?'#2A2A3A':p>=60?'#38A169':p>=30?'#D97706':'#007bff' }
     function wearSeverity(vals){ const v=vals.filter(x=>x!=null); if(!v.length)return''; const m=Math.min(...v); return m>=60?'good':m>=30?'warn':'crit' }
 
     function fmtDate(ds){ const loc=_lang==='en'?'en-US':'es-MX'; return new Date(ds+'T12:00:00').toLocaleDateString(loc,{weekday:'long',day:'numeric',month:'long',year:'numeric'}) }
@@ -660,7 +660,7 @@
     function renderPayPalButtons() {
       const container = document.getElementById('paypal-button-container');
       container.innerHTML = `
-        <button onclick="submitBookingFallback()" style="width:100%;padding:15px 24px;background:linear-gradient(135deg,#CC2936,#A31F2B);border:none;border-radius:12px;color:white;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:-0.01em;box-shadow:0 0 24px rgba(204,41,54,0.25);transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.2s ease" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 0 32px rgba(204,41,54,0.38)'" onmouseout="this.style.transform='';this.style.boxShadow='0 0 24px rgba(204,41,54,0.25)'">
+        <button onclick="submitBookingFallback()" style="width:100%;padding:15px 24px;background:linear-gradient(135deg,#007bff,#0056b3);border:none;border-radius:12px;color:white;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:-0.01em;box-shadow:0 0 24px rgba(0,123,255,0.25);transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.2s ease" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 0 32px rgba(0,123,255,0.38)'" onmouseout="this.style.transform='';this.style.boxShadow='0 0 24px rgba(0,123,255,0.25)'">
           Confirmar cita →
         </button>
         <p style="text-align:center;font-size:12px;color:#44445A;margin-top:10px;line-height:1.5">El pago se realiza cuando el técnico llega a tu domicilio</p>`;
@@ -794,7 +794,7 @@
             </div>
             <div class="v-arrow">›</div>
           </div>`).join('');
-      } catch { wrap.innerHTML = `<div class="empty-state" style="color:#CC2936">${t('loading')} error</div>`; }
+      } catch { wrap.innerHTML = `<div class="empty-state" style="color:#007bff">${t('loading')} error</div>`; }
     }
 
     function toggleAddVehicle(show){
@@ -900,7 +900,7 @@
             </div>
             <button class="btn-cancel-appt" onclick="cancelAppt(${a.id})">${t('cancel_appt')}</button>
           </div>`).join('');
-      } catch { wrap.innerHTML=`<div class="empty-state" style="color:#CC2936">Error</div>`; }
+      } catch { wrap.innerHTML=`<div class="empty-state" style="color:#007bff">Error</div>`; }
     }
 
     async function cancelAppt(id){
@@ -932,7 +932,7 @@
           statusSec.style.display = 'none';
         }
         wrap.innerHTML = items.map(a => renderHistoryEntry(a)).join('');
-      } catch { wrap.innerHTML='<div class="empty-state" style="color:#CC2936">Error al cargar historial</div>'; }
+      } catch { wrap.innerHTML='<div class="empty-state" style="color:#007bff">Error al cargar historial</div>'; }
     }
 
     // ── Car schematic ──────────────────────────────────
@@ -949,7 +949,7 @@
           <circle cx="30" cy="30" r="${r}" fill="none" stroke="${c}" stroke-width="5"
             stroke-dasharray="${fill.toFixed(1)} ${circ.toFixed(1)}" stroke-linecap="round"
             transform="rotate(-90 30 30)"/>
-          <text x="30" y="34" text-anchor="middle" font-family="'DM Sans',sans-serif"
+          <text x="30" y="34" text-anchor="middle" font-family="'Montserrat',sans-serif"
             font-size="11" font-weight="700" fill="${c}">${label}</text>
         </svg>`;
       }
@@ -1069,7 +1069,7 @@
           });
           wrap.appendChild(el);
         });
-      } catch { wrap.innerHTML='<div class="slot-ph" style="color:#CC2936">Error al cargar</div>'; }
+      } catch { wrap.innerHTML='<div class="slot-ph" style="color:#007bff">Error al cargar</div>'; }
     }
 
     async function submitBooking(){
@@ -1082,7 +1082,7 @@
         const price = OIL_PRICES_MAP[v.oil_type] || 65;
         document.getElementById('bm-price-amount').textContent = `$${price}`;
         document.getElementById('bm-price-detail').innerHTML =
-          `${v.vehicle}<br><span style="color:#CC2936">${v.oil_type}</span>`;
+          `${v.vehicle}<br><span style="color:#007bff">${v.oil_type}</span>`;
         document.getElementById('bm-payment-wrap').style.display = 'block';
         document.getElementById('bm-submit').style.display = 'none';
         renderPayPalButtons();
@@ -1247,7 +1247,7 @@
       <div id="pm-content">
         <div style="text-align:center;margin-bottom:24px">
           <div style="font-size:44px;margin-bottom:12px">🛢️</div>
-          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.02em;margin-bottom:6px">¡Tu técnico llegó!</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.02em;margin-bottom:6px">¡Tu técnico llegó!</div>
           <div style="font-size:13px;color:#44445A">Selecciona cómo quieres pagar</div>
         </div>
         <div style="background:#18181F;border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:16px;margin-bottom:24px">
@@ -1261,10 +1261,10 @@
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px">
             <span style="font-size:13px;color:#8888A0">Total</span>
-            <span id="pm-price" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#F4F4F8"></span>
+            <span id="pm-price" style="font-family:'Montserrat',sans-serif;font-size:22px;font-weight:800;color:#F4F4F8"></span>
           </div>
         </div>
-        <button id="pm-btn-cash" style="width:100%;padding:14px;background:#18181F;border:2px solid rgba(255,255,255,0.08);border-radius:12px;color:#C8C8D8;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px;transition:border-color 0.15s,background 0.15s" onmouseover="this.style.borderColor='rgba(255,255,255,0.18)';this.style.background='#1E1E28'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.background='#18181F'">
+        <button id="pm-btn-cash" style="width:100%;padding:14px;background:#18181F;border:2px solid rgba(255,255,255,0.08);border-radius:12px;color:#C8C8D8;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px;transition:border-color 0.15s,background 0.15s" onmouseover="this.style.borderColor='rgba(255,255,255,0.18)';this.style.background='#1E1E28'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.background='#18181F'">
           <span style="font-size:20px">💵</span> Pagar en efectivo
         </button>
         <div id="pm-divider" style="display:flex;align-items:center;gap:12px;margin:12px 0;color:#2A2A3A;font-size:12px">
@@ -1274,7 +1274,7 @@
       </div>
       <div id="pm-success" style="display:none;text-align:center;padding:16px 0">
         <div id="pm-success-icon" style="font-size:56px;margin-bottom:16px"></div>
-        <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.02em;margin-bottom:8px">¡Confirmado!</div>
+        <div style="font-family:'Montserrat',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.02em;margin-bottom:8px">¡Confirmado!</div>
         <div id="pm-success-msg" style="font-size:14px;color:#44445A;line-height:1.6"></div>
       </div>
     </div>

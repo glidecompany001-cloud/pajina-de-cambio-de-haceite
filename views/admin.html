@@ -2,24 +2,25 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="/brand/favicon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel Admin – Cambio de Aceite</title>
+  <title>GLIDE</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    body { font-family:'DM Sans',sans-serif; background:#09090B; color:#F4F4F8; min-height:100vh; }
+    body { font-family:'Montserrat',sans-serif; background:#09090B; color:#F4F4F8; min-height:100vh; }
     .grain { position:fixed;inset:0;pointer-events:none;z-index:40;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"); }
-    .orb-1 { position:fixed;width:700px;height:700px;border-radius:50%;top:-300px;right:-200px;pointer-events:none;background:radial-gradient(circle,rgba(204,41,54,0.09) 0%,transparent 65%); }
+    .orb-1 { position:fixed;width:700px;height:700px;border-radius:50%;top:-300px;right:-200px;pointer-events:none;background:radial-gradient(circle,rgba(0,123,255,0.09) 0%,transparent 65%); }
 
     /* Topbar */
     .topbar { background:#111118;border-bottom:1px solid rgba(255,255,255,0.06);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30; }
     .topbar-brand { display:flex;align-items:center;gap:10px; }
-    .topbar-brand .name { font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:-0.02em;color:#F4F4F8; }
-    .admin-chip { font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:2px 8px;border-radius:5px;background:rgba(204,41,54,0.12);border:1px solid rgba(204,41,54,0.2);color:#CC2936; }
+    .topbar-brand .name { font-family:'Montserrat',sans-serif;font-size:16px;font-weight:800;letter-spacing:-0.02em;color:#F4F4F8; }
+    .admin-chip { font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:2px 8px;border-radius:5px;background:rgba(0,123,255,0.12);border:1px solid rgba(0,123,255,0.2);color:#007bff; }
     .topbar-right { display:flex;align-items:center;gap:10px; }
-    .btn-link { padding:6px 14px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:#606078;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;transition:background 0.15s ease,color 0.15s ease,transform 0.15s ease;display:inline-block; }
+    .btn-link { padding:6px 14px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:#606078;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;transition:background 0.15s ease,color 0.15s ease,transform 0.15s ease;display:inline-block; }
     .btn-link:hover { background:rgba(255,255,255,0.07);color:#C0C0D0;transform:translateY(-1px); }
     .btn-link:active { transform:translateY(0); }
     .btn-link:focus-visible { outline:2px solid rgba(255,255,255,0.15);outline-offset:2px;border-radius:8px; }
@@ -34,11 +35,11 @@
     .stat-card { background:#111118;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:18px 20px;box-shadow:0 2px 12px rgba(0,0,0,0.4);cursor:pointer;transition:border-color 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.15s ease; }
     .stat-card:hover { border-color:rgba(255,255,255,0.14);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.5); }
     .stat-card:active { transform:translateY(0); }
-    .stat-card:focus-visible { outline:2px solid rgba(204,41,54,0.4);outline-offset:2px;border-radius:14px; }
-    .stat-card.stat-active { border-color:rgba(204,41,54,0.35);box-shadow:0 0 0 1px rgba(204,41,54,0.12) inset,0 4px 16px rgba(0,0,0,0.5); }
-    .stat-num { font-family:'Syne',sans-serif;font-size:34px;font-weight:800;letter-spacing:-0.03em;line-height:1; }
+    .stat-card:focus-visible { outline:2px solid rgba(0,123,255,0.4);outline-offset:2px;border-radius:14px; }
+    .stat-card.stat-active { border-color:rgba(0,123,255,0.35);box-shadow:0 0 0 1px rgba(0,123,255,0.12) inset,0 4px 16px rgba(0,0,0,0.5); }
+    .stat-num { font-family:'Montserrat',sans-serif;font-size:34px;font-weight:800;letter-spacing:-0.03em;line-height:1; }
     .stat-lbl { font-size:11px;font-weight:600;color:#44445A;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px; }
-    .num-red    { color:#CC2936; }
+    .num-red    { color:#007bff; }
     .num-amber  { color:#D97706; }
     .num-blue   { color:#4A7EC8; }
     .num-green  { color:#38A169; }
@@ -47,10 +48,10 @@
 
     /* Tabs */
     .tab-bar { display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,0.07);margin-bottom:0;overflow-x:auto; }
-    .tab-btn { padding:11px 20px;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.03em;text-transform:uppercase;color:#44445A;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.15s ease,border-color 0.15s ease;white-space:nowrap; }
+    .tab-btn { padding:11px 20px;background:none;border:none;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.03em;text-transform:uppercase;color:#44445A;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.15s ease,border-color 0.15s ease;white-space:nowrap; }
     .tab-btn:hover { color:#8888A0; }
-    .tab-btn.active { color:#F4F4F8;border-bottom-color:#CC2936; }
-    .tab-btn:focus-visible { outline:2px solid rgba(204,41,54,0.4);outline-offset:2px;border-radius:4px; }
+    .tab-btn.active { color:#F4F4F8;border-bottom-color:#007bff; }
+    .tab-btn:focus-visible { outline:2px solid rgba(0,123,255,0.4);outline-offset:2px;border-radius:4px; }
 
     /* Panel */
     .panel-wrap { background:#111118;border:1px solid rgba(255,255,255,0.07);border-radius:0 0 16px 16px;padding:24px;box-shadow:0 4px 24px rgba(0,0,0,0.4); }
@@ -60,9 +61,9 @@
     /* Date group */
     .date-group { margin-bottom:28px; }
     .date-head { display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.05); }
-    .date-str { font-family:'Syne',sans-serif;font-size:14px;font-weight:700;letter-spacing:-0.01em;text-transform:capitalize;color:#C8C8D8; }
+    .date-str { font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;letter-spacing:-0.01em;text-transform:capitalize;color:#C8C8D8; }
     .urgency-chip { font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:3px 9px;border-radius:5px; }
-    .u-today    { background:rgba(204,41,54,0.12);border:1px solid rgba(204,41,54,0.22);color:#CC2936; }
+    .u-today    { background:rgba(0,123,255,0.12);border:1px solid rgba(0,123,255,0.22);color:#007bff; }
     .u-tomorrow { background:rgba(217,119,6,0.12);border:1px solid rgba(217,119,6,0.22);color:#D97706; }
     .u-week     { background:rgba(202,138,4,0.1);border:1px solid rgba(202,138,4,0.2);color:#CA8A04; }
     .u-later    { background:rgba(56,161,105,0.1);border:1px solid rgba(56,161,105,0.2);color:#38A169; }
@@ -71,9 +72,9 @@
     /* Appointment card */
     .appt-card { display:flex;align-items:flex-start;gap:14px;background:#18181F;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:16px;margin-bottom:10px;transition:border-color 0.15s ease,box-shadow 0.15s ease; }
     .appt-card:hover { border-color:rgba(255,255,255,0.1);box-shadow:0 4px 16px rgba(0,0,0,0.3); }
-    .appt-card.urgent  { border-left:3px solid #CC2936;background:rgba(204,41,54,0.04); }
+    .appt-card.urgent  { border-left:3px solid #007bff;background:rgba(0,123,255,0.04); }
     .appt-card.warning { border-left:3px solid #D97706;background:rgba(217,119,6,0.04); }
-    .time-pill { background:#22222E;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:8px 12px;font-size:16px;font-weight:800;font-family:'Syne',sans-serif;color:#F4F4F8;flex-shrink:0;min-width:68px;text-align:center;font-variant-numeric:tabular-nums; }
+    .time-pill { background:#22222E;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:8px 12px;font-size:16px;font-weight:800;font-family:'Montserrat',sans-serif;color:#F4F4F8;flex-shrink:0;min-width:68px;text-align:center;font-variant-numeric:tabular-nums; }
     .appt-info { flex:1;min-width:0; }
     .a-name { font-size:15px;font-weight:600;color:#F4F4F8; }
     .a-detail { font-size:13px;color:#44445A;margin-top:3px; }
@@ -86,25 +87,25 @@
     .b-tech { background:rgba(13,148,136,0.1);border:1px solid rgba(13,148,136,0.2);color:#0D9488; }
     .a-notes { font-size:12px;color:#33334A;margin-top:6px;font-style:italic; }
     .appt-actions { display:flex;flex-direction:column;gap:6px;flex-shrink:0; }
-    .btn-done { padding:8px 14px;border-radius:8px;background:rgba(56,161,105,0.1);border:1px solid rgba(56,161,105,0.2);color:#38A169;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+    .btn-done { padding:8px 14px;border-radius:8px;background:rgba(56,161,105,0.1);border:1px solid rgba(56,161,105,0.2);color:#38A169;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
     .btn-done:hover { background:rgba(56,161,105,0.18);transform:scale(1.04); }
     .btn-done:active { transform:scale(0.97); }
     .btn-done:focus-visible { outline:2px solid rgba(56,161,105,0.5);outline-offset:2px;border-radius:8px; }
-    .btn-del { padding:8px 14px;border-radius:8px;background:rgba(204,41,54,0.08);border:1px solid rgba(204,41,54,0.15);color:#CC2936;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
-    .btn-del:hover { background:rgba(204,41,54,0.14);transform:scale(1.04); }
+    .btn-del { padding:8px 14px;border-radius:8px;background:rgba(0,123,255,0.08);border:1px solid rgba(0,123,255,0.15);color:#007bff;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+    .btn-del:hover { background:rgba(0,123,255,0.14);transform:scale(1.04); }
     .btn-del:active { transform:scale(0.97); }
-    .btn-del:focus-visible { outline:2px solid rgba(204,41,54,0.5);outline-offset:2px;border-radius:8px; }
+    .btn-del:focus-visible { outline:2px solid rgba(0,123,255,0.5);outline-offset:2px;border-radius:8px; }
     .tech-assign { margin-top:10px;display:flex;align-items:center;gap:8px; }
     .tech-assign-lbl { font-size:11px;font-weight:600;color:#44445A;text-transform:uppercase;letter-spacing:0.06em;white-space:nowrap; }
-    .tech-select { padding:5px 10px;background:#22222E;border:1px solid rgba(255,255,255,0.07);border-radius:7px;color:#C8C8D8;font-family:'DM Sans',sans-serif;font-size:12px;outline:none;cursor:pointer;transition:border-color 0.15s ease; }
+    .tech-select { padding:5px 10px;background:#22222E;border:1px solid rgba(255,255,255,0.07);border-radius:7px;color:#C8C8D8;font-family:'Montserrat',sans-serif;font-size:12px;outline:none;cursor:pointer;transition:border-color 0.15s ease; }
     .tech-select:focus { border-color:rgba(13,148,136,0.45); }
 
     /* Filter bar */
     .filter-bar { display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;align-items:center; }
-    .filter-select,.filter-input { padding:8px 12px;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:8px;color:#C8C8D8;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color 0.15s ease; }
-    .filter-select:focus,.filter-input:focus { border-color:rgba(204,41,54,0.4); }
+    .filter-select,.filter-input { padding:8px 12px;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:8px;color:#C8C8D8;font-family:'Montserrat',sans-serif;font-size:13px;outline:none;transition:border-color 0.15s ease; }
+    .filter-select:focus,.filter-input:focus { border-color:rgba(0,123,255,0.4); }
     .filter-input::placeholder { color:#33334A; }
-    .btn-refresh { margin-left:auto;padding:8px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px;color:#606078;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.15s ease,color 0.15s ease,transform 0.15s ease; }
+    .btn-refresh { margin-left:auto;padding:8px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px;color:#606078;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.15s ease,color 0.15s ease,transform 0.15s ease; }
     .btn-refresh:hover { background:rgba(255,255,255,0.07);color:#C0C0D0;transform:translateY(-1px); }
     .btn-refresh:active { transform:translateY(0); }
     .btn-refresh:focus-visible { outline:2px solid rgba(255,255,255,0.15);outline-offset:2px;border-radius:8px; }
@@ -128,16 +129,16 @@
     @media(max-width:580px) { .nf-row { grid-template-columns:1fr; } }
     .nf-group { margin-bottom:14px; }
     .nf-label { display:block;font-size:11px;font-weight:600;color:#5A5A78;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:7px; }
-    .nf-field { width:100%;padding:10px 13px;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:9px;color:#F4F4F8;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color 0.18s ease,box-shadow 0.18s ease; }
+    .nf-field { width:100%;padding:10px 13px;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:9px;color:#F4F4F8;font-family:'Montserrat',sans-serif;font-size:14px;outline:none;transition:border-color 0.18s ease,box-shadow 0.18s ease; }
     .nf-field::placeholder { color:#333345; }
-    .nf-field:focus { border-color:rgba(204,41,54,0.55);box-shadow:0 0 0 3px rgba(204,41,54,0.09); }
+    .nf-field:focus { border-color:rgba(0,123,255,0.55);box-shadow:0 0 0 3px rgba(0,123,255,0.09); }
     textarea.nf-field { resize:vertical;min-height:80px; }
-    .nf-error { background:rgba(204,41,54,0.08);border:1px solid rgba(204,41,54,0.22);border-radius:8px;padding:10px 14px;color:#FF8590;font-size:13px;margin-top:4px;display:none; }
+    .nf-error { background:rgba(0,123,255,0.08);border:1px solid rgba(0,123,255,0.22);border-radius:8px;padding:10px 14px;color:#FF8590;font-size:13px;margin-top:4px;display:none; }
     .nf-error.show { display:block; }
-    .btn-primary-form { padding:12px 28px;background:linear-gradient(135deg,#CC2936 0%,#A31F2B 100%);border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 0 24px rgba(204,41,54,0.22),0 2px 8px rgba(0,0,0,0.45);transition:transform 0.22s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.22s ease;margin-top:20px; }
-    .btn-primary-form:hover { transform:translateY(-2px) scale(1.01);box-shadow:0 0 32px rgba(204,41,54,0.32),0 6px 16px rgba(0,0,0,0.5); }
+    .btn-primary-form { padding:12px 28px;background:linear-gradient(135deg,#007bff 0%,#0056b3 100%);border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#fff;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 0 24px rgba(0,123,255,0.22),0 2px 8px rgba(0,0,0,0.45);transition:transform 0.22s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.22s ease;margin-top:20px; }
+    .btn-primary-form:hover { transform:translateY(-2px) scale(1.01);box-shadow:0 0 32px rgba(0,123,255,0.32),0 6px 16px rgba(0,0,0,0.5); }
     .btn-primary-form:active { transform:translateY(0) scale(0.99); }
-    .btn-primary-form:focus-visible { outline:2px solid rgba(204,41,54,0.7);outline-offset:3px;border-radius:10px; }
+    .btn-primary-form:focus-visible { outline:2px solid rgba(0,123,255,0.7);outline-offset:3px;border-radius:10px; }
     .nf-hint { font-size:11px;color:#33334A;margin-top:5px; }
 
     /* Technicians panel */
@@ -147,18 +148,18 @@
     .tech-info { flex:1;min-width:0; }
     .tech-name { font-size:14px;font-weight:600;color:#F4F4F8; }
     .tech-meta { font-size:12px;color:#44445A;margin-top:2px; }
-    .btn-del-tech { padding:6px 12px;border-radius:8px;background:rgba(204,41,54,0.08);border:1px solid rgba(204,41,54,0.15);color:#CC2936;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
-    .btn-del-tech:hover { background:rgba(204,41,54,0.14);transform:scale(1.04); }
+    .btn-del-tech { padding:6px 12px;border-radius:8px;background:rgba(0,123,255,0.08);border:1px solid rgba(0,123,255,0.15);color:#007bff;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+    .btn-del-tech:hover { background:rgba(0,123,255,0.14);transform:scale(1.04); }
     .btn-del-tech:active { transform:scale(0.97); }
-    .btn-del-tech:focus-visible { outline:2px solid rgba(204,41,54,0.5);outline-offset:2px;border-radius:8px; }
-    .btn-pass-tech { padding:6px 12px;border-radius:8px;background:rgba(13,148,136,0.08);border:1px solid rgba(13,148,136,0.18);color:#0D9488;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1);margin-right:6px; }
+    .btn-del-tech:focus-visible { outline:2px solid rgba(0,123,255,0.5);outline-offset:2px;border-radius:8px; }
+    .btn-pass-tech { padding:6px 12px;border-radius:8px;background:rgba(13,148,136,0.08);border:1px solid rgba(13,148,136,0.18);color:#0D9488;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1);margin-right:6px; }
     .btn-pass-tech:hover { background:rgba(13,148,136,0.14);transform:scale(1.04); }
     .btn-pass-tech:active { transform:scale(0.97); }
     .btn-pass-tech:focus-visible { outline:2px solid rgba(13,148,136,0.5);outline-offset:2px;border-radius:8px; }
     .var-chip { display:inline-block;padding:3px 10px;background:#18181F;border:1px solid rgba(255,255,255,0.1);border-radius:6px;font-family:monospace;font-size:11px;color:#B0B0C8;cursor:pointer;transition:background 0.15s ease,color 0.15s ease; }
     .var-chip:hover { background:#22222E;color:#F4F4F8; }
     .add-tech-box { background:#18181F;border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:20px;margin-bottom:24px; }
-    .btn-add-tech { padding:10px 22px;background:rgba(13,148,136,0.1);border:1px solid rgba(13,148,136,0.22);border-radius:9px;color:#0D9488;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+    .btn-add-tech { padding:10px 22px;background:rgba(13,148,136,0.1);border:1px solid rgba(13,148,136,0.22);border-radius:9px;color:#0D9488;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
     .btn-add-tech:hover { background:rgba(13,148,136,0.18);transform:scale(1.03); }
     .btn-add-tech:active { transform:scale(0.97); }
     .btn-add-tech:focus-visible { outline:2px solid rgba(13,148,136,0.5);outline-offset:2px;border-radius:9px; }
@@ -167,28 +168,28 @@
     .modal-backdrop { position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:100;display:none;align-items:center;justify-content:center;padding:16px; }
     .modal-backdrop.open { display:flex; }
     .modal { background:#111118;border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:28px;width:100%;max-width:500px;box-shadow:0 24px 80px rgba(0,0,0,0.7);position:relative;max-height:90vh;overflow-y:auto; }
-    .modal-title { font-family:'Syne',sans-serif;font-size:18px;font-weight:800;letter-spacing:-0.02em;margin-bottom:6px; }
+    .modal-title { font-family:'Montserrat',sans-serif;font-size:18px;font-weight:800;letter-spacing:-0.02em;margin-bottom:6px; }
     .modal-sub { font-size:13px;color:#44445A;margin-bottom:22px; }
     .modal-close { position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);color:#606078;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s ease,color 0.15s ease; }
     .modal-close:hover { background:rgba(255,255,255,0.1);color:#F4F4F8; }
     .modal-close:focus-visible { outline:2px solid rgba(255,255,255,0.15);outline-offset:2px;border-radius:8px; }
     .modal-section { font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#5A5A78;margin:20px 0 12px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.04); }
     .mileage-row { display:flex;align-items:center;gap:12px;margin-bottom:4px; }
-    .mileage-input { flex:1;max-width:180px;padding:9px 13px;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:9px;color:#F4F4F8;font-family:'Syne',sans-serif;font-size:17px;font-weight:800;outline:none;transition:border-color 0.18s ease,box-shadow 0.18s ease; }
-    .mileage-input:focus { border-color:rgba(204,41,54,0.55);box-shadow:0 0 0 3px rgba(204,41,54,0.09); }
-    .mileage-input::placeholder { color:#333345;font-family:'DM Sans',sans-serif;font-weight:400;font-size:14px; }
+    .mileage-input { flex:1;max-width:180px;padding:9px 13px;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:9px;color:#F4F4F8;font-family:'Montserrat',sans-serif;font-size:17px;font-weight:800;outline:none;transition:border-color 0.18s ease,box-shadow 0.18s ease; }
+    .mileage-input:focus { border-color:rgba(0,123,255,0.55);box-shadow:0 0 0 3px rgba(0,123,255,0.09); }
+    .mileage-input::placeholder { color:#333345;font-family:'Montserrat',sans-serif;font-weight:400;font-size:14px; }
     .slider-row { display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:4px; }
     .slider-item { display:flex;flex-direction:column;gap:6px; }
     .slider-lbl { font-size:12px;font-weight:600;color:#8888A0; }
-    .slider-val { font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#F4F4F8;min-width:36px; }
+    .slider-val { font-family:'Montserrat',sans-serif;font-size:15px;font-weight:800;color:#F4F4F8;min-width:36px; }
     .slider-header { display:flex;justify-content:space-between;align-items:center; }
-    input[type="range"] { width:100%;accent-color:#CC2936;cursor:pointer;height:4px; }
+    input[type="range"] { width:100%;accent-color:#007bff;cursor:pointer;height:4px; }
     .modal-actions { display:flex;gap:10px;margin-top:24px; }
-    .btn-modal-confirm { flex:1;padding:12px;background:linear-gradient(135deg,#38A169,#2F855A);border:none;border-radius:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 0 20px rgba(56,161,105,0.2);transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.2s ease; }
+    .btn-modal-confirm { flex:1;padding:12px;background:linear-gradient(135deg,#38A169,#2F855A);border:none;border-radius:10px;color:#fff;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 0 20px rgba(56,161,105,0.2);transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.2s ease; }
     .btn-modal-confirm:hover { transform:translateY(-2px) scale(1.01);box-shadow:0 0 28px rgba(56,161,105,0.32); }
     .btn-modal-confirm:active { transform:translateY(0) scale(0.99); }
     .btn-modal-confirm:focus-visible { outline:2px solid rgba(56,161,105,0.6);outline-offset:3px;border-radius:10px; }
-    .btn-modal-skip { padding:12px 18px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#606078;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.15s ease,color 0.15s ease,transform 0.15s ease; }
+    .btn-modal-skip { padding:12px 18px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#606078;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.15s ease,color 0.15s ease,transform 0.15s ease; }
     .btn-modal-skip:hover { background:rgba(255,255,255,0.08);color:#C0C0D0;transform:translateY(-1px); }
     .btn-modal-skip:active { transform:translateY(0); }
     .btn-modal-skip:focus-visible { outline:2px solid rgba(255,255,255,0.15);outline-offset:2px;border-radius:10px; }
@@ -206,7 +207,7 @@
     </div>
     <div class="topbar-right">
       <a href="/" target="_blank" class="btn-link">Ver página →</a>
-      <a href="/logout" class="btn-link" style="color:#CC2936;border-color:rgba(204,41,54,0.2);background:rgba(204,41,54,0.06)">Salir</a>
+      <a href="/logout" class="btn-link" style="color:#007bff;border-color:rgba(0,123,255,0.2);background:rgba(0,123,255,0.06)">Salir</a>
     </div>
   </header>
 
@@ -398,7 +399,7 @@
         <div id="sg-ok" style="font-size:13px;color:#68D391;margin-bottom:12px;display:none"></div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
           <button class="btn-primary-form" style="margin-top:0;padding:10px 22px;font-size:13px" onclick="saveSendGridConfig()">💾 Guardar configuración</button>
-          <button onclick="testSendGrid()" style="padding:10px 18px;background:rgba(13,148,136,0.1);border:1px solid rgba(13,148,136,0.22);border-radius:9px;color:#0D9488;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background 0.15s ease">📤 Enviar correo de prueba</button>
+          <button onclick="testSendGrid()" style="padding:10px 18px;background:rgba(13,148,136,0.1);border:1px solid rgba(13,148,136,0.22);border-radius:9px;color:#0D9488;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background 0.15s ease">📤 Enviar correo de prueba</button>
         </div>
 
         <!-- Email Templates -->
@@ -434,8 +435,8 @@
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
             <button class="btn-primary-form" style="margin-top:0;padding:10px 20px;font-size:13px" onclick="saveTpl('appointment_confirmed')">💾 Guardar</button>
-            <button onclick="previewTpl('appointment_confirmed')" style="padding:10px 16px;background:rgba(74,126,200,0.1);border:1px solid rgba(74,126,200,0.22);border-radius:9px;color:#4A7EC8;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer">👁 Vista previa</button>
-            <button onclick="resetTpl('appointment_confirmed')" style="padding:10px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:9px;color:#606078;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer">↺ Restaurar por defecto</button>
+            <button onclick="previewTpl('appointment_confirmed')" style="padding:10px 16px;background:rgba(74,126,200,0.1);border:1px solid rgba(74,126,200,0.22);border-radius:9px;color:#4A7EC8;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer">👁 Vista previa</button>
+            <button onclick="resetTpl('appointment_confirmed')" style="padding:10px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:9px;color:#606078;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;cursor:pointer">↺ Restaurar por defecto</button>
           </div>
           <div id="tpl-ok-appointment_confirmed" style="font-size:13px;color:#68D391;margin-top:12px;display:none"></div>
           <div id="tpl-err-appointment_confirmed" style="font-size:13px;color:#FF8090;margin-top:12px;display:none"></div>
@@ -459,8 +460,8 @@
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
             <button class="btn-primary-form" style="margin-top:0;padding:10px 20px;font-size:13px" onclick="saveTpl('forgot_password')">💾 Guardar</button>
-            <button onclick="previewTpl('forgot_password')" style="padding:10px 16px;background:rgba(74,126,200,0.1);border:1px solid rgba(74,126,200,0.22);border-radius:9px;color:#4A7EC8;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer">👁 Vista previa</button>
-            <button onclick="resetTpl('forgot_password')" style="padding:10px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:9px;color:#606078;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer">↺ Restaurar por defecto</button>
+            <button onclick="previewTpl('forgot_password')" style="padding:10px 16px;background:rgba(74,126,200,0.1);border:1px solid rgba(74,126,200,0.22);border-radius:9px;color:#4A7EC8;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer">👁 Vista previa</button>
+            <button onclick="resetTpl('forgot_password')" style="padding:10px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:9px;color:#606078;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;cursor:pointer">↺ Restaurar por defecto</button>
           </div>
           <div id="tpl-ok-forgot_password" style="font-size:13px;color:#68D391;margin-top:12px;display:none"></div>
           <div id="tpl-err-forgot_password" style="font-size:13px;color:#FF8090;margin-top:12px;display:none"></div>
@@ -484,8 +485,8 @@
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
             <button class="btn-primary-form" style="margin-top:0;padding:10px 20px;font-size:13px" onclick="saveTpl('email_verification')">💾 Guardar</button>
-            <button onclick="previewTpl('email_verification')" style="padding:10px 16px;background:rgba(74,126,200,0.1);border:1px solid rgba(74,126,200,0.22);border-radius:9px;color:#4A7EC8;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer">👁 Vista previa</button>
-            <button onclick="resetTpl('email_verification')" style="padding:10px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:9px;color:#606078;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer">↺ Restaurar por defecto</button>
+            <button onclick="previewTpl('email_verification')" style="padding:10px 16px;background:rgba(74,126,200,0.1);border:1px solid rgba(74,126,200,0.22);border-radius:9px;color:#4A7EC8;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer">👁 Vista previa</button>
+            <button onclick="resetTpl('email_verification')" style="padding:10px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:9px;color:#606078;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;cursor:pointer">↺ Restaurar por defecto</button>
           </div>
           <div id="tpl-ok-email_verification" style="font-size:13px;color:#68D391;margin-top:12px;display:none"></div>
           <div id="tpl-err-email_verification" style="font-size:13px;color:#FF8090;margin-top:12px;display:none"></div>
@@ -510,8 +511,8 @@
         <div style="margin-bottom:20px">
           <div style="font-size:11px;font-weight:600;color:#5A5A78;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px">Modo</div>
           <div style="display:flex;gap:8px">
-            <button id="pp-mode-sandbox" onclick="setPPMode('sandbox')" style="padding:8px 20px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s ease;background:rgba(204,41,54,0.12);border:1px solid rgba(204,41,54,0.3);color:#CC2936">🧪 Sandbox (pruebas)</button>
-            <button id="pp-mode-live"    onclick="setPPMode('live')"    style="padding:8px 20px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s ease;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:#606078">🚀 Live (producción)</button>
+            <button id="pp-mode-sandbox" onclick="setPPMode('sandbox')" style="padding:8px 20px;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s ease;background:rgba(0,123,255,0.12);border:1px solid rgba(0,123,255,0.3);color:#007bff">🧪 Sandbox (pruebas)</button>
+            <button id="pp-mode-live"    onclick="setPPMode('live')"    style="padding:8px 20px;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s ease;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:#606078">🚀 Live (producción)</button>
           </div>
           <input type="hidden" id="pp-mode" value="sandbox">
         </div>
@@ -660,7 +661,7 @@
       const sandboxBtn = document.getElementById('pp-mode-sandbox');
       const liveBtn    = document.getElementById('pp-mode-live');
       if (mode === 'sandbox') {
-        sandboxBtn.style.background = 'rgba(204,41,54,0.12)'; sandboxBtn.style.borderColor = 'rgba(204,41,54,0.3)'; sandboxBtn.style.color = '#CC2936';
+        sandboxBtn.style.background = 'rgba(0,123,255,0.12)'; sandboxBtn.style.borderColor = 'rgba(0,123,255,0.3)'; sandboxBtn.style.color = '#007bff';
         liveBtn.style.background    = 'rgba(255,255,255,0.04)'; liveBtn.style.borderColor = 'rgba(255,255,255,0.07)'; liveBtn.style.color = '#606078';
       } else {
         liveBtn.style.background    = 'rgba(56,161,105,0.12)'; liveBtn.style.borderColor = 'rgba(56,161,105,0.3)'; liveBtn.style.color = '#38A169';
@@ -716,7 +717,7 @@
         document.getElementById('sg-from-name').value  = d.from_name  || '';
         document.getElementById('sg-status').innerHTML = d.configured
           ? `<div style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:rgba(56,161,105,0.1);border:1px solid rgba(56,161,105,0.25);border-radius:8px;font-size:13px;color:#38A169">✅ Resend configurado — correos activos desde <strong>${d.from_email}</strong></div>`
-          : `<div style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:rgba(204,41,54,0.08);border:1px solid rgba(204,41,54,0.2);border-radius:8px;font-size:13px;color:#FF8090">⚠️ Resend no configurado — ingresa tu API key para activar los correos</div>`;
+          : `<div style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:rgba(0,123,255,0.08);border:1px solid rgba(0,123,255,0.2);border-radius:8px;font-size:13px;color:#FF8090">⚠️ Resend no configurado — ingresa tu API key para activar los correos</div>`;
         loadTemplates();
       } catch {}
     }
@@ -836,13 +837,14 @@
           const t = line.trim();
           if (!t) return '<div style="height:6px"></div>';
           if (t.startsWith('http://') || t.startsWith('https://'))
-            return `<div style="text-align:center;margin:16px 0"><a href="${t}" style="display:inline-block;background:linear-gradient(135deg,#CC2936,#A31F2B);color:white;padding:13px 28px;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px">Abrir enlace</a></div>`;
+            return `<div style="text-align:center;margin:16px 0"><a href="${t}" style="display:inline-block;background:linear-gradient(135deg,#007bff,#0056b3);color:white;padding:13px 28px;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px">Abrir enlace</a></div>`;
           return `<p style="font-size:15px;color:#333;margin:0 0 10px;line-height:1.5">${t}</p>`;
         }).join('');
-        preview = `<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;border-radius:16px;overflow:hidden"><div style="background:linear-gradient(135deg,#CC2936,#A31F2B);padding:32px;text-align:center"><div style="font-size:48px">${icon}</div><h1 style="color:white;font-size:22px;margin:12px 0 0;font-family:Arial,sans-serif">${title}</h1></div><div style="background:#f8f9fa;padding:28px;border:1px solid #e9ecef;border-top:none;border-radius:0 0 16px 16px">${inner}<p style="text-align:center;font-size:12px;color:#999;margin:16px 0 0">¡Gracias por tu preferencia!</p></div></div>`;
+        preview = `<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;border-radius:16px;overflow:hidden"><div style="background:linear-gradient(135deg,#007bff,#0056b3);padding:32px;text-align:center"><div style="font-size:48px">${icon}</div><h1 style="color:white;font-size:22px;margin:12px 0 0;font-family:Arial,sans-serif">${title}</h1></div><div style="background:#f8f9fa;padding:28px;border:1px solid #e9ecef;border-top:none;border-radius:0 0 16px 16px">${inner}<p style="text-align:center;font-size:12px;color:#999;margin:16px 0 0">¡Gracias por tu preferencia!</p></div></div>`;
       }
       const win = window.open('','_blank','width=640,height=700');
-      win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Vista previa — ${esc(subj)}</title><style>body{margin:0;padding:24px;background:#e9ecef;font-family:Arial,sans-serif}</style></head><body>${preview}</body></html>`);
+      win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="/brand/favicon.png"><title>GLIDE</title><style>body{margin:0;padding:24px;background:#e9ecef;font-family:Arial,sans-serif}</style></head><body>${preview}</body></html>`);
       win.document.close();
     }
 
@@ -929,7 +931,7 @@
         wrap.innerHTML = filterLabel
           ? `<div style="font-size:12px;color:#44445A;margin-bottom:16px;font-weight:600">Filtro activo: ${filterLabel}
                <button onclick="_upcomingFilter=null;document.querySelectorAll('.stat-card').forEach(c=>c.classList.remove('stat-active'));loadUpcoming()"
-                 style="margin-left:8px;color:#CC2936;background:none;border:none;cursor:pointer;font-size:12px;font-weight:700">✕ quitar</button></div>`
+                 style="margin-left:8px;color:#007bff;background:none;border:none;cursor:pointer;font-size:12px;font-weight:700">✕ quitar</button></div>`
           : '';
         if(!appts.length){wrap.innerHTML+='<div class="empty"><div class="empty-icon">📭</div><p style="color:#33334A;font-size:14px">No hay citas en este rango</p></div>';return;}
         const groups={};
@@ -969,7 +971,7 @@
           html+='</div>';
         });
         wrap.innerHTML += html;
-      } catch { wrap.innerHTML='<div class="empty" style="color:#CC2936">Error al cargar</div>'; }
+      } catch { wrap.innerHTML='<div class="empty" style="color:#007bff">Error al cargar</div>'; }
     }
 
     // ── All appointments ───────────────────────────────────────────────────────

@@ -2,20 +2,21 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="/brand/favicon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pago – Cambio de Aceite</title>
+  <title>GLIDE</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{box-sizing:border-box}
-    body{font-family:'DM Sans',sans-serif;background:#09090B;color:#F4F4F8;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+    body{font-family:'Montserrat',sans-serif;background:#09090B;color:#F4F4F8;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
     .grain{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E")}
-    .orb{position:fixed;width:600px;height:600px;border-radius:50%;top:-200px;left:50%;transform:translateX(-50%);pointer-events:none;background:radial-gradient(circle,rgba(204,41,54,0.07) 0%,transparent 65%)}
+    .orb{position:fixed;width:600px;height:600px;border-radius:50%;top:-200px;left:50%;transform:translateX(-50%);pointer-events:none;background:radial-gradient(circle,rgba(0,123,255,0.07) 0%,transparent 65%)}
     .card{background:#111118;border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:32px;width:100%;max-width:420px;position:relative;z-index:1;box-shadow:0 32px 80px rgba(0,0,0,0.6)}
     .logo{display:flex;align-items:center;gap:10px;margin-bottom:28px}
     .logo-icon{font-size:28px}
-    .logo-name{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;letter-spacing:-0.02em}
-    .title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.02em;margin-bottom:4px}
+    .logo-name{font-family:'Montserrat',sans-serif;font-size:18px;font-weight:800;letter-spacing:-0.02em}
+    .title{font-family:'Montserrat',sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.02em;margin-bottom:4px}
     .subtitle{font-size:13px;color:#44445A;margin-bottom:24px}
     .info-box{background:#18181F;border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:16px;margin-bottom:24px}
     .info-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0}
@@ -24,9 +25,9 @@
     .info-value{font-size:14px;color:#C8C8D8;font-weight:600}
     .price-row{padding-top:10px!important;margin-top:4px}
     .price-row .info-label{font-size:13px;color:#8888A0}
-    .price-row .info-value{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#F4F4F8}
+    .price-row .info-value{font-family:'Montserrat',sans-serif;font-size:22px;font-weight:800;color:#F4F4F8}
     .section-title{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#5A5A78;margin-bottom:12px}
-    .btn-cash{width:100%;padding:15px;background:#18181F;border:2px solid rgba(255,255,255,0.08);border-radius:14px;color:#C8C8D8;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:border-color 0.15s ease,background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1);margin-bottom:12px}
+    .btn-cash{width:100%;padding:15px;background:#18181F;border:2px solid rgba(255,255,255,0.08);border-radius:14px;color:#C8C8D8;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:border-color 0.15s ease,background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1);margin-bottom:12px}
     .btn-cash:hover{border-color:rgba(255,255,255,0.18);background:#1E1E28;transform:translateY(-2px)}
     .btn-cash:active{transform:translateY(0)}
     #paypal-button-container{margin-top:4px}
@@ -34,10 +35,10 @@
     .divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.05)}
     .success-wrap{text-align:center;padding:16px 0}
     .success-icon{font-size:56px;margin-bottom:16px}
-    .success-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.02em;margin-bottom:8px}
+    .success-title{font-family:'Montserrat',sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.02em;margin-bottom:8px}
     .success-sub{font-size:14px;color:#44445A;line-height:1.6}
     #loading{text-align:center;padding:40px 0;color:#33334A;font-size:14px}
-    #error-wrap{text-align:center;padding:40px 0;color:#CC2936;font-size:14px}
+    #error-wrap{text-align:center;padding:40px 0;color:#007bff;font-size:14px}
   </style>
 </head>
 <body>
@@ -45,8 +46,7 @@
   <div class="orb"></div>
   <div class="card">
     <div class="logo">
-      <span class="logo-icon">🛢️</span>
-      <span class="logo-name">Cambio de Aceite</span>
+      <img src="/brand/logo.svg" alt="GLIDE" style="height:24px;width:auto">
     </div>
     <div id="loading">Cargando…</div>
     <div id="error-wrap" style="display:none"></div>
