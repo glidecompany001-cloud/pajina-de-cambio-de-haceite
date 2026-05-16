@@ -1026,7 +1026,7 @@
         const hasLatestHealth = [latest.tire_fl,latest.tire_fr,latest.tire_rl,latest.tire_rr,latest.brake_front,latest.brake_rear].some(v=>v!=null);
         if (hasLatestHealth){
           statusSec.style.display = 'block';
-          const score = calcHealthScore(latest);
+          const score = calcHealthScore(items);
           const grade = healthGrade(score);
           const sc = wearColor(score);
           const r=24, circ=2*Math.PI*r, fill=(score/100)*circ;
@@ -1061,10 +1061,21 @@
       } catch { wrap.innerHTML='<div class="empty-state" style="color:#007bff">Error al cargar historial</div>'; }
     }
 
-    // ── Health score ───────────────────────────────────
-    function calcHealthScore(e){
-      const vals=[e.tire_fl,e.tire_fr,e.tire_rl,e.tire_rr,e.brake_front,e.brake_rear].filter(v=>v!=null);
-      return vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):null;
+    // ── Health score (based on recurring oil change adherence) ────────────────
+    function calcHealthScore(items){
+      if(!items||!items.length) return null;
+      const count=items.length;
+      const latest=items[0];
+      const today=new Date();
+      const lastDate=new Date(latest.date+'T12:00:00');
+      const daysSinceLast=Math.floor((today-lastDate)/(1000*60*60*24));
+      const intervalDays=(latest.recurrence_weeks||12)*7;
+      // Base: more services = better maintained
+      const base=count>=6?90:count>=4?80:count>=2?70:60;
+      // Recency: penalize if overdue relative to expected interval
+      const ratio=daysSinceLast/intervalDays;
+      const adj=ratio<=1?10:ratio<=1.25?0:ratio<=1.5?-15:ratio<=2?-30:-50;
+      return Math.max(5,Math.min(100,base+adj));
     }
     function healthGrade(s){ return s>=80?'A':s>=65?'B':s>=50?'C':s>=35?'D':'F'; }
 
