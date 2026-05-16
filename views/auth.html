@@ -196,14 +196,13 @@
               <input class="field" type="text" id="g-number" placeholder="123">
             </div>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="field-label" data-i18n="lbl_city">Ciudad *</label>
-              <input class="field" type="text" id="g-city" placeholder="Monterrey">
-            </div>
-            <div class="form-group">
-              <label class="field-label" data-i18n="lbl_state">Estado *</label>
-              <input class="field" type="text" id="g-state" placeholder="PA">
+          <div class="form-group">
+            <label class="field-label" data-i18n="lbl_city">Ciudad *</label>
+            <input type="hidden" id="g-city" value="New Jersey">
+            <input type="hidden" id="g-state" value="NJ">
+            <div style="display:flex;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:4px;gap:4px;position:relative">
+              <button type="button" id="city-btn-nj" onclick="selectCity('New Jersey','NJ')" style="flex:1;padding:9px 0;border-radius:7px;border:none;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:background 0.18s ease,color 0.18s ease;background:linear-gradient(135deg,#007bff,#0056b3);color:#fff;box-shadow:0 2px 8px rgba(0,123,255,0.3)">New Jersey</button>
+              <button type="button" id="city-btn-phi" onclick="selectCity('Philadelphia','PA')" style="flex:1;padding:9px 0;border-radius:7px;border:none;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:background 0.18s ease,color 0.18s ease;background:transparent;color:#44445A">Philadelphia</button>
             </div>
           </div>
           <div class="form-group" style="margin-bottom:20px">
@@ -488,6 +487,24 @@
     const G_DAYS_EN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     const G_MONS_EN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
+    function selectCity(city, state) {
+      document.getElementById('g-city').value = city;
+      document.getElementById('g-state').value = state;
+      const light = document.documentElement.classList.contains('light');
+      const inactiveColor = light ? '#9090B0' : '#44445A';
+      const inactiveBg = 'transparent';
+      const activeBg = 'linear-gradient(135deg,#007bff,#0056b3)';
+      const njBtn  = document.getElementById('city-btn-nj');
+      const phiBtn = document.getElementById('city-btn-phi');
+      if (city === 'New Jersey') {
+        njBtn.style.background  = activeBg;  njBtn.style.color  = '#fff'; njBtn.style.boxShadow = '0 2px 8px rgba(0,123,255,0.3)';
+        phiBtn.style.background = inactiveBg; phiBtn.style.color = inactiveColor; phiBtn.style.boxShadow = 'none';
+      } else {
+        phiBtn.style.background = activeBg;  phiBtn.style.color  = '#fff'; phiBtn.style.boxShadow = '0 2px 8px rgba(0,123,255,0.3)';
+        njBtn.style.background  = inactiveBg; njBtn.style.color  = inactiveColor; njBtn.style.boxShadow = 'none';
+      }
+    }
+
     function buildGuestDateStrip(){
       const strip=document.getElementById('g-date-strip');
       if(!strip)return;
@@ -577,7 +594,8 @@
     function resetGuestForm(){
       document.getElementById('guest-success').style.display='none';
       document.getElementById('guest-form-wrap').style.display='block';
-      ['g-name','g-phone','g-vehicle','g-street','g-number','g-city','g-state','g-zip'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+      ['g-name','g-phone','g-vehicle','g-street','g-number','g-zip'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+      selectCity('New Jersey','NJ');
       document.getElementById('g-date').value='';
       document.getElementById('g-time').value='';
       buildGuestDateStrip();
