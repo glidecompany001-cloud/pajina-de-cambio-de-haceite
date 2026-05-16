@@ -1053,7 +1053,10 @@
                 <div style="font-size:11px;color:${light?'#B0B0C8':'#33334A'};margin-top:3px">📅 ${t('last_svc')} ${fmtShort(latest.date)}</div>
               </div>
             </div>`+
-            renderCarSchematic(latest);
+            renderCarSchematic(latest)+
+            `<button onclick="downloadHealthReport()" id="btn-download-report" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:16px;padding:12px;border-radius:10px;background:rgba(0,123,255,0.08);border:1px solid rgba(0,123,255,0.22);color:#007bff;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1);" onmouseover="this.style.background='rgba(0,123,255,0.15)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(0,123,255,0.08)';this.style.transform=''">
+              ⬇️ ${_lang==='en'?'Download maintenance report':'Descargar reporte de mantenimiento'}
+            </button>`;
         } else {
           statusSec.style.display = 'none';
         }
@@ -1070,10 +1073,12 @@
       const lastDate=new Date(latest.date+'T12:00:00');
       const daysSinceLast=Math.floor((today-lastDate)/(1000*60*60*24));
       const intervalDays=(latest.recurrence_weeks||12)*7;
-      // Base: more services = better maintained
+      const ratio=daysSinceLast/intervalDays;
+      // First oil change with us = 100% (freshly serviced)
+      if(count===1&&ratio<=1) return 100;
+      // Base: more services = better maintained history
       const base=count>=6?90:count>=4?80:count>=2?70:60;
       // Recency: penalize if overdue relative to expected interval
-      const ratio=daysSinceLast/intervalDays;
       const adj=ratio<=1?10:ratio<=1.25?0:ratio<=1.5?-15:ratio<=2?-30:-50;
       return Math.max(5,Math.min(100,base+adj));
     }
@@ -1153,6 +1158,127 @@
         </div>
         ${hasHealth ? renderCarSchematic(a) : ''}
       </div>`;
+    }
+
+    // ── Download maintenance report (PDF) ─────────────
+    async function downloadHealthReport(){
+      const btn = document.getElementById('btn-download-report');
+      if (btn) { btn.disabled=true; btn.innerHTML='⏳ '+((_lang==='en')?'Generating…':'Generando…'); }
+      try {
+        if (!window.jspdf) {
+          await new Promise((res,rej)=>{
+            const s=document.createElement('script');
+            s.src='https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js';
+            s.onload=res; s.onerror=rej;
+            document.head.appendChild(s);
+          });
+        }
+        const { jsPDF } = window.jspdf;
+        const v = _activeVehicle;
+        const items = _currentHistory;
+        if (!items.length) return;
+        const score = calcHealthScore(items);
+        const grade = score!=null?healthGrade(score):'—';
+        const scoreLabel = score>=60?'Excelente estado':score>=30?'Estado moderado':'Requiere atención';
+        const lang = _lang||'es';
+
+        const doc = new jsPDF({ unit:'mm', format:'a4' });
+        const W=210, M=18;
+        let y=0;
+
+        // ── Header bar ──────────────────────────────────
+        doc.setFillColor(0,123,255);
+        doc.rect(0,0,W,18,'F');
+        doc.setFontSize(13); doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255);
+        doc.text('glide', M, 12);
+        doc.setFontSize(9); doc.setFont('helvetica','normal');
+        doc.text('glide.autos', W-M, 12, {align:'right'});
+
+        // ── Title ───────────────────────────────────────
+        y=30;
+        doc.setFontSize(20); doc.setFont('helvetica','bold'); doc.setTextColor(10,10,26);
+        doc.text(lang==='en'?'Vehicle Maintenance Report':'Reporte de Mantenimiento Vehicular', M, y);
+        y+=7;
+        doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(130,130,160);
+        const today=new Date().toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});
+        doc.text((lang==='en'?'Generated: ':'Generado el: ')+today, M, y);
+
+        // ── Vehicle info box ─────────────────────────────
+        y+=10;
+        doc.setFillColor(240,243,255);
+        doc.roundedRect(M, y, W-M*2, 22, 3,3, 'F');
+        doc.setFontSize(13); doc.setFont('helvetica','bold'); doc.setTextColor(10,10,26);
+        doc.text(v.vehicle||'—', M+6, y+9);
+        doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(100,100,140);
+        doc.text((lang==='en'?'Oil type: ':'Tipo de aceite: ')+(v.oil_type||'—'), M+6, y+16);
+        if (v.location) doc.text('📍 '+v.location, M+80, y+16);
+
+        // ── Health score ─────────────────────────────────
+        y+=30;
+        doc.setFillColor(score>=60?230:score>=30?255:255, score>=60?248:score>=30?237:235, score>=60?235:score>=30?215:230);
+        doc.roundedRect(M, y, W-M*2, 28, 3,3, 'F');
+        const sc=score>=60?[40,140,80]:score>=30?[180,100,0]:[0,100,220];
+        doc.setTextColor(...sc);
+        doc.setFontSize(26); doc.setFont('helvetica','bold');
+        doc.text((score!=null?score+'%':'—'), M+8, y+19);
+        doc.setFontSize(11); doc.setFont('helvetica','bold');
+        doc.text(grade, M+38, y+19);
+        doc.setFontSize(10); doc.setFont('helvetica','normal'); doc.setTextColor(80,80,110);
+        doc.text(lang==='en'?'Health Score':'Puntuación de salud', M+8, y+8);
+        doc.text(scoreLabel, M+50, y+19);
+        doc.setFontSize(9); doc.setTextColor(130,130,160);
+        doc.text((lang==='en'?'Based on oil change history · ':'Basado en historial de cambios de aceite · ')+items.length+(lang==='en'?' recorded services':' servicios registrados'), M+8, y+26);
+
+        // ── History table ─────────────────────────────────
+        y+=36;
+        doc.setFontSize(11); doc.setFont('helvetica','bold'); doc.setTextColor(10,10,26);
+        doc.text(lang==='en'?'Oil Change History':'Historial de Cambios de Aceite', M, y);
+        y+=6;
+
+        // Table header
+        doc.setFillColor(0,123,255);
+        doc.rect(M, y, W-M*2, 8, 'F');
+        doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255);
+        doc.text('#', M+2, y+5.5);
+        doc.text(lang==='en'?'Date':'Fecha', M+10, y+5.5);
+        doc.text(lang==='en'?'Mileage':'Millaje', M+80, y+5.5);
+        doc.text(lang==='en'?'Oil type':'Tipo de aceite', M+120, y+5.5);
+        y+=8;
+
+        items.forEach((h,i)=>{
+          if(y>270){ doc.addPage(); y=20; }
+          const bg=i%2===0?[248,250,255]:[255,255,255];
+          doc.setFillColor(...bg);
+          doc.rect(M, y, W-M*2, 7, 'F');
+          doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(40,40,60);
+          const dt=new Date(h.date+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'});
+          doc.text(String(i+1), M+2, y+5);
+          doc.text(dt, M+10, y+5);
+          doc.text(h.mileage?Number(h.mileage).toLocaleString('en-US')+' mi':'—', M+80, y+5);
+          doc.text(h.oil_type||'—', M+120, y+5);
+          y+=7;
+        });
+
+        // ── Footer ───────────────────────────────────────
+        y=Math.max(y+14, 272);
+        doc.setDrawColor(200,210,240); doc.setLineWidth(0.3);
+        doc.line(M, y, W-M, y);
+        y+=5;
+        doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(150,150,180);
+        doc.text(lang==='en'
+          ?'This document certifies the vehicle maintenance history registered in GLIDE.'
+          :'Este documento certifica el historial de mantenimiento del vehículo registrado en GLIDE.',
+          M, y);
+        y+=4;
+        doc.text('glide.autos · '+(lang==='en'?'Official maintenance record':'Registro oficial de mantenimiento'), M, y);
+
+        const filename = 'glide-reporte-'+(v.vehicle||'vehiculo').replace(/[^a-zA-Z0-9]/g,'-').toLowerCase()+'.pdf';
+        doc.save(filename);
+      } catch(e) {
+        alert(_lang==='en'?'Error generating PDF. Try again.':'Error al generar el PDF. Intenta de nuevo.');
+      } finally {
+        if (btn) { btn.disabled=false; btn.innerHTML='⬇️ '+(_lang==='en'?'Download maintenance report':'Descargar reporte de mantenimiento'); }
+      }
     }
 
     // ── Booking modal ──────────────────────────────────
