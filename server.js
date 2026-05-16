@@ -462,8 +462,10 @@ const TIME_SLOTS = ['8:00','9:00','10:00','11:00','12:00','13:00','14:00','15:00
 app.get('/api/appointments/available-slots', requireCustomer, async (req, res) => {
   const { date } = req.query;
   if (!date) return res.status(400).json({ error: 'Date required' });
-  const taken = (await dbAll("SELECT time FROM appointments WHERE date=? AND status='pending'", [date])).map(r => r.time);
-  res.json({ available: TIME_SLOTS.filter(s => !taken.includes(s)), taken });
+  const maxPerSlot = parseInt(await getSetting('slots_per_time') || '1', 10);
+  const rows = await dbAll("SELECT time, COUNT(*) as cnt FROM appointments WHERE date=? AND status='pending' GROUP BY time", [date]);
+  const countMap = {}; rows.forEach(r => { countMap[r.time] = r.cnt; });
+  res.json({ available: TIME_SLOTS.filter(s => (countMap[s]||0) < maxPerSlot), taken: TIME_SLOTS.filter(s => (countMap[s]||0) >= maxPerSlot) });
 });
 
 app.post('/api/appointments', requireCustomer, async (req, res) => {
@@ -475,8 +477,9 @@ app.post('/api/appointments', requireCustomer, async (req, res) => {
   const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
   if (date < tomorrow.toISOString().split('T')[0])
     return res.status(400).json({ error: 'Las citas deben agendarse con al menos 1 día de anticipación' });
-  const exists = await dbGet("SELECT id FROM appointments WHERE date=? AND time=? AND status='pending'", [date, time]);
-  if (exists) return res.status(409).json({ error: 'Ese horario ya está reservado' });
+  const maxPerSlot = parseInt(await getSetting('slots_per_time') || '1', 10);
+  const slotCount = await dbGet("SELECT COUNT(*) as cnt FROM appointments WHERE date=? AND time=? AND status='pending'", [date, time]);
+  if ((slotCount?.cnt || 0) >= maxPerSlot) return res.status(409).json({ error: 'Ese horario ya no tiene cupo disponible' });
   const r = await dbRun(
     `INSERT INTO appointments (user_id,vehicle_id,name,email,phone,vehicle,oil_type,date,time,notes,location,is_recurring,recurrence_weeks)
      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`,
@@ -940,8 +943,10 @@ app.put('/api/admin/settings/paypal', requireAdmin, async (req, res) => {
 app.get('/api/guest/available-slots', async (req, res) => {
   const { date } = req.query;
   if (!date) return res.status(400).json({ error: 'Date required' });
-  const taken = (await dbAll("SELECT time FROM appointments WHERE date=? AND status='pending'", [date])).map(r => r.time);
-  res.json({ available: TIME_SLOTS.filter(s => !taken.includes(s)), taken });
+  const maxPerSlot = parseInt(await getSetting('slots_per_time') || '1', 10);
+  const rows = await dbAll("SELECT time, COUNT(*) as cnt FROM appointments WHERE date=? AND status='pending' GROUP BY time", [date]);
+  const countMap = {}; rows.forEach(r => { countMap[r.time] = r.cnt; });
+  res.json({ available: TIME_SLOTS.filter(s => (countMap[s]||0) < maxPerSlot), taken: TIME_SLOTS.filter(s => (countMap[s]||0) >= maxPerSlot) });
 });
 
 app.post('/api/guest/appointments', async (req, res) => {
@@ -951,8 +956,9 @@ app.post('/api/guest/appointments', async (req, res) => {
   const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
   if (date < tomorrow.toISOString().split('T')[0])
     return res.status(400).json({ error: 'Las citas deben agendarse con al menos 1 día de anticipación' });
-  const exists = await dbGet("SELECT id FROM appointments WHERE date=? AND time=? AND status='pending'", [date, time]);
-  if (exists) return res.status(409).json({ error: 'Ese horario ya está reservado' });
+  const maxPerSlot = parseInt(await getSetting('slots_per_time') || '1', 10);
+  const slotCount = await dbGet("SELECT COUNT(*) as cnt FROM appointments WHERE date=? AND time=? AND status='pending'", [date, time]);
+  if ((slotCount?.cnt || 0) >= maxPerSlot) return res.status(409).json({ error: 'Ese horario ya no tiene cupo disponible' });
   const r = await dbRun(
     `INSERT INTO appointments (user_id,name,email,phone,vehicle,oil_type,date,time,notes,location,is_recurring,recurrence_weeks)
      VALUES (NULL,?,?,?,?,?,?,?,?,?,0,12)`,
@@ -975,6 +981,18 @@ app.get('/api/cron/reminders', async (req, res) => {
     if (a.phone) { const ok = await sendSMS(a.phone,'sms_reminder',{name:(a.name||'').split(' ')[0],time:a.time}); if(ok) sent++; }
   }
   res.json({ sent, total: appts.length });
+});
+
+// ─── Admin: capacity setting ──────────────────────────────────────────────────
+app.get('/api/admin/settings/capacity', requireAdmin, async (_req, res) => {
+  const val = await getSetting('slots_per_time');
+  res.json({ slots_per_time: parseInt(val || '1', 10) });
+});
+app.put('/api/admin/settings/capacity', requireAdmin, async (req, res) => {
+  const n = parseInt(req.body.slots_per_time, 10);
+  if (!n || n < 1 || n > 20) return res.status(400).json({ error: 'Valor inválido (1–20)' });
+  await saveSetting('slots_per_time', String(n));
+  res.json({ success: true });
 });
 
 // ─── Admin: SMS settings ──────────────────────────────────────────────────────
