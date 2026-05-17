@@ -51,8 +51,8 @@
     .num-teal   { color:#0D9488; }
 
     /* Tabs */
-    .tab-bar { display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,0.07);margin-bottom:0;overflow-x:auto; }
-    .tab-btn { padding:11px 20px;background:none;border:none;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.03em;text-transform:uppercase;color:#44445A;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.15s ease,border-color 0.15s ease;white-space:nowrap; }
+    .tab-bar { display:flex;flex-wrap:wrap;gap:0;border-bottom:1px solid rgba(255,255,255,0.07);margin-bottom:0; }
+    .tab-btn { padding:10px 16px;background:none;border:none;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.03em;text-transform:uppercase;color:#44445A;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.15s ease,border-color 0.15s ease;white-space:nowrap; }
     .tab-btn:hover { color:#8888A0; }
     .tab-btn.active { color:#F4F4F8;border-bottom-color:#007bff; }
     .tab-btn:focus-visible { outline:2px solid rgba(0,123,255,0.4);outline-offset:2px;border-radius:4px; }
@@ -234,6 +234,32 @@
     html.light .nf-label{color:#7070A0}
     html.light select.nf-field option{background:#fff;color:#0A0A1A}
     html.light .modal-backdrop{background:rgba(0,0,0,0.35)}
+    html.light .add-tech-box{background:#F0F3FF;border-color:rgba(0,0,0,0.08)}
+    html.light .var-chip{background:#E8EBF8;border-color:rgba(0,0,0,0.1);color:#5A5A80}
+    html.light .var-chip:hover{background:#DDE1F5;color:#0A0A1A}
+    html.light .tech-card{background:#F4F6FF;border-color:rgba(0,0,0,0.08)}
+    html.light .tech-card:hover{border-color:rgba(0,0,0,0.14)}
+    html.light .tech-name{color:#0A0A1A}
+    html.light .tech-email{color:#7070A0}
+    html.light .sms-tpl-box{background:#F0F3FF;border-color:rgba(0,0,0,0.08)}
+    html.light .sms-tpl-title{color:#2A2A40}
+    html.light .sms-tpl-area{background:#fff;border-color:rgba(0,0,0,0.1);color:#0A0A1A}
+    html.light .sms-tpl-area::placeholder{color:#B0B0C8}
+    html.light .nf-section-title{color:#5A5A80}
+    html.light #pp-status .status-ok{background:rgba(56,161,105,0.08);border-color:rgba(56,161,105,0.2)}
+    html.light .modal{background:#fff;border-color:rgba(0,0,0,0.08)}
+    html.light .modal-title{color:#0A0A1A}
+    html.light .modal-sub{color:#7070A0}
+    html.light .modal-section{color:#7070A0}
+    html.light .mileage-input{background:#F0F3FF;border-color:rgba(0,0,0,0.1);color:#0A0A1A}
+    html.light .num-field{background:#F0F3FF;border-color:rgba(0,0,0,0.12);color:#0A0A1A}
+    html.light .appt-summary-box{background:#F0F3FF;border-color:rgba(0,0,0,0.06);color:#7070A0}
+    html.light .appt-summary-box strong{color:#0A0A1A}
+    html.light .map-field{background:#F0F3FF;border-color:rgba(0,0,0,0.1);color:#0A0A1A}
+    html.light .map-quick-btn{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.09);color:#7070A0}
+    html.light .map-quick-btn.active{background:rgba(0,123,255,0.08);border-color:rgba(0,123,255,0.25);color:#007bff}
+    html.light #map-container{border-color:rgba(0,0,0,0.1)}
+    html.light #map-stats{color:#9090B0}
     html.light .modal{background:#fff;border-color:rgba(0,0,0,0.08);box-shadow:0 24px 80px rgba(0,0,0,0.12)}
     html.light .modal-close{background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.08);color:#7070A0}
     html.light .modal-close:hover{background:rgba(0,0,0,0.1);color:#0A0A1A}
