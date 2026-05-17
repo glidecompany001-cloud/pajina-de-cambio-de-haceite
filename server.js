@@ -120,6 +120,8 @@ const dbReady = (async () => {
     "ALTER TABLE appointments ADD COLUMN arrival_confirmed INTEGER DEFAULT 0",
     "ALTER TABLE appointments ADD COLUMN payment_token TEXT DEFAULT NULL",
     "ALTER TABLE appointments ADD COLUMN payment_status TEXT DEFAULT 'pending'",
+    "ALTER TABLE appointments ADD COLUMN lat REAL DEFAULT NULL",
+    "ALTER TABLE appointments ADD COLUMN lng REAL DEFAULT NULL",
   ]) { try { await dbExec(sql); } catch {} }
   try { await dbExec("UPDATE users SET email_verified=1 WHERE verification_token IS NULL AND email_verified=0"); } catch {}
   await buildSendGrid();
@@ -546,6 +548,35 @@ app.get('/api/admin/appointments', requireAdmin, async (_req, res) => {
   ));
 });
 
+app.get('/api/admin/appointments/map', requireAdmin, async (_req, res) => {
+  const rows = await dbAll(
+    `SELECT a.id, a.name, a.phone, a.vehicle, a.oil_type, a.date, a.time, a.status,
+            a.payment_status, a.location, a.lat, a.lng, a.technician_id,
+            t.name as technician_name
+     FROM appointments a
+     LEFT JOIN users t ON a.technician_id = t.id
+     WHERE a.status != 'cancelled' AND a.location != '' AND a.location IS NOT NULL
+     ORDER BY a.date DESC, a.time ASC`
+  );
+  res.json(rows);
+});
+
+app.post('/api/admin/appointments/:id/geocode', requireAdmin, async (req, res) => {
+  const appt = await dbGet('SELECT id, location, lat, lng FROM appointments WHERE id=?', [+req.params.id]);
+  if (!appt) return res.status(404).json({ error: 'Not found' });
+  if (appt.lat && appt.lng) return res.json({ lat: appt.lat, lng: appt.lng });
+  if (!appt.location) return res.status(400).json({ error: 'No location' });
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(appt.location)}&format=json&limit=1`;
+    const r = await fetch(url, { headers: { 'User-Agent': 'GlideOilChange/1.0' } });
+    const data = await r.json();
+    if (!data.length) return res.status(404).json({ error: 'No results' });
+    const lat = parseFloat(data[0].lat), lng = parseFloat(data[0].lon);
+    await dbRun('UPDATE appointments SET lat=?, lng=? WHERE id=?', [lat, lng, Number(appt.id)]);
+    res.json({ lat, lng });
+  } catch (e) { res.status(500).json({ error: 'Geocoding failed' }); }
+});
+
 app.get('/api/admin/stats', requireAdmin, async (_req, res) => {
   const today = new Date().toISOString().split('T')[0];
   const d7 = new Date(); d7.setDate(d7.getDate() + 7);
@@ -594,6 +625,27 @@ app.put('/api/admin/appointments/:id/complete', requireAdmin, async (req, res) =
     sendConfirmation({ ...appt, date: nextDate, id: nextId });
   }
   res.json({ success: true, nextId, nextDate });
+});
+
+app.put('/api/admin/appointments/:id/generate-payment', requireAdmin, async (req, res) => {
+  const appt = await dbGet('SELECT * FROM appointments WHERE id=? AND status!=?', [+req.params.id, 'cancelled']);
+  if (!appt) return res.status(404).json({ error: 'Not found' });
+  let token = appt.payment_token;
+  if (!token) {
+    token = require('crypto').randomBytes(16).toString('hex');
+    await dbRun("UPDATE appointments SET arrival_confirmed=1, payment_token=?, payment_status='pending' WHERE id=?", [token, Number(appt.id)]);
+  } else if (!appt.arrival_confirmed) {
+    await dbRun("UPDATE appointments SET arrival_confirmed=1 WHERE id=?", [Number(appt.id)]);
+  }
+  const paymentUrl = `${req.protocol}://${req.get('host')}/pay/${token}`;
+  res.json({ success: true, paymentUrl, token });
+});
+
+app.put('/api/admin/appointments/:id/mark-cash', requireAdmin, async (req, res) => {
+  const appt = await dbGet('SELECT id FROM appointments WHERE id=?', [+req.params.id]);
+  if (!appt) return res.status(404).json({ error: 'Not found' });
+  await dbRun("UPDATE appointments SET arrival_confirmed=1, payment_status='cash' WHERE id=?", [Number(appt.id)]);
+  res.json({ success: true });
 });
 
 app.put('/api/admin/appointments/:id/assign', requireAdmin, async (req, res) => {
@@ -1093,10 +1145,13 @@ app.put('/api/admin/settings/sms', requireAdmin, async (req, res) => {
 
 app.post('/api/admin/sms/test', requireAdmin, async (req, res) => {
   const { phone } = req.body;
-  if (!phone) return res.status(400).json({ error: 'Phone required' });
+  if (!phone) return res.status(400).json({ error: 'Ingresa un número de teléfono' });
   await buildTwilio();
+  if (!twilioClient) return res.status(400).json({ error: 'Twilio no está configurado. Guarda el Account SID y Auth Token primero.' });
+  const fromNum = await getSetting('twilio_from');
+  if (!fromNum) return res.status(400).json({ error: 'Falta el número de teléfono From. Guárdalo primero.' });
   const ok = await sendSMS(phone, 'sms_booking', { name: 'Test', date: 'hoy', time: '10:00' });
-  res.json({ success: ok, error: ok ? null : 'No se pudo enviar. Verifica las credenciales de Twilio.' });
+  res.json({ success: ok, error: ok ? null : 'No se pudo enviar. Verifica que las credenciales y el número From sean correctos.' });
 });
 
 // ─── Start ────────────────────────────────────────────────────────────────────

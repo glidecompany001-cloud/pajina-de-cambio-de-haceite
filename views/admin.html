@@ -8,6 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>(function(){if(localStorage.getItem('glide-theme')==='light')document.documentElement.classList.add('light')})()</script>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -259,6 +262,32 @@
     html.light .svc-price-desc{color:#9090B0}
     html.light .svc-price-input{background:#fff;border-color:rgba(0,0,0,0.12);color:#0A0A1A}
     html.light .csvc-card{background:#F4F6FF;border-color:rgba(0,0,0,0.08)}
+
+    /* ── Map panel ── */
+    #map-container{height:520px;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);position:relative;z-index:1}
+    .map-filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;align-items:flex-end}
+    .map-filter-group{display:flex;flex-direction:column;gap:5px}
+    .map-filter-label{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#5A5A78}
+    .map-quick-btn{padding:7px 13px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#8888A0;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:background 0.15s,color 0.15s,border-color 0.15s}
+    .map-quick-btn.active,.map-quick-btn:hover{background:rgba(0,123,255,0.12);border-color:rgba(0,123,255,0.3);color:#007bff}
+    .map-field{padding:7px 11px;background:#18181F;border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#F4F4F8;font-family:'Montserrat',sans-serif;font-size:13px;outline:none}
+    .map-field:focus{border-color:rgba(0,123,255,0.5)}
+    html.light .map-field{background:#F0F3FF;border-color:rgba(0,0,0,0.1);color:#0A0A1A}
+    html.light .map-quick-btn{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.09);color:#7070A0}
+    html.light .map-quick-btn.active,html.light .map-quick-btn:hover{background:rgba(0,123,255,0.08);border-color:rgba(0,123,255,0.25);color:#007bff}
+    #map-stats{font-size:12px;color:#44445A;margin-bottom:10px}
+    .leaflet-popup-content-wrapper{background:#111118!important;border:1px solid rgba(255,255,255,0.1)!important;border-radius:14px!important;box-shadow:0 8px 32px rgba(0,0,0,0.6)!important;color:#F4F4F8!important;padding:0!important}
+    .leaflet-popup-content{margin:0!important;width:260px!important}
+    .leaflet-popup-tip{background:#111118!important}
+    .leaflet-popup-close-button{color:#606078!important;top:10px!important;right:10px!important;font-size:18px!important}
+    .map-popup{padding:16px}
+    .map-popup-name{font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;color:#F4F4F8;margin-bottom:6px}
+    .map-popup-row{font-size:12px;color:#44445A;margin-bottom:3px;line-height:1.5}
+    .map-popup-row span{color:#C8C8D8}
+    .map-popup-select{width:100%;padding:8px 10px;background:#18181F;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#F4F4F8;font-family:'Montserrat',sans-serif;font-size:13px;margin-top:10px;outline:none;cursor:pointer}
+    .map-popup-btn{width:100%;margin-top:8px;padding:9px;background:linear-gradient(135deg,#007bff,#0056b3);border:none;border-radius:9px;color:#fff;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:opacity 0.15s}
+    .map-popup-btn:hover{opacity:0.88}
+    .map-popup-btn:disabled{opacity:0.45;cursor:default}
   </style>
 </head>
 <body>
@@ -267,8 +296,8 @@
 
   <header class="topbar">
     <div class="topbar-brand">
-      <span style="font-size:20px">🛢️</span>
-      <span class="name">Cambio de Aceite</span>
+      <img src="/brand/icon.svg" alt="GLIDE" style="height:26px;width:auto">
+      <img src="/brand/logo.svg" alt="GLIDE" style="height:18px;width:auto">
       <span class="admin-chip">Admin</span>
     </div>
     <div class="topbar-right">
@@ -300,6 +329,8 @@
       <button class="tab-btn"        id="tb-pagos"    onclick="switchTab('pagos')">💳 Pagos</button>
       <button class="tab-btn"        id="tb-servicios" onclick="switchTab('servicios')">🔧 Servicios</button>
       <button class="tab-btn"        id="tb-sms"       onclick="switchTab('sms')">📱 SMS</button>
+      <button class="tab-btn"        id="tb-pos"       onclick="switchTab('pos')">🏪 POS</button>
+      <button class="tab-btn"        id="tb-map"       onclick="switchTab('map')">🗺️ Mapa</button>
     </div>
     <div class="panel-wrap">
 
@@ -875,6 +906,111 @@
 
       </div>
 
+      <!-- ── POS ── -->
+      <div class="panel" id="panel-pos">
+        <div class="form-section-title" style="margin-top:0">🏪 Punto de Venta (POS)</div>
+        <p style="font-size:13px;color:#44445A;margin-bottom:20px;line-height:1.6">Selecciona una cita para cobrar directamente. Se genera un código QR que el cliente escanea para pagar en línea, o puedes registrar pago en efectivo.</p>
+
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+          <div>
+            <label style="font-size:11px;font-weight:600;color:#5A5A78;letter-spacing:0.08em;text-transform:uppercase;display:block;margin-bottom:6px">Fecha</label>
+            <input type="date" id="pos-date-filter" class="nf-field" style="width:auto;padding:8px 12px"
+              oninput="loadPOSAppointments()">
+          </div>
+          <div style="margin-top:18px">
+            <button onclick="loadPOSAppointments()" style="padding:9px 18px;border-radius:9px;background:rgba(0,123,255,0.1);border:1px solid rgba(0,123,255,0.25);color:#007bff;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer">↺ Actualizar</button>
+          </div>
+        </div>
+
+        <div id="pos-list"></div>
+      </div>
+
+      <!-- ── Map ── -->
+      <div class="panel" id="panel-map">
+        <div class="form-section-title" style="margin-top:0">🗺️ Mapa de citas</div>
+
+        <!-- Filters -->
+        <div class="map-filters">
+          <!-- Quick date -->
+          <div class="map-filter-group">
+            <div class="map-filter-label">Período</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <button class="map-quick-btn active" id="mq-today"  onclick="setMapQuick('today')">Hoy</button>
+              <button class="map-quick-btn"         id="mq-week"   onclick="setMapQuick('week')">Esta semana</button>
+              <button class="map-quick-btn"         id="mq-month"  onclick="setMapQuick('month')">Este mes</button>
+              <button class="map-quick-btn"         id="mq-all"    onclick="setMapQuick('all')">Todas</button>
+            </div>
+          </div>
+          <!-- Date range -->
+          <div class="map-filter-group">
+            <div class="map-filter-label">Desde</div>
+            <input type="date" id="mf-from" class="map-field" oninput="setMapQuick(null);applyMapFilters()">
+          </div>
+          <div class="map-filter-group">
+            <div class="map-filter-label">Hasta</div>
+            <input type="date" id="mf-to" class="map-field" oninput="setMapQuick(null);applyMapFilters()">
+          </div>
+          <!-- ZIP -->
+          <div class="map-filter-group">
+            <div class="map-filter-label">ZIP code</div>
+            <input type="text" id="mf-zip" class="map-field" placeholder="Ej. 19103" maxlength="10" style="width:100px" oninput="applyMapFilters()">
+          </div>
+          <!-- City -->
+          <div class="map-filter-group">
+            <div class="map-filter-label">Ciudad</div>
+            <select id="mf-city" class="map-field" onchange="applyMapFilters()">
+              <option value="">Todas</option>
+              <option value="Philadelphia">Philadelphia</option>
+              <option value="New Jersey">New Jersey</option>
+            </select>
+          </div>
+          <!-- Status -->
+          <div class="map-filter-group">
+            <div class="map-filter-label">Estado</div>
+            <select id="mf-status" class="map-field" onchange="applyMapFilters()">
+              <option value="">Todos</option>
+              <option value="pending">Pendientes</option>
+              <option value="completed">Completadas</option>
+            </select>
+          </div>
+          <!-- Tech -->
+          <div class="map-filter-group">
+            <div class="map-filter-label">Técnico</div>
+            <select id="mf-tech" class="map-field" onchange="applyMapFilters()">
+              <option value="">Todos</option>
+              <option value="none">Sin asignar</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="map-stats"></div>
+        <div style="position:relative">
+          <div id="map-container"></div>
+          <div id="map-loading" style="position:absolute;inset:0;background:rgba(9,9,11,0.75);display:flex;align-items:center;justify-content:center;z-index:500;border-radius:14px;flex-direction:column;gap:10px">
+            <div style="font-size:22px">🗺️</div>
+            <div style="font-size:13px;color:#8888A0">Cargando mapa…</div>
+            <div id="map-geocode-progress" style="font-size:11px;color:#44445A"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Admin POS modal -->
+  <div id="admin-pos-modal" style="position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:300;display:none;align-items:center;justify-content:center;padding:16px">
+    <div style="background:#111118;border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:28px 24px 24px;width:100%;max-width:380px;box-shadow:0 32px 80px rgba(0,0,0,0.8);position:relative;text-align:center">
+      <button onclick="closeAdminPOS()" style="position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.09);color:#606078;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#44445A;margin-bottom:4px">Punto de venta</div>
+      <div id="apos-price" style="font-family:'Montserrat',sans-serif;font-size:52px;font-weight:900;letter-spacing:-0.03em;color:#F4F4F8;line-height:1;margin:12px 0 4px">$0</div>
+      <div style="font-size:12px;color:#44445A;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:20px">Total a cobrar</div>
+      <div id="apos-info" style="background:#18181F;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:12px 16px;margin-bottom:20px;text-align:left"></div>
+      <div style="background:#fff;border-radius:16px;padding:14px;display:inline-block;margin-bottom:8px"><canvas id="apos-qr"></canvas></div>
+      <div style="font-size:11px;color:#44445A;margin-bottom:18px">El cliente escanea el código para pagar en línea</div>
+      <div style="display:flex;align-items:center;gap:10px;margin:0 0 14px;color:#2A2A3A;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase">
+        <div style="flex:1;height:1px;background:rgba(255,255,255,0.06)"></div>o paga en efectivo<div style="flex:1;height:1px;background:rgba(255,255,255,0.06)"></div>
+      </div>
+      <button id="apos-cash-btn" onclick="adminPosCash()" style="width:100%;padding:15px;background:rgba(202,138,4,0.1);border:2px solid rgba(202,138,4,0.25);border-radius:14px;color:#CA8A04;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:800;cursor:pointer">💵 Cobrado en efectivo</button>
     </div>
   </div>
 
@@ -954,7 +1090,7 @@
     }
     function urgencyClass(days) { return days<=1?'urgent':days<=3?'warning':''; }
 
-    const ALL_TABS = ['upcoming','all','new','techs','config','pagos','servicios','sms'];
+    const ALL_TABS = ['upcoming','all','new','techs','config','pagos','servicios','sms','pos','map'];
 
     function switchTab(t) {
       ALL_TABS.forEach(tab => {
@@ -968,6 +1104,8 @@
       if(t==='pagos')     loadPayPalConfig();
       if(t==='servicios') { loadSvcSettings(); loadPrices(); loadCustomServices(); }
       if(t==='sms')       loadSmsSettings();
+      if(t==='pos')       loadPOSAppointments();
+      if(t==='map')       initAdminMap();
     }
 
     // ── Services settings ──────────────────────────────
@@ -1754,8 +1892,8 @@
         const r = await fetch('/api/admin/settings/sms');
         if (!r.ok) return;
         const d = await r.json();
-        if (d.twilio_sid)  document.getElementById('sms-sid').value   = d.twilio_sid;
-        if (d.twilio_from) document.getElementById('sms-from').value  = d.twilio_from;
+        if (d.sid)  document.getElementById('sms-sid').value  = d.sid;
+        if (d.from) document.getElementById('sms-from').value = d.from;
         const tplMap = {
           sms_booking:  'sms-tpl-booking',
           sms_arriving: 'sms-tpl-arriving',
@@ -1779,7 +1917,7 @@
       try {
         const r = await fetch('/api/admin/settings/sms', {
           method: 'PUT', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ twilio_sid: sid, twilio_token: token, twilio_from: from })
+          body: JSON.stringify({ sid, token, from })
         });
         const d = await r.json();
         if (!r.ok) { errEl.textContent = d.error || 'Error al guardar'; errEl.style.display = 'block'; return; }
@@ -1820,13 +1958,245 @@
       try {
         const r = await fetch('/api/admin/sms/test', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ to })
+          body: JSON.stringify({ phone: to })
         });
         const d = await r.json();
         if (r.ok) { resEl.textContent = '✓ SMS enviado correctamente'; resEl.style.color = '#68D391'; }
         else       { resEl.textContent = '✗ ' + (d.error || 'Error al enviar'); resEl.style.color = '#FF8090'; }
         resEl.style.display = 'block';
       } catch { resEl.textContent = 'Error de conexión'; resEl.style.color = '#FF8090'; resEl.style.display = 'block'; }
+    }
+
+    // ── Admin POS ──────────────────────────────────────────────────────────────
+    const ADMIN_OIL_PRICES = { 'Convencional': '65.00', 'Semi-sintético': '75.00', 'Sintético total': '85.00' };
+    let _aposId = null;
+
+    async function loadPOSAppointments() {
+      const wrap = document.getElementById('pos-list');
+      const dateEl = document.getElementById('pos-date-filter');
+      if (!dateEl.value) dateEl.value = new Date().toISOString().split('T')[0];
+      const date = dateEl.value;
+      wrap.innerHTML = '<div style="color:#44445A;font-size:13px;padding:20px 0">Cargando…</div>';
+      try {
+        const all = await fetch('/api/admin/appointments').then(r => r.json());
+        const appts = all.filter(a => a.date === date && a.status !== 'cancelled' && a.status !== 'completed');
+        if (!appts.length) {
+          wrap.innerHTML = '<div style="color:#33334A;font-size:13px;padding:20px 0;text-align:center">No hay citas pendientes para esta fecha</div>';
+          return;
+        }
+        const paid = s => s === 'cash' || s === 'paid_online';
+        wrap.innerHTML = appts.sort((a,b)=>a.time.localeCompare(b.time)).map(a => {
+          const price = ADMIN_OIL_PRICES[a.oil_type] || '65.00';
+          const isPaid = paid(a.payment_status);
+          const payBadge = isPaid
+            ? `<span style="font-size:10px;font-weight:700;text-transform:uppercase;padding:2px 8px;border-radius:5px;background:rgba(56,161,105,0.1);border:1px solid rgba(56,161,105,0.2);color:#38A169">${a.payment_status==='cash'?'✓ Efectivo':'✓ En línea'}</span>`
+            : `<span style="font-size:10px;font-weight:700;text-transform:uppercase;padding:2px 8px;border-radius:5px;background:rgba(217,119,6,0.1);border:1px solid rgba(217,119,6,0.2);color:#D97706">⏳ Sin pagar</span>`;
+          const btn = isPaid ? '' : `<button onclick="openAdminPOS(${a.id},'${esc(a.name)}','${esc(a.vehicle)}','${esc(a.oil_type)}')" style="padding:9px 16px;border-radius:9px;background:rgba(0,123,255,0.1);border:1px solid rgba(0,123,255,0.25);color:#007bff;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">💳 POS</button>`;
+          return `<div style="display:flex;align-items:center;gap:14px;background:#111118;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:14px 16px;margin-bottom:10px">
+            <div style="background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:8px 10px;font-size:16px;font-weight:800;font-family:'Montserrat',sans-serif;color:#F4F4F8;flex-shrink:0;min-width:64px;text-align:center">${esc(a.time)}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:15px;font-weight:600;color:#F4F4F8">${esc(a.name)}</div>
+              <div style="font-size:13px;color:#44445A;margin-top:2px">🚗 ${esc(a.vehicle)} · ${esc(a.oil_type)}</div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:6px">${payBadge}<span style="font-size:13px;font-weight:700;color:#C8C8D8">$${price}</span></div>
+            </div>
+            ${btn}
+          </div>`;
+        }).join('');
+      } catch { wrap.innerHTML = '<div style="color:#FF8090;font-size:13px;padding:20px 0">Error al cargar citas</div>'; }
+    }
+
+    async function openAdminPOS(id, name, vehicle, oil_type) {
+      _aposId = id;
+      const price = ADMIN_OIL_PRICES[oil_type] || '65.00';
+      document.getElementById('apos-price').textContent = '$' + price;
+      document.getElementById('apos-info').innerHTML =
+        `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.04)"><span style="color:#44445A">Cliente</span><span style="color:#C8C8D8;font-weight:600">${esc(name)}</span></div>
+         <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.04)"><span style="color:#44445A">Vehículo</span><span style="color:#C8C8D8;font-weight:600">${esc(vehicle)}</span></div>
+         <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px"><span style="color:#44445A">Servicio</span><span style="color:#C8C8D8;font-weight:600">${esc(oil_type)}</span></div>`;
+      const btn = document.getElementById('apos-cash-btn');
+      btn.disabled = true; btn.textContent = 'Generando…';
+      document.getElementById('admin-pos-modal').style.display = 'flex';
+      try {
+        const d = await fetch(`/api/admin/appointments/${id}/generate-payment`, { method: 'PUT', headers: { 'Content-Type': 'application/json' } }).then(r => r.json());
+        if (d.paymentUrl) {
+          QRCode.toCanvas(document.getElementById('apos-qr'), d.paymentUrl, { width: 180, margin: 1, color: { dark: '#000000', light: '#ffffff' } }, ()=>{});
+        }
+      } catch {}
+      btn.disabled = false; btn.textContent = '💵 Cobrado en efectivo';
+    }
+
+    function closeAdminPOS() {
+      document.getElementById('admin-pos-modal').style.display = 'none';
+      _aposId = null;
+    }
+
+    async function adminPosCash() {
+      if (!_aposId) return;
+      const btn = document.getElementById('apos-cash-btn');
+      btn.disabled = true; btn.textContent = '…';
+      try {
+        const d = await fetch(`/api/admin/appointments/${_aposId}/mark-cash`, { method: 'PUT', headers: { 'Content-Type': 'application/json' } }).then(r => r.json());
+        if (d.success) { closeAdminPOS(); loadPOSAppointments(); }
+        else { alert('Error: ' + (d.error || 'desconocido')); btn.disabled = false; btn.textContent = '💵 Cobrado en efectivo'; }
+      } catch { btn.disabled = false; btn.textContent = '💵 Cobrado en efectivo'; }
+    }
+
+    // ── Admin Map ──────────────────────────────────────────────────────────────
+    let _map = null, _mapMarkers = [], _mapData = [], _mapInited = false, _mapQuick = 'today';
+
+    function setMapQuick(key) {
+      _mapQuick = key;
+      ['today','week','month','all'].forEach(k => {
+        document.getElementById('mq-'+k)?.classList.toggle('active', k===key);
+      });
+      if (!key) return;
+      const today = new Date(); today.setHours(0,0,0,0);
+      const fmt = d => d.toISOString().split('T')[0];
+      let from = fmt(today), to = fmt(today);
+      if (key === 'week') { const e = new Date(today); e.setDate(e.getDate()+6); to = fmt(e); }
+      else if (key === 'month') { const e = new Date(today); e.setDate(e.getDate()+29); to = fmt(e); }
+      else if (key === 'all') { from = '2020-01-01'; to = '2099-12-31'; }
+      document.getElementById('mf-from').value = from;
+      document.getElementById('mf-to').value   = to;
+      applyMapFilters();
+    }
+
+    async function initAdminMap() {
+      // Set default date range (today)
+      if (!document.getElementById('mf-from').value) setMapQuick('today');
+
+      // Init Leaflet map once
+      if (!_mapInited) {
+        _mapInited = true;
+        _map = L.map('map-container').setView([39.95, -75.16], 11);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+          maxZoom: 19
+        }).addTo(_map);
+        // Fix map size after tab shows
+        setTimeout(() => _map.invalidateSize(), 100);
+      } else {
+        setTimeout(() => _map.invalidateSize(), 100);
+      }
+
+      // Populate tech filter
+      const techSel = document.getElementById('mf-tech');
+      if (_techs.length && techSel.options.length <= 2) {
+        _techs.forEach(t => {
+          const o = document.createElement('option'); o.value = t.id; o.textContent = t.name; techSel.appendChild(o);
+        });
+      }
+
+      await loadMapData();
+    }
+
+    async function loadMapData() {
+      document.getElementById('map-loading').style.display = 'flex';
+      try {
+        _mapData = await fetch('/api/admin/appointments/map').then(r => r.json());
+        // Geocode any missing coords sequentially (1/sec to respect Nominatim)
+        const missing = _mapData.filter(a => !a.lat || !a.lng);
+        const prog = document.getElementById('map-geocode-progress');
+        for (let i = 0; i < missing.length; i++) {
+          const a = missing[i];
+          prog.textContent = `Geolocalizando ${i+1}/${missing.length}…`;
+          try {
+            const d = await fetch(`/api/admin/appointments/${a.id}/geocode`, { method: 'POST' }).then(r => r.json());
+            if (d.lat) { a.lat = d.lat; a.lng = d.lng; }
+          } catch {}
+          if (i < missing.length - 1) await new Promise(r => setTimeout(r, 1100));
+        }
+        applyMapFilters();
+      } catch { document.getElementById('map-stats').textContent = 'Error al cargar datos'; }
+      document.getElementById('map-loading').style.display = 'none';
+    }
+
+    function applyMapFilters() {
+      if (!_map) return;
+      const from   = document.getElementById('mf-from').value;
+      const to     = document.getElementById('mf-to').value;
+      const zip    = document.getElementById('mf-zip').value.trim().toLowerCase();
+      const city   = document.getElementById('mf-city').value;
+      const status = document.getElementById('mf-status').value;
+      const tech   = document.getElementById('mf-tech').value;
+
+      const filtered = _mapData.filter(a => {
+        if (!a.lat || !a.lng) return false;
+        if (from && a.date < from) return false;
+        if (to   && a.date > to)   return false;
+        if (zip  && !(a.location||'').toLowerCase().includes(zip)) return false;
+        if (city && !(a.location||'').toLowerCase().includes(city.toLowerCase())) return false;
+        if (status && a.status !== status) return false;
+        if (tech === 'none' && a.technician_id) return false;
+        if (tech && tech !== 'none' && String(a.technician_id) !== tech) return false;
+        return true;
+      });
+
+      // Clear old markers
+      _mapMarkers.forEach(m => m.remove());
+      _mapMarkers = [];
+
+      const statusColor = { pending: '#007bff', completed: '#38A169' };
+      filtered.forEach(a => {
+        const color = statusColor[a.status] || '#ffc107';
+        const icon = L.divIcon({
+          className: '',
+          html: `<div style="width:14px;height:14px;border-radius:50%;background:${color};border:2px solid rgba(255,255,255,0.8);box-shadow:0 2px 6px rgba(0,0,0,0.5)"></div>`,
+          iconSize: [14,14], iconAnchor: [7,7]
+        });
+        const marker = L.marker([a.lat, a.lng], { icon }).addTo(_map);
+        marker.bindPopup(buildMapPopup(a), { maxWidth: 280 });
+        _mapMarkers.push(marker);
+      });
+
+      // Fit bounds
+      if (filtered.length) {
+        const bounds = L.latLngBounds(filtered.map(a => [a.lat, a.lng]));
+        _map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+      }
+
+      const total = filtered.length, withCoords = _mapData.filter(a => a.lat).length, totalAll = _mapData.length;
+      document.getElementById('map-stats').textContent =
+        `${total} cita${total!==1?'s':''} en el mapa · ${totalAll - withCoords} sin geolocalizar`;
+    }
+
+    function buildMapPopup(a) {
+      const fmt = d => new Date(d+'T12:00:00').toLocaleDateString('es-MX',{weekday:'short',day:'numeric',month:'short'});
+      const payBadge = a.payment_status === 'cash' ? '💵' : a.payment_status === 'paid_online' ? '✅' : '⏳';
+      const statusLabel = a.status === 'completed' ? '✓ Completada' : 'Pendiente';
+      const techOptions = `<option value="">Sin asignar</option>` +
+        _techs.map(t => `<option value="${t.id}" ${a.technician_id==t.id?'selected':''}>${esc(t.name)}</option>`).join('');
+
+      return `<div class="map-popup">
+        <div class="map-popup-name">${esc(a.name)}</div>
+        <div class="map-popup-row">🚗 <span>${esc(a.vehicle)}</span></div>
+        <div class="map-popup-row">🛢️ <span>${esc(a.oil_type)}</span></div>
+        <div class="map-popup-row">📅 <span>${fmt(a.date)} · ${esc(a.time)}</span></div>
+        <div class="map-popup-row">📞 <span>${esc(a.phone||'—')}</span></div>
+        <div class="map-popup-row">📍 <span style="font-size:11px">${esc(a.location)}</span></div>
+        <div class="map-popup-row">${payBadge} <span>${statusLabel}</span></div>
+        <select class="map-popup-select" id="mpp-tech-${a.id}">${techOptions}</select>
+        <button class="map-popup-btn" onclick="saveMapTech(${a.id})">Guardar técnico</button>
+      </div>`;
+    }
+
+    async function saveMapTech(id) {
+      const sel = document.getElementById('mpp-tech-'+id);
+      const btn = sel?.nextElementSibling;
+      if (!sel || !btn) return;
+      btn.disabled = true; btn.textContent = 'Guardando…';
+      try {
+        const r = await fetch(`/api/admin/appointments/${id}/assign`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ technician_id: sel.value || null })
+        }).then(r => r.json());
+        if (r.success) {
+          const appt = _mapData.find(a => a.id == id);
+          if (appt) { appt.technician_id = sel.value ? +sel.value : null; appt.technician_name = _techs.find(t=>t.id==+sel.value)?.name||null; }
+          btn.textContent = '✓ Guardado';
+          setTimeout(() => { if(btn) btn.textContent = 'Guardar técnico'; btn.disabled = false; }, 1500);
+        } else { btn.disabled = false; btn.textContent = 'Guardar técnico'; alert('Error al guardar'); }
+      } catch { btn.disabled = false; btn.textContent = 'Guardar técnico'; }
     }
 
     // ── Init ───────────────────────────────────────────────────────────────────

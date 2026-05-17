@@ -139,6 +139,36 @@
     html.light .appt-summary-box{background:#F0F3FF;border-color:rgba(0,0,0,0.06);color:#7070A0}
     html.light .appt-summary-box strong{color:#0A0A1A}
     html.light .btn-skip{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.08);color:#7070A0}
+
+    /* ── POS Modal ─────────────────────────────────── */
+    .pos-modal-bd{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
+    .pos-modal-bd.open{display:flex}
+    .pos-modal{background:#111118;border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:28px 24px 24px;width:100%;max-width:380px;box-shadow:0 32px 80px rgba(0,0,0,0.8);position:relative;text-align:center}
+    .pos-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.09);color:#606078;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .pos-close:hover{background:rgba(255,255,255,0.1);color:#F4F4F8}
+    .pos-price{font-family:'Montserrat',sans-serif;font-size:52px;font-weight:900;letter-spacing:-0.03em;color:#F4F4F8;line-height:1;margin:12px 0 4px}
+    .pos-price-lbl{font-size:12px;color:#44445A;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:20px}
+    .pos-info{background:#18181F;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:12px 16px;margin-bottom:20px;text-align:left}
+    .pos-info-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:13px}
+    .pos-info-row:not(:last-child){border-bottom:1px solid rgba(255,255,255,0.04)}
+    .pos-info-label{color:#44445A}
+    .pos-info-val{color:#C8C8D8;font-weight:600}
+    .pos-qr{background:#fff;border-radius:16px;padding:14px;display:inline-block;margin-bottom:8px}
+    .pos-qr-lbl{font-size:11px;color:#44445A;margin-bottom:18px}
+    .pos-divider{display:flex;align-items:center;gap:10px;margin:0 0 14px;color:#2A2A3A;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase}
+    .pos-divider::before,.pos-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.06)}
+    .btn-pos-cash{width:100%;padding:15px;background:rgba(202,138,4,0.1);border:2px solid rgba(202,138,4,0.25);border-radius:14px;color:#CA8A04;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1)}
+    .btn-pos-cash:hover{background:rgba(202,138,4,0.18);transform:translateY(-2px)}
+    .btn-pos-cash:active{transform:translateY(0)}
+    html.light .pos-modal{background:#fff;border-color:rgba(0,0,0,0.1)}
+    html.light .pos-price{color:#0A0A1A}
+    html.light .pos-info{background:#F0F3FF;border-color:rgba(0,0,0,0.07)}
+    html.light .pos-info-row:not(:last-child){border-bottom-color:rgba(0,0,0,0.05)}
+    html.light .pos-info-label{color:#7070A0}
+    html.light .pos-info-val{color:#2A2A40}
+    .btn-pos{padding:9px 14px;border-radius:9px;background:rgba(0,123,255,0.1);border:1px solid rgba(0,123,255,0.25);color:#007bff;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.15s ease,transform 0.2s cubic-bezier(0.34,1.56,0.64,1)}
+    .btn-pos:hover{background:rgba(0,123,255,0.18);transform:scale(1.04)}
+    .btn-pos:active{transform:scale(0.97)}
   </style>
 </head>
 <body>
@@ -183,6 +213,21 @@
     </div>
   </div>
 
+  <!-- POS Modal -->
+  <div class="pos-modal-bd" id="pos-modal">
+    <div class="pos-modal">
+      <button class="pos-close" onclick="closePOS()">✕</button>
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#44445A;margin-bottom:4px">Punto de venta</div>
+      <div class="pos-price" id="pos-price-val">$0</div>
+      <div class="pos-price-lbl">Total a cobrar</div>
+      <div class="pos-info" id="pos-info-box"></div>
+      <div class="pos-qr" id="pos-qr-canvas"><canvas id="pos-qr"></canvas></div>
+      <div class="pos-qr-lbl">El cliente escanea el código para pagar en línea</div>
+      <div class="pos-divider">o paga en efectivo</div>
+      <button class="btn-pos-cash" id="pos-cash-btn" onclick="posCash()">💵 Cobrado en efectivo</button>
+    </div>
+  </div>
+
   <header class="topbar">
     <div class="topbar-brand">
       <img src="/brand/icon.svg" alt="GLIDE" style="height:26px;width:auto"><span style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:800;color:#ffffff;letter-spacing:-0.03em">glide</span>
@@ -201,6 +246,7 @@
     <div id="appointments-list"><div class="empty"><div class="empty-icon">⏳</div></div></div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <script>
     function toggleTheme(){var l=document.documentElement.classList.toggle('light');localStorage.setItem('glide-theme',l?'light':'dark');var b=document.getElementById('theme-btn');if(b)b.textContent=l?'☀️':'🌙'}
     function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
@@ -233,6 +279,42 @@
         if (d.success) loadAppointments();
         else { alert('Error: ' + (d.error || 'desconocido')); if (btn) { btn.disabled = false; btn.innerHTML = '💵 Cobrado'; } }
       } catch { if (btn) { btn.disabled = false; btn.innerHTML = '💵 Cobrado'; } }
+    }
+
+    const OIL_PRICES = { 'Convencional': '65.00', 'Semi-sintético': '75.00', 'Sintético total': '85.00' };
+    let _posId = null;
+
+    function openPOS(id, name, vehicle, oil_type, token) {
+      _posId = id;
+      const price = OIL_PRICES[oil_type] || '65.00';
+      document.getElementById('pos-price-val').textContent = '$' + price;
+      document.getElementById('pos-info-box').innerHTML =
+        `<div class="pos-info-row"><span class="pos-info-label">Cliente</span><span class="pos-info-val">${esc(name)}</span></div>
+         <div class="pos-info-row"><span class="pos-info-label">Vehículo</span><span class="pos-info-val">${esc(vehicle)}</span></div>
+         <div class="pos-info-row"><span class="pos-info-label">Servicio</span><span class="pos-info-val">${esc(oil_type)}</span></div>`;
+      const payUrl = `${location.origin}/pay/${token}`;
+      const canvas = document.getElementById('pos-qr');
+      QRCode.toCanvas(canvas, payUrl, { width: 180, margin: 1, color: { dark: '#000000', light: '#ffffff' } }, ()=>{});
+      document.getElementById('pos-cash-btn').disabled = false;
+      document.getElementById('pos-cash-btn').textContent = '💵 Cobrado en efectivo';
+      document.getElementById('pos-modal').classList.add('open');
+    }
+
+    function closePOS() {
+      document.getElementById('pos-modal').classList.remove('open');
+      _posId = null;
+    }
+
+    async function posCash() {
+      if (!_posId) return;
+      const btn = document.getElementById('pos-cash-btn');
+      btn.disabled = true; btn.textContent = '…';
+      try {
+        const r = await fetch(`/api/tech/appointments/${_posId}/mark-cash`, { method: 'PUT', headers: { 'Content-Type': 'application/json' } });
+        const d = await r.json();
+        if (d.success) { closePOS(); loadAppointments(); }
+        else { alert('Error: ' + (d.error || 'desconocido')); btn.disabled = false; btn.textContent = '💵 Cobrado en efectivo'; }
+      } catch { btn.disabled = false; btn.textContent = '💵 Cobrado en efectivo'; }
     }
 
     async function init(){
@@ -271,8 +353,8 @@
               actionBtn = `<button class="btn-arrive" onclick="markArrived(${a.id})">📍 Llegué</button>`;
             } else if (!paid) {
               actionBtn = `<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+                ${a.payment_token?`<button class="btn-pos" onclick="openPOS(${a.id},'${esc(a.name)}','${esc(a.vehicle)}','${esc(a.oil_type)}','${esc(a.payment_token)}')">💳 POS</button>`:''}
                 <button class="btn-cash" onclick="markCash(${a.id})">💵 Cobrado</button>
-                ${a.payment_token?`<a class="pay-link" href="/pay/${a.payment_token}" target="_blank">Link de pago →</a>`:''}
               </div>`;
             } else {
               actionBtn = `<button class="btn-complete" onclick="openModal(${a.id},'${esc(a.name)}','${esc(a.vehicle)}','${esc(a.date)}','${esc(a.time)}')">✓ Completar</button>`;
