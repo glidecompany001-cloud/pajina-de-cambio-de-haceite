@@ -219,11 +219,11 @@
           </div>
           <div class="form-group">
             <label class="field-label" data-i18n="lbl_city">Ciudad *</label>
-            <input type="hidden" id="g-city" value="New Jersey">
-            <input type="hidden" id="g-state" value="NJ">
+            <input type="hidden" id="g-city" value="Philadelphia">
+            <input type="hidden" id="g-state" value="PA">
             <div id="city-toggle-wrap" style="display:flex;border-radius:10px;padding:4px;gap:4px">
-              <button type="button" id="city-btn-nj" onclick="selectCity('New Jersey','NJ')" style="flex:1;padding:9px 0;border-radius:7px;border:none;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.18s ease,color 0.18s ease;background:linear-gradient(135deg,#007bff,#0056b3);color:#fff;box-shadow:0 2px 8px rgba(0,123,255,0.3)">New Jersey</button>
-              <button type="button" id="city-btn-phi" onclick="selectCity('Philadelphia','PA')" style="flex:1;padding:9px 0;border-radius:7px;border:none;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.18s ease,color 0.18s ease;background:transparent;color:#44445A">Philadelphia</button>
+              <button type="button" id="city-btn-phi" onclick="selectCity('Philadelphia','PA')" style="flex:1;padding:9px 0;border-radius:7px;border:none;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.18s ease,color 0.18s ease;background:linear-gradient(135deg,#007bff,#0056b3);color:#fff;box-shadow:0 2px 8px rgba(0,123,255,0.3)">Philadelphia</button>
+              <button type="button" id="city-btn-nj" onclick="selectCity('New Jersey','NJ')" style="flex:1;padding:9px 0;border-radius:7px;border:none;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.18s ease,color 0.18s ease;background:transparent;color:#44445A">New Jersey</button>
             </div>
           </div>
           <div class="form-group" style="margin-bottom:20px">
@@ -514,7 +514,7 @@
         loadGuestSlots(selDate);
       }
       // Refresh city toggle colors
-      selectCity(document.getElementById('g-city')?.value||'New Jersey', document.getElementById('g-state')?.value||'NJ');
+      selectCity(document.getElementById('g-city')?.value||'Philadelphia', document.getElementById('g-state')?.value||'PA');
     }
     (function(){var b=document.getElementById('theme-btn');if(b&&document.documentElement.classList.contains('light'))b.textContent='☀️'})();
 
@@ -633,7 +633,7 @@
       document.getElementById('guest-success').style.display='none';
       document.getElementById('guest-form-wrap').style.display='block';
       ['g-name','g-phone','g-vehicle','g-street','g-number','g-zip'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-      selectCity('New Jersey','NJ');
+      selectCity('Philadelphia','PA');
       document.getElementById('g-date').value='';
       document.getElementById('g-time').value='';
       buildGuestDateStrip();
