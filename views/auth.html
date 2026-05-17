@@ -74,22 +74,22 @@
     html.light #city-toggle-wrap{background:#F0F3FF;border-color:rgba(0,0,0,0.1)}
     .g-addr-divider{color:#5A5A78;border-bottom:1px solid rgba(255,255,255,0.05)}
     html.light .g-addr-divider{color:#7070A0;border-bottom-color:rgba(0,0,0,0.08)}
-    /* Date strip */
-    .g-date-btn{flex-shrink:0;width:48px;padding:8px 4px;border-radius:9px;background:#18181F;border:1px solid rgba(255,255,255,0.07);cursor:pointer;text-align:center;user-select:none;transition:background 0.15s ease,border-color 0.15s ease}
-    .g-date-btn.sel{background:rgba(0,123,255,0.18)!important;border-color:rgba(0,123,255,0.55)!important}
-    .g-date-day{font-size:8px;font-weight:700;color:#44445A;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:3px}
-    .g-date-num{font-size:16px;font-weight:800;font-family:'Montserrat',sans-serif;color:#F4F4F8;line-height:1}
-    .g-date-mon{font-size:8px;color:#606078;margin-top:3px;text-transform:uppercase}
-    html.light .g-date-btn{background:#F0F3FF;border-color:rgba(0,0,0,0.08)}
-    html.light .g-date-day{color:#9090B0}
-    html.light .g-date-num{color:#0A0A1A}
-    html.light .g-date-mon{color:#9090B0}
+    /* Date strip — prefixed glide- to avoid Tailwind collisions */
+    .glide-date-btn{flex-shrink:0;width:48px;padding:8px 4px;border-radius:9px;background:#18181F!important;border:1px solid rgba(255,255,255,0.07)!important;cursor:pointer;text-align:center;user-select:none;transition:background 0.15s ease,border-color 0.15s ease}
+    .glide-date-btn.sel{background:rgba(0,123,255,0.18)!important;border-color:rgba(0,123,255,0.55)!important}
+    .glide-date-day{font-size:8px!important;font-weight:700!important;color:#44445A!important;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:3px}
+    .glide-date-num{font-size:16px!important;font-weight:800!important;font-family:'Montserrat',sans-serif!important;color:#F4F4F8!important;line-height:1}
+    .glide-date-mon{font-size:8px!important;color:#606078!important;margin-top:3px;text-transform:uppercase}
+    html.light .glide-date-btn{background:#F0F3FF!important;border-color:rgba(0,0,0,0.08)!important}
+    html.light .glide-date-day{color:#9090B0!important}
+    html.light .glide-date-num{color:#0A0A1A!important}
+    html.light .glide-date-mon{color:#9090B0!important}
     /* Time slots */
-    .g-slot{padding:9px 4px;border-radius:8px;background:#18181F;border:1px solid rgba(255,255,255,0.07);text-align:center;font-size:12px;font-weight:600;color:#888898;cursor:pointer;transition:background 0.15s ease,border-color 0.15s ease,color 0.15s ease}
-    .g-slot.sel{background:rgba(0,123,255,0.18)!important;border-color:rgba(0,123,255,0.55)!important;color:#007bff!important}
-    .g-slot-taken{padding:9px 4px;border-radius:8px;background:#141418;border:1px solid rgba(255,255,255,0.03);text-align:center;font-size:12px;font-weight:600;color:#2A2A3A;cursor:not-allowed;text-decoration:line-through}
-    html.light .g-slot{background:#F0F3FF;border-color:rgba(0,0,0,0.08);color:#5A5A80}
-    html.light .g-slot-taken{background:#E8EAF6;border-color:rgba(0,0,0,0.04);color:#C0C0D8}
+    .glide-slot{padding:9px 4px;border-radius:8px;background:#18181F!important;border:1px solid rgba(255,255,255,0.07)!important;text-align:center;font-size:12px!important;font-weight:600!important;color:#888898!important;cursor:pointer;transition:background 0.15s ease,border-color 0.15s ease,color 0.15s ease}
+    .glide-slot.sel{background:rgba(0,123,255,0.18)!important;border-color:rgba(0,123,255,0.55)!important;color:#007bff!important}
+    .glide-slot-taken{padding:9px 4px;border-radius:8px;background:#141418!important;border:1px solid rgba(255,255,255,0.03)!important;text-align:center;font-size:12px!important;font-weight:600!important;color:#2A2A3A!important;cursor:not-allowed;text-decoration:line-through}
+    html.light .glide-slot{background:#F0F3FF!important;border-color:rgba(0,0,0,0.08)!important;color:#5A5A80!important}
+    html.light .glide-slot-taken{background:#E8EAF6!important;border-color:rgba(0,0,0,0.04)!important;color:#C0C0D8!important}
   </style>
 </head>
 <body>
@@ -499,7 +499,23 @@
       sb.style.display = 'block';
       sb.innerHTML = t('linkGenerated') + '<br><a href="' + decodeURIComponent(resetUrl) + '" style="color:#60a5fa;word-break:break-all;font-size:12px">' + decodeURIComponent(resetUrl) + '</a>';
     }
-    function toggleTheme(){var l=document.documentElement.classList.toggle('light');localStorage.setItem('glide-theme',l?'light':'dark');var b=document.getElementById('theme-btn');if(b)b.textContent=l?'☀️':'🌙'}
+    function toggleTheme(){
+      var l=document.documentElement.classList.toggle('light');
+      localStorage.setItem('glide-theme',l?'light':'dark');
+      var b=document.getElementById('theme-btn');if(b)b.textContent=l?'☀️':'🌙';
+      // Rebuild date strip and slots so JS-rendered colors update
+      const selDate=document.getElementById('g-date')?.value;
+      buildGuestDateStrip();
+      if(selDate){
+        // Re-mark selected date
+        document.getElementById('g-date-strip')?.querySelectorAll('.glide-date-btn').forEach(btn=>{
+          if(btn.dataset.date===selDate) btn.classList.add('sel');
+        });
+        loadGuestSlots(selDate);
+      }
+      // Refresh city toggle colors
+      selectCity(document.getElementById('g-city')?.value||'New Jersey', document.getElementById('g-state')?.value||'NJ');
+    }
     (function(){var b=document.getElementById('theme-btn');if(b&&document.documentElement.classList.contains('light'))b.textContent='☀️'})();
 
     // ── Guest booking ──────────────────────────────────
@@ -539,10 +555,11 @@
           const yyyy=d.getFullYear(),mm=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');
           const ds=`${yyyy}-${mm}-${dd}`;
           const btn=document.createElement('div');
-          btn.className='g-date-btn';
-          btn.innerHTML=`<div class="g-date-day">${days[d.getDay()]}</div><div class="g-date-num">${d.getDate()}</div><div class="g-date-mon">${mons[d.getMonth()]}</div>`;
+          btn.className='glide-date-btn';
+          btn.dataset.date=ds;
+          btn.innerHTML=`<div class="glide-date-day">${days[d.getDay()]}</div><div class="glide-date-num">${d.getDate()}</div><div class="glide-date-mon">${mons[d.getMonth()]}</div>`;
           btn.addEventListener('click',()=>{
-            strip.querySelectorAll('.g-date-btn').forEach(b=>b.classList.remove('sel'));
+            strip.querySelectorAll('.glide-date-btn').forEach(b=>b.classList.remove('sel'));
             btn.classList.add('sel');
             document.getElementById('g-date').value=ds;
             loadGuestSlots(ds);
@@ -565,10 +582,10 @@
         all.forEach(s=>{
           const el=document.createElement('div');
           const tk=taken.includes(s);
-          el.className=tk?'g-slot-taken':'g-slot';
+          el.className=tk?'glide-slot-taken':'glide-slot';
           el.textContent=s;
           if(!tk) el.addEventListener('click',()=>{
-            wrap.querySelectorAll('.g-slot').forEach(x=>x.classList.remove('sel'));
+            wrap.querySelectorAll('.glide-slot').forEach(x=>x.classList.remove('sel'));
             el.classList.add('sel');
             document.getElementById('g-time').value=s;
           });
