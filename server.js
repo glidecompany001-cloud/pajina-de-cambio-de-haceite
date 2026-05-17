@@ -79,6 +79,14 @@ const dbReady = (async () => {
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
   )`);
   await dbExec(`CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT DEFAULT '')`);
+  await dbExec(`CREATE TABLE IF NOT EXISTS custom_services (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    description TEXT DEFAULT '',
+    price REAL DEFAULT 0,
+    active INTEGER DEFAULT 1,
+    sort_order INTEGER DEFAULT 0
+  )`);
   await dbExec(`CREATE TABLE IF NOT EXISTS vehicle_health (
     id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER UNIQUE NOT NULL,
     vehicle TEXT DEFAULT '', tire_fl INTEGER DEFAULT NULL, tire_fr INTEGER DEFAULT NULL,
@@ -981,6 +989,67 @@ app.get('/api/cron/reminders', async (req, res) => {
     if (a.phone) { const ok = await sendSMS(a.phone,'sms_reminder',{name:(a.name||'').split(' ')[0],time:a.time}); if(ok) sent++; }
   }
   res.json({ sent, total: appts.length });
+});
+
+// ─── Public: prices ──────────────────────────────────────────────────────────
+app.get('/api/public/prices', async (_req, res) => {
+  res.json({
+    oil_convencional: parseFloat(await getSetting('price_oil_convencional') || '65'),
+    oil_semi:         parseFloat(await getSetting('price_oil_semi')         || '75'),
+    oil_sintetico:    parseFloat(await getSetting('price_oil_sintetico')    || '85'),
+  });
+});
+
+// ─── Admin: prices ────────────────────────────────────────────────────────────
+app.get('/api/admin/settings/prices', requireAdmin, async (_req, res) => {
+  res.json({
+    oil_convencional: parseFloat(await getSetting('price_oil_convencional') || '65'),
+    oil_semi:         parseFloat(await getSetting('price_oil_semi')         || '75'),
+    oil_sintetico:    parseFloat(await getSetting('price_oil_sintetico')    || '85'),
+    brakes:           await getSetting('price_brakes') || '',
+    tires:            await getSetting('price_tires')  || '',
+    glass:            await getSetting('price_glass')  || '',
+  });
+});
+
+app.put('/api/admin/settings/prices', requireAdmin, async (req, res) => {
+  const keys = ['oil_convencional','oil_semi','oil_sintetico','brakes','tires','glass'];
+  for (const k of keys) {
+    if (req.body[k] !== undefined && req.body[k] !== '') {
+      const v = parseFloat(req.body[k]);
+      if (!isNaN(v) && v >= 0) await saveSetting('price_' + k, String(v));
+    }
+  }
+  res.json({ success: true });
+});
+
+// ─── Admin: custom services ───────────────────────────────────────────────────
+app.get('/api/admin/custom-services', requireAdmin, async (_req, res) => {
+  res.json(await dbAll('SELECT * FROM custom_services ORDER BY sort_order, id'));
+});
+
+app.post('/api/admin/custom-services', requireAdmin, async (req, res) => {
+  const { name, description, price } = req.body;
+  if (!name?.trim()) return res.status(400).json({ error: 'El nombre es requerido' });
+  const r = await dbRun(
+    'INSERT INTO custom_services (name, description, price) VALUES (?,?,?)',
+    [name.trim(), description?.trim() || '', parseFloat(price) || 0]
+  );
+  res.json({ success: true, id: r.lastInsertRowid });
+});
+
+app.put('/api/admin/custom-services/:id', requireAdmin, async (req, res) => {
+  const { name, description, price, active } = req.body;
+  await dbRun(
+    'UPDATE custom_services SET name=?, description=?, price=?, active=? WHERE id=?',
+    [name?.trim() || '', description?.trim() || '', parseFloat(price) || 0, active ? 1 : 0, +req.params.id]
+  );
+  res.json({ success: true });
+});
+
+app.delete('/api/admin/custom-services/:id', requireAdmin, async (req, res) => {
+  await dbRun('DELETE FROM custom_services WHERE id=?', [+req.params.id]);
+  res.json({ success: true });
 });
 
 // ─── Admin: capacity setting ──────────────────────────────────────────────────

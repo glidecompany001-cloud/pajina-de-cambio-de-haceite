@@ -243,10 +243,22 @@
     html.light .num-field{background:#F0F3FF;border-color:rgba(0,0,0,0.12);color:#0A0A1A}
     html.light .num-field::placeholder{color:#B0B0C8}
     html.light .btn-modal-skip{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.08);color:#7070A0}
-    html.light #panel-servicios [style*="background:#18181F"]{background:#fff!important;border-color:rgba(0,0,0,0.08)!important}
-    html.light #panel-servicios [style*="color:#F4F4F8"]{color:#0A0A1A!important}
-    html.light #panel-servicios [style*="color:#44445A"]{color:#9090B0!important}
     html.light #panel-servicios p{color:#9090B0}
+    .svc-price-card{display:flex;align-items:center;gap:14px;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px 18px}
+    .svc-price-name{font-size:14px;font-weight:700;color:#F4F4F8}
+    .svc-price-desc{font-size:12px;color:#44445A;margin-top:2px}
+    .svc-dollar{font-size:16px;color:#8888A0;font-weight:700}
+    .svc-price-input{width:80px;padding:7px 10px;background:#111118;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#F4F4F8;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:800;outline:none;text-align:center;transition:border-color 0.15s ease}
+    .svc-price-input:focus{border-color:rgba(0,123,255,0.5)}
+    .btn-svc-save{padding:6px 14px;background:rgba(0,123,255,0.1);border:1px solid rgba(0,123,255,0.22);border-radius:8px;color:#007bff;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.15s ease}
+    .btn-svc-save:hover{background:rgba(0,123,255,0.18)}
+    .csvc-card{display:flex;align-items:center;gap:14px;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px 18px;margin-bottom:10px;transition:border-color 0.15s ease}
+    .csvc-card:hover{border-color:rgba(255,255,255,0.1)}
+    html.light .svc-price-card{background:#F4F6FF;border-color:rgba(0,0,0,0.08)}
+    html.light .svc-price-name{color:#0A0A1A}
+    html.light .svc-price-desc{color:#9090B0}
+    html.light .svc-price-input{background:#fff;border-color:rgba(0,0,0,0.12);color:#0A0A1A}
+    html.light .csvc-card{background:#F4F6FF;border-color:rgba(0,0,0,0.08)}
   </style>
 </head>
 <body>
@@ -741,60 +753,126 @@
 
       <!-- ── Servicios ── -->
       <div class="panel" id="panel-servicios">
-        <div class="form-section-title" style="margin-top:0">🔧 Activar / desactivar servicios</div>
-        <p style="font-size:13px;color:#44445A;margin-bottom:24px;line-height:1.6">
-          El cambio de aceite siempre está activo. Activa los demás servicios cuando estés listo para ofrecerlos.
-        </p>
         <div id="svc-status" style="margin-bottom:16px"></div>
 
-        <div style="display:flex;flex-direction:column;gap:14px;max-width:480px">
-          <!-- Frenos -->
-          <div style="display:flex;align-items:center;justify-content:space-between;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px 20px">
-            <div style="display:flex;align-items:center;gap:12px">
-              <span style="font-size:24px">🛑</span>
-              <div>
-                <div style="font-size:14px;font-weight:700;color:#F4F4F8">Cambio de frenos</div>
-                <div style="font-size:12px;color:#44445A;margin-top:2px">Pastillas y discos</div>
-              </div>
-            </div>
-            <label style="position:relative;display:inline-block;width:46px;height:26px;cursor:pointer">
-              <input type="checkbox" id="svc-toggle-brakes" style="opacity:0;width:0;height:0" onchange="saveSvcSettings()">
-              <span id="svc-slider-brakes" style="position:absolute;inset:0;border-radius:13px;background:#2A2A3A;transition:background 0.2s ease;border:1px solid rgba(255,255,255,0.08)"></span>
-              <span id="svc-knob-brakes" style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#606078;transition:transform 0.2s ease,background 0.2s ease"></span>
-            </label>
+        <!-- ── Precios: cambio de aceite ── -->
+        <div class="form-section-title" style="margin-top:0">🛢️ Cambio de aceite — Precios</div>
+        <div style="display:flex;flex-direction:column;gap:10px;max-width:520px">
+          <div class="svc-price-card">
+            <div style="flex:1"><div class="svc-price-name">Convencional</div><div class="svc-price-desc">Aceite mineral estándar</div></div>
+            <div style="display:flex;align-items:center;gap:6px"><span class="svc-dollar">$</span><input type="number" id="price-oil-conv" class="svc-price-input" min="0" step="1" placeholder="65"></div>
           </div>
-          <!-- Llantas -->
-          <div style="display:flex;align-items:center;justify-content:space-between;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px 20px">
-            <div style="display:flex;align-items:center;gap:12px">
-              <span style="font-size:24px">🔧</span>
-              <div>
-                <div style="font-size:14px;font-weight:700;color:#F4F4F8">Cambio de llantas</div>
-                <div style="font-size:12px;color:#44445A;margin-top:2px">Montaje y balanceo</div>
-              </div>
-            </div>
-            <label style="position:relative;display:inline-block;width:46px;height:26px;cursor:pointer">
-              <input type="checkbox" id="svc-toggle-tires" style="opacity:0;width:0;height:0" onchange="saveSvcSettings()">
-              <span id="svc-slider-tires" style="position:absolute;inset:0;border-radius:13px;background:#2A2A3A;transition:background 0.2s ease;border:1px solid rgba(255,255,255,0.08)"></span>
-              <span id="svc-knob-tires" style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#606078;transition:transform 0.2s ease,background 0.2s ease"></span>
-            </label>
+          <div class="svc-price-card">
+            <div style="flex:1"><div class="svc-price-name">Semi-sintético</div><div class="svc-price-desc">Mezcla mineral y sintético</div></div>
+            <div style="display:flex;align-items:center;gap:6px"><span class="svc-dollar">$</span><input type="number" id="price-oil-semi" class="svc-price-input" min="0" step="1" placeholder="75"></div>
           </div>
-          <!-- Cristales -->
-          <div style="display:flex;align-items:center;justify-content:space-between;background:#18181F;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px 20px">
-            <div style="display:flex;align-items:center;gap:12px">
-              <span style="font-size:24px">🪟</span>
-              <div>
-                <div style="font-size:14px;font-weight:700;color:#F4F4F8">Cambio de cristales</div>
-                <div style="font-size:12px;color:#44445A;margin-top:2px">Parabrisas y ventanas</div>
-              </div>
-            </div>
-            <label style="position:relative;display:inline-block;width:46px;height:26px;cursor:pointer">
-              <input type="checkbox" id="svc-toggle-glass" style="opacity:0;width:0;height:0" onchange="saveSvcSettings()">
-              <span id="svc-slider-glass" style="position:absolute;inset:0;border-radius:13px;background:#2A2A3A;transition:background 0.2s ease;border:1px solid rgba(255,255,255,0.08)"></span>
-              <span id="svc-knob-glass" style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#606078;transition:transform 0.2s ease,background 0.2s ease"></span>
-            </label>
+          <div class="svc-price-card">
+            <div style="flex:1"><div class="svc-price-name">Sintético total</div><div class="svc-price-desc">Aceite 100% sintético premium</div></div>
+            <div style="display:flex;align-items:center;gap:6px"><span class="svc-dollar">$</span><input type="number" id="price-oil-sint" class="svc-price-input" min="0" step="1" placeholder="85"></div>
           </div>
         </div>
-        <p style="font-size:12px;color:#44445A;margin-top:20px">Los cambios se aplican de inmediato en la página de reservas.</p>
+        <div id="price-oil-ok" style="font-size:13px;color:#68D391;margin:8px 0;display:none"></div>
+        <button class="btn-primary-form" style="margin-top:10px;padding:10px 22px;font-size:13px" onclick="savePricesOil()">💾 Guardar precios de aceite</button>
+
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.05);margin:28px 0">
+
+        <!-- ── Servicios adicionales con toggle + precio ── -->
+        <div class="form-section-title" style="margin-top:0">🔧 Otros servicios — Activar y precio</div>
+        <div style="display:flex;flex-direction:column;gap:12px;max-width:520px">
+
+          <!-- Frenos -->
+          <div class="svc-price-card" style="flex-direction:column;align-items:stretch;gap:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:12px">
+                <span style="font-size:22px">🛑</span>
+                <div><div class="svc-price-name">Cambio de frenos</div><div class="svc-price-desc">Pastillas y discos</div></div>
+              </div>
+              <label style="position:relative;display:inline-block;width:46px;height:26px;cursor:pointer;flex-shrink:0">
+                <input type="checkbox" id="svc-toggle-brakes" style="opacity:0;width:0;height:0" onchange="saveSvcSettings()">
+                <span id="svc-slider-brakes" style="position:absolute;inset:0;border-radius:13px;background:#2A2A3A;transition:background 0.2s ease;border:1px solid rgba(255,255,255,0.08)"></span>
+                <span id="svc-knob-brakes" style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#606078;transition:transform 0.2s ease,background 0.2s ease"></span>
+              </label>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:12px;color:#8888A0;font-weight:600">Precio:</span>
+              <span class="svc-dollar">$</span>
+              <input type="number" id="price-brakes" class="svc-price-input" min="0" step="1" placeholder="0">
+              <button onclick="savePriceService('brakes')" class="btn-svc-save">Guardar</button>
+              <span id="price-brakes-ok" style="font-size:12px;color:#68D391;display:none">✓</span>
+            </div>
+          </div>
+
+          <!-- Llantas -->
+          <div class="svc-price-card" style="flex-direction:column;align-items:stretch;gap:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:12px">
+                <span style="font-size:22px">🔧</span>
+                <div><div class="svc-price-name">Cambio de llantas</div><div class="svc-price-desc">Montaje y balanceo</div></div>
+              </div>
+              <label style="position:relative;display:inline-block;width:46px;height:26px;cursor:pointer;flex-shrink:0">
+                <input type="checkbox" id="svc-toggle-tires" style="opacity:0;width:0;height:0" onchange="saveSvcSettings()">
+                <span id="svc-slider-tires" style="position:absolute;inset:0;border-radius:13px;background:#2A2A3A;transition:background 0.2s ease;border:1px solid rgba(255,255,255,0.08)"></span>
+                <span id="svc-knob-tires" style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#606078;transition:transform 0.2s ease,background 0.2s ease"></span>
+              </label>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:12px;color:#8888A0;font-weight:600">Precio:</span>
+              <span class="svc-dollar">$</span>
+              <input type="number" id="price-tires" class="svc-price-input" min="0" step="1" placeholder="0">
+              <button onclick="savePriceService('tires')" class="btn-svc-save">Guardar</button>
+              <span id="price-tires-ok" style="font-size:12px;color:#68D391;display:none">✓</span>
+            </div>
+          </div>
+
+          <!-- Cristales -->
+          <div class="svc-price-card" style="flex-direction:column;align-items:stretch;gap:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:12px">
+                <span style="font-size:22px">🪟</span>
+                <div><div class="svc-price-name">Cambio de cristales</div><div class="svc-price-desc">Parabrisas y ventanas</div></div>
+              </div>
+              <label style="position:relative;display:inline-block;width:46px;height:26px;cursor:pointer;flex-shrink:0">
+                <input type="checkbox" id="svc-toggle-glass" style="opacity:0;width:0;height:0" onchange="saveSvcSettings()">
+                <span id="svc-slider-glass" style="position:absolute;inset:0;border-radius:13px;background:#2A2A3A;transition:background 0.2s ease;border:1px solid rgba(255,255,255,0.08)"></span>
+                <span id="svc-knob-glass" style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#606078;transition:transform 0.2s ease,background 0.2s ease"></span>
+              </label>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:12px;color:#8888A0;font-weight:600">Precio:</span>
+              <span class="svc-dollar">$</span>
+              <input type="number" id="price-glass" class="svc-price-input" min="0" step="1" placeholder="0">
+              <button onclick="savePriceService('glass')" class="btn-svc-save">Guardar</button>
+              <span id="price-glass-ok" style="font-size:12px;color:#68D391;display:none">✓</span>
+            </div>
+          </div>
+
+        </div>
+
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.05);margin:28px 0">
+
+        <!-- ── Servicios personalizados ── -->
+        <div class="form-section-title" style="margin-top:0">✨ Servicios personalizados</div>
+        <div class="add-tech-box" style="margin-bottom:20px">
+          <div class="form-section-title" style="margin-top:0">Añadir nuevo servicio</div>
+          <div class="nf-row">
+            <div class="nf-group">
+              <label class="nf-label">Nombre *</label>
+              <input class="nf-field" id="csvc-name" type="text" placeholder="Ej. Cambio de filtro de aire">
+            </div>
+            <div class="nf-group">
+              <label class="nf-label">Precio ($)</label>
+              <input class="nf-field" id="csvc-price" type="number" min="0" step="1" placeholder="0">
+            </div>
+          </div>
+          <div class="nf-group" style="margin-bottom:0">
+            <label class="nf-label">Descripción (opcional)</label>
+            <input class="nf-field" id="csvc-desc" type="text" placeholder="Breve descripción del servicio">
+          </div>
+          <div id="csvc-error" style="font-size:13px;color:#FF8090;margin-top:10px;display:none"></div>
+          <button class="btn-add-tech" style="margin-top:14px" onclick="addCustomService()">+ Añadir servicio</button>
+        </div>
+        <div id="custom-services-list"></div>
+
       </div>
 
     </div>
@@ -888,7 +966,7 @@
       if(t==='techs')     loadTechs();
       if(t==='config')    { loadSendGridConfig(); loadCapacity(); }
       if(t==='pagos')     loadPayPalConfig();
-      if(t==='servicios') loadSvcSettings();
+      if(t==='servicios') { loadSvcSettings(); loadPrices(); loadCustomServices(); }
       if(t==='sms')       loadSmsSettings();
     }
 
@@ -1529,6 +1607,104 @@
         if (data.error) { errEl.textContent = data.error; errEl.style.display = 'block'; return; }
         closeTechPassModal();
       } catch { errEl.textContent = 'Error al guardar contraseña'; errEl.style.display = 'block'; }
+    }
+
+    // ── Prices & custom services ───────────────────────────────────────────────
+    async function loadPrices() {
+      try {
+        const d = await fetch('/api/admin/settings/prices').then(r => r.json());
+        if (d.oil_convencional) document.getElementById('price-oil-conv').value = d.oil_convencional;
+        if (d.oil_semi)         document.getElementById('price-oil-semi').value = d.oil_semi;
+        if (d.oil_sintetico)    document.getElementById('price-oil-sint').value = d.oil_sintetico;
+        if (d.brakes !== '')    document.getElementById('price-brakes').value   = d.brakes;
+        if (d.tires  !== '')    document.getElementById('price-tires').value    = d.tires;
+        if (d.glass  !== '')    document.getElementById('price-glass').value    = d.glass;
+      } catch(e) { console.error(e); }
+    }
+
+    async function savePricesOil() {
+      const okEl = document.getElementById('price-oil-ok');
+      okEl.style.display = 'none';
+      const body = {
+        oil_convencional: document.getElementById('price-oil-conv').value,
+        oil_semi:         document.getElementById('price-oil-semi').value,
+        oil_sintetico:    document.getElementById('price-oil-sint').value,
+      };
+      const r = await fetch('/api/admin/settings/prices', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+      });
+      if (r.ok) { okEl.textContent = '✓ Precios actualizados'; okEl.style.display = 'block'; setTimeout(() => okEl.style.display='none', 3000); }
+    }
+
+    async function savePriceService(key) {
+      const val = document.getElementById('price-' + key).value;
+      const okEl = document.getElementById('price-' + key + '-ok');
+      okEl.style.display = 'none';
+      const r = await fetch('/api/admin/settings/prices', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ [key]: val })
+      });
+      if (r.ok) { okEl.style.display = 'inline'; setTimeout(() => okEl.style.display='none', 2500); }
+    }
+
+    async function loadCustomServices() {
+      const wrap = document.getElementById('custom-services-list');
+      try {
+        const list = await fetch('/api/admin/custom-services').then(r => r.json());
+        if (!list.length) {
+          wrap.innerHTML = '<div class="empty" style="padding:24px 0"><div style="font-size:32px;text-align:center">✨</div><p style="color:#33334A;font-size:14px;text-align:center;margin-top:8px">No hay servicios personalizados aún</p></div>';
+          return;
+        }
+        wrap.innerHTML = list.map(s => `
+          <div class="csvc-card" id="csvc-${s.id}">
+            <div style="width:40px;height:40px;border-radius:10px;background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">✨</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:14px;font-weight:700;color:#F4F4F8">${esc(s.name)}</div>
+              ${s.description ? `<div style="font-size:12px;color:#44445A;margin-top:2px">${esc(s.description)}</div>` : ''}
+              <div style="font-size:13px;font-weight:800;color:#8B5CF6;margin-top:4px">$${s.price}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+              <label style="position:relative;display:inline-block;width:40px;height:22px;cursor:pointer" title="${s.active ? 'Activo' : 'Inactivo'}">
+                <input type="checkbox" ${s.active ? 'checked' : ''} style="opacity:0;width:0;height:0" onchange="toggleCustomService(${s.id},this.checked)">
+                <span style="position:absolute;inset:0;border-radius:11px;background:${s.active ? '#007bff' : '#2A2A3A'};transition:background 0.2s ease;border:1px solid rgba(255,255,255,0.08)"></span>
+                <span style="position:absolute;top:2px;left:${s.active ? '19px' : '2px'};width:18px;height:18px;border-radius:50%;background:${s.active ? '#fff' : '#606078'};transition:left 0.2s ease,background 0.2s ease"></span>
+              </label>
+              <button class="btn-del-tech" onclick="deleteCustomService(${s.id})">Eliminar</button>
+            </div>
+          </div>`).join('');
+      } catch(e) { wrap.innerHTML = '<p style="color:#007bff;font-size:13px">Error al cargar</p>'; }
+    }
+
+    async function addCustomService() {
+      const name  = document.getElementById('csvc-name').value.trim();
+      const price = document.getElementById('csvc-price').value;
+      const desc  = document.getElementById('csvc-desc').value.trim();
+      const errEl = document.getElementById('csvc-error');
+      errEl.style.display = 'none';
+      if (!name) { errEl.textContent = 'El nombre es requerido'; errEl.style.display = 'block'; return; }
+      const r = await fetch('/api/admin/custom-services', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, price: parseFloat(price)||0, description: desc })
+      });
+      const d = await r.json();
+      if (!r.ok) { errEl.textContent = d.error || 'Error'; errEl.style.display = 'block'; return; }
+      document.getElementById('csvc-name').value = '';
+      document.getElementById('csvc-price').value = '';
+      document.getElementById('csvc-desc').value = '';
+      loadCustomServices();
+    }
+
+    async function toggleCustomService(id, active) {
+      await fetch(`/api/admin/custom-services/${id}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ active })
+      });
+      loadCustomServices();
+    }
+
+    async function deleteCustomService(id) {
+      if (!confirm('¿Eliminar este servicio?')) return;
+      await fetch(`/api/admin/custom-services/${id}`, { method: 'DELETE' });
+      loadCustomServices();
     }
 
     // ── Capacity setting ───────────────────────────────────────────────────────
