@@ -983,7 +983,10 @@
           </div>
         </div>
 
-        <div id="map-stats"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+          <div id="map-stats" style="margin-bottom:0"></div>
+          <button onclick="seedTestAppointments()" id="map-seed-btn" style="padding:6px 14px;border-radius:8px;background:rgba(255,193,7,0.08);border:1px solid rgba(255,193,7,0.2);color:#ffc107;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:0.04em">🧪 Datos de prueba</button>
+        </div>
         <div style="position:relative">
           <div id="map-container"></div>
           <div id="map-loading" style="position:absolute;inset:0;background:rgba(9,9,11,0.75);display:flex;align-items:center;justify-content:center;z-index:500;border-radius:14px;flex-direction:column;gap:10px">
@@ -2069,9 +2072,13 @@
       if (!_mapInited) {
         _mapInited = true;
         _map = L.map('map-container').setView([39.95, -75.16], 11);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+          attribution: 'Tiles &copy; Esri &mdash; Esri, USDA, USGS, AEX, GeoEye',
           maxZoom: 19
+        }).addTo(_map);
+        // Labels overlay on top of satellite
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '', opacity: 0.35, maxZoom: 19
         }).addTo(_map);
         // Fix map size after tab shows
         setTimeout(() => _map.invalidateSize(), 100);
@@ -2178,6 +2185,18 @@
         <select class="map-popup-select" id="mpp-tech-${a.id}">${techOptions}</select>
         <button class="map-popup-btn" onclick="saveMapTech(${a.id})">Guardar técnico</button>
       </div>`;
+    }
+
+    async function seedTestAppointments() {
+      const btn = document.getElementById('map-seed-btn');
+      btn.disabled = true; btn.textContent = 'Creando…';
+      try {
+        const r = await fetch('/api/admin/seed-test', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+        const d = await r.json();
+        if (d.success) { btn.textContent = `✓ ${d.count} creadas`; await loadMapData(); }
+        else { btn.textContent = 'Error'; }
+      } catch { btn.textContent = 'Error'; }
+      setTimeout(() => { btn.disabled = false; btn.textContent = '🧪 Datos de prueba'; }, 3000);
     }
 
     async function saveMapTech(id) {

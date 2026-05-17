@@ -1029,6 +1029,34 @@ app.post('/api/guest/appointments', async (req, res) => {
   res.json({ success: true, id: r.lastInsertRowid });
 });
 
+// ─── Seed test data ───────────────────────────────────────────────────────────
+app.post('/api/admin/seed-test', requireAdmin, async (_req, res) => {
+  const today = new Date();
+  const fmtDate = (offset) => { const d = new Date(today); d.setDate(d.getDate()+offset); return d.toISOString().split('T')[0]; };
+  const testAppts = [
+    { name:'Carlos Méndez',    phone:'215-555-0101', vehicle:'Toyota Camry 2019',    oil_type:'Convencional',    date:fmtDate(0),  time:'9:00',  location:'1500 Market St, Philadelphia, PA 19102',       status:'pending',   payment_status:'pending' },
+    { name:'Ana García',       phone:'215-555-0102', vehicle:'Honda Civic 2021',     oil_type:'Semi-sintético',  date:fmtDate(0),  time:'10:30', location:'2000 Spruce St, Philadelphia, PA 19103',       status:'pending',   payment_status:'pending' },
+    { name:'Luis Torres',      phone:'215-555-0103', vehicle:'Ford F-150 2020',      oil_type:'Sintético total', date:fmtDate(1),  time:'8:00',  location:'1234 N Broad St, Philadelphia, PA 19121',      status:'pending',   payment_status:'pending' },
+    { name:'María López',      phone:'215-555-0104', vehicle:'Chevrolet Malibu 2018',oil_type:'Convencional',    date:fmtDate(1),  time:'11:00', location:'500 S 52nd St, Philadelphia, PA 19143',        status:'pending',   payment_status:'pending' },
+    { name:'Roberto Sánchez',  phone:'215-555-0105', vehicle:'Nissan Altima 2022',   oil_type:'Semi-sintético',  date:fmtDate(2),  time:'9:30',  location:'3456 Chestnut St, Philadelphia, PA 19104',     status:'completed', payment_status:'cash' },
+    { name:'Patricia Flores',  phone:'215-555-0106', vehicle:'Jeep Cherokee 2020',   oil_type:'Sintético total', date:fmtDate(2),  time:'14:00', location:'890 E Girard Ave, Philadelphia, PA 19125',     status:'pending',   payment_status:'pending' },
+    { name:'Juan Rodríguez',   phone:'856-555-0201', vehicle:'Hyundai Elantra 2021', oil_type:'Convencional',    date:fmtDate(0),  time:'13:00', location:'100 Main St, Newark, NJ 07102',                status:'pending',   payment_status:'pending' },
+    { name:'Sandra Martínez',  phone:'973-555-0202', vehicle:'BMW 3 Series 2019',    oil_type:'Sintético total', date:fmtDate(1),  time:'10:00', location:'500 Broad St, Newark, NJ 07102',               status:'completed', payment_status:'paid_online' },
+    { name:'Diego Hernández',  phone:'201-555-0203', vehicle:'Honda CR-V 2022',      oil_type:'Semi-sintético',  date:fmtDate(3),  time:'15:30', location:'200 Washington St, Hoboken, NJ 07030',         status:'pending',   payment_status:'pending' },
+    { name:'Carmen Reyes',     phone:'215-555-0107', vehicle:'Subaru Outback 2020',  oil_type:'Sintético total', date:fmtDate(4),  time:'8:30',  location:'4200 Baltimore Ave, Philadelphia, PA 19104',   status:'pending',   payment_status:'pending' },
+  ];
+  let count = 0;
+  for (const a of testAppts) {
+    await dbRun(
+      `INSERT INTO appointments (name, phone, vehicle, oil_type, date, time, location, status, payment_status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [a.name, a.phone, a.vehicle, a.oil_type, a.date, a.time, a.location, a.status, a.payment_status]
+    );
+    count++;
+  }
+  res.json({ success: true, count });
+});
+
 // ─── Cron: recordatorios 24h antes ───────────────────────────────────────────
 app.get('/api/cron/reminders', async (req, res) => {
   const secret = req.headers['authorization']?.replace('Bearer ','') || req.query.secret || '';
